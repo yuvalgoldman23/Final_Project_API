@@ -1,4 +1,6 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, url_for, redirect, session
+from authlib.integrations.flask_client import OAuth
+from auth import auth_required
 import requests
 
 app = Flask(__name__)
@@ -23,144 +25,88 @@ watchlists = {}
 # Dummy database for storing posts
 posts = {}
 
-
 # TODO add function to validate email format, password strength, etc
+
+# Configure OAuth
+oauth = OAuth(app)
+google = oauth.remote_app(
+    'google',
+    consumer_key='your_google_client_id',
+    consumer_secret='your_google_client_secret',
+    request_token_params={
+        'scope': 'email'
+    },
+    base_url='https://www.googleapis.com/oauth2/v1/',
+    request_token_url=None,
+    access_token_method='POST',
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+)
 
 
 # API endpoints
 
-@app.route('/api/users', methods=['POST'])
-def create_user():
-    data = request.json
 
-    # Basic input validation
-    if not all(key in data for key in ('username', 'email', 'password')):
-        return jsonify({"error": "Missing required fields"}), 400
-    # TODO add a check for username length - probably more fitting to do in the client
-    username = data['username']
-    email = data['email']
-    password = data['password']
-
-    # Check if username or email already exists
-    for user in users.values():
-        if user['username'] == username:
-            return jsonify({"error": "Username already exists"}), 409
-        if user['email'] == email:
-            return jsonify({"error": "Email already exists"}), 409
-
-    # Generate user ID
-    user_id = str(len(users) + 1)
-
-    # Create user object
-    new_user = {
-        "id": user_id,
-        "username": username,
-        "email": email,
-        "password": password  # Note: In a real application, password should be securely hashed before saving
-    }
-
-    # Save user to database
-    users[user_id] = new_user
-
-    return jsonify(new_user), 201
+@app.route('/')
+def index():
+    return 'Placeholder'
 
 
-@app.route('/api/users/<user_id>', methods=['GET'])
-def get_user(user_id):
-    user = users.get(user_id)
-    if user:
-        return jsonify(user)
-    else:
-        return jsonify({"error": "User not found"}), 404
+@app.route('/login/authorized')
+def authorized():
+    resp = google.authorized_response()
+    if resp is None or resp.get('access_token') is None:
+        return 'Access denied: reason={}, error={}'.format(
+            request.args['error_reason'],
+            request.args['error_description']
+        )
+
+    session['google_token'] = (resp['access_token'], '')
+    # Call your callback function here
+    return callback()
 
 
-@app.route('/api/users/<user_id>/details', methods=['PUT'])
-def update_user_details(user_id):
-    user = users.get(user_id)
-    if user:
-        update_data = request.json
-
-        # Check if 'username' is present in the update_data
-        if 'username' in update_data:
-            return jsonify({"error": "Username cannot be updated"}), 400
-
-        # Update other details
-        user.update(update_data)
-        users[user_id] = user
-        return jsonify(user)
-    else:
-        return jsonify({"error": "User not found"}), 404
-
-
-@app.route('/api/users/<user_id>', methods=['DELETE'])
-def delete_user(user_id):
-    if user_id in users:
-        del users[user_id]
-        return jsonify({"message": f"User with ID {user_id} has been deleted successfully."})
-    else:
-        return jsonify({"error": "User not found"}), 404
+# OAuth Callback Route
+@app.route('/callback')
+def callback():
+    token = session.get('google_token')
+    if not token:
+        return 'Access denied: Missing access token'
+    # Use the token to authenticate the user, extract user information, etc.
+    # Retrieve user information from AuthJS userinfo endpoint
+    user_info = google.get('userinfo').json()
+    user_id = user_info.get('sub')
+    user_name = user_info.get('name')
+    user_pic = user_info.get('picture')
+    # Authenticate the user and establish a session
+    # Return a json including redirection to the index, the authjs token, and some user info
+    return jsonify({'redirect_url': url_for('index'), 'token': token[0], 'user_id': user_id,
+                    'user_name': user_name, 'user_pic': user_pic})
 
 
-@app.route('/api/users', methods=['GET'])
-def list_users():
-    return jsonify(list(users.values()))
+# Login Route - Redirect to AuthJS Authorization Endpoint
+@app.route('/login')
+def login():
+    # Upon authorization, redirect to callback so the needed details are then transferred back to the client
+    return oauth.authorize(callback=url_for('authorized', _external=True))
 
 
-@app.route('/api/login', methods=['POST'])
-def user_login():
-    credentials = request.json
-    for user in users.values():
-        if user['email'] == credentials['email'] and user['password'] == credentials['password']:
-            return jsonify({"token": "dummy_token"}), 200
-    return jsonify({"error": "Invalid credentials"}), 401
-
-
-@app.route('/api/forgot-password', methods=['POST'])
-def forgot_password():
-    email = request.json.get('email')
-    # Logic for sending password reset email
-    return jsonify({"message": "Password reset email sent successfully."}), 200
-
-
-@app.route('/api/reset-password', methods=['POST'])
-def reset_password():
-    reset_data = request.json
-    # Logic for resetting password
-    return jsonify({"message": "Password reset successful."}), 200
-
-
-@app.route('/api/users/<user_id>/details', methods=['GET'])
-def get_user_details(user_id):
-    user = users.get(user_id)
-    if user:
-        return jsonify(user)
-    else:
-        return jsonify({"error": "User not found"}), 404
-
-
-@app.route('/api/users/<user_id>/details', methods=['PUT'])
-def update_user_details(user_id):
-    user = users.get(user_id)
-    if user:
-        update_data = request.json
-        user.update(update_data)
-        users[user_id] = user
-        return jsonify(user)
-    else:
-        return jsonify({"error": "User not found"}), 404
+@app.route('/logout')
+def logout():
+    # Clear the session data to log out the user
+    session.clear()
+    return jsonify({'message': 'Logged out successfully'})
 
 
 @app.route('/api/watchlists', methods=['POST'])
+@auth_required
 def create_watchlist():
     data = request.json
     # Basic input validation
     if 'user_id' not in data:
         return jsonify({"error": "Missing user_id field"}), 400
-    if 'token' not in data:
-        return jsonify({"error": "Missing token field"}), 400
     # TODO - limit the number of watchlists per user???
     user_id = data['user_id']
-    token = data['token']
     # TODO add a check for name length? probably more fitting to do in the client
     name = data.get('name', 'Untitled Watchlist')
     description = data.get('description', '')
@@ -168,10 +114,8 @@ def create_watchlist():
     user = users.get(user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
-    # TODO check user token - add usage of OAuth here
     # Generate watchlist ID
     watchlist_id = str(len(watchlists) + 1)
-
     # Create watchlist object
     new_watchlist = {
         "id": watchlist_id,
@@ -193,12 +137,11 @@ def create_watchlist():
 
 
 @app.route('/api/watchlists/<watchlist_id>', methods=['GET'])
+@auth_required
 def get_watchlist(watchlist_id):
     watchlist = watchlists.get(watchlist_id)
     data = request.json
-    if 'token' not in data:
-        return jsonify({"error": "Missing token field"}), 400
-    token = data['token']
+    # TODO - should watchlists be public? if so, no token or auth required....
     # TODO add token check
     if watchlist:
         return jsonify(watchlist)
@@ -210,12 +153,11 @@ def get_watchlist(watchlist_id):
 
 
 @app.route('/api/users/<user_id>/watchlists', methods=['GET'])
+@auth_required
 def get_user_watchlists(user_id):
     data = request.json
-    if 'token' not in data:
-        return jsonify({"error": "Missing token field"}), 400
+    # Check that the user actually exists...
     user = users.get(user_id)
-    # TODO add token check for user
     if user:
         user_watchlist_ids = user.get('watchlists', [])
         user_watchlists = [watchlists[watchlist_id] for watchlist_id in user_watchlist_ids]
@@ -228,12 +170,9 @@ def get_user_watchlists(user_id):
 
 
 @app.route('/api/watchlists/<watchlist_id>', methods=['DELETE'])
+@auth_required
 def delete_user_watchlist(watchlist_id):
-    data = request.json
-    if 'token' not in data:
-        return jsonify({"error": "Missing token field"}), 400
     watchlist = watchlists.get(watchlist_id)
-    # TODO add step to check token validity compared to user_id
     if watchlist:
         # Remove watchlist from watchlists DB
         del watchlists[watchlist_id]
@@ -249,11 +188,9 @@ def delete_user_watchlist(watchlist_id):
 
 
 @app.route('api/watchlists/<watchlist_id', method=['PUT'])
+@auth_required
 def update_watchlist(watchlist_id):
     data = request.json
-    if 'token' not in data:
-        return jsonify({"error": "Missing token field"}), 400
-    # TODO add step to check token validity compared to user_id in the watchlist
     watchlist = watchlists.get(watchlist_id)
     if watchlist:
         data = request.json
@@ -280,12 +217,10 @@ def update_watchlist(watchlist_id):
 
 
 @app.route('/api/watchlists/<watchlist_id>/movies/<movie_id>', methods=['DELETE'])
+@auth_required
 def delete_movie_from_watchlist(watchlist_id, movie_id):
     data = request.json
-    if 'token' not in data:
-        return jsonify({"error": "Missing token field"}), 400
     watchlist = watchlists.get(watchlist_id)
-    # TODO add validation of token compared to the user_id in the watchlist
     if not watchlist:
         return jsonify({"error": "Watchlist not found"}), 404
     # Check if movie exists in the watchlist
@@ -301,24 +236,18 @@ def delete_movie_from_watchlist(watchlist_id, movie_id):
 
 
 @app.route('/api/posts', methods=['POST'])
+@auth_required
 def create_post():
     data = request.json
-
     # Basic input validation
     if not all(key in data for key in ('text', 'user_id', 'token')):
         return jsonify({"error": "Missing required fields"}), 400
-
-    # Validate user token (mocked validation for demonstration)
-    if not validate_token(data['user_id'], data['token']):
-        return jsonify({"error": "Invalid user token"}), 401
-
     # Create post object
     new_post = {
         "text": data['text'],
         "mentioned_user_id": data.get('mentioned_user_id'),
         "user_id": data['user_id']
     }
-
     # Save post to database or perform further actions
     # For demonstration, just append to posts list
     posts.append(new_post)
@@ -388,9 +317,7 @@ def get_streaming_providers():
         return jsonify({"error": str(e)}), 500
 
 
-def validate_token(user_id, token):
-    # Dummy token validation (replace with actual implementation)
-    return True  # Always validate for demonstration purposes
+# TODO - add an endpoint that returns the logo of a streaming provider?
 
 
 if __name__ == '__main__':
