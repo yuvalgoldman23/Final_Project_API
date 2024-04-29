@@ -31,6 +31,8 @@ posts = {}
 
 # TODO add function to validate email format, password strength, etc
 
+# TODO - the following is probably redundant, and belongs in the client only
+'''
 # OAuth Implementation
 
 app.config['SECRET_KEY'] = 'top secret!'
@@ -128,22 +130,20 @@ def oauth2_authorize():
 
     # redirect the user to the Google OAuth2 provider authorization URL
     return redirect(app.config['GOOGLE_AUTHORIZE_URL'] + '?' + qs)
+'''
 
 
 @app.route('/api/watchlists', methods=['POST'])
 @auth_required
-def create_watchlist():
+def create_watchlist(token_info):
     data = request.json
     # Basic input validation
-    if 'user_id' not in data:
-        return jsonify({"error": "Missing user_id field"}), 400
-    # TODO - limit the number of watchlists per user???
-    user_id = data['user_id']
+    token_user_id = token_info.get('sub')
     # TODO add a check for name length? probably more fitting to do in the client
     name = data.get('name', 'Untitled Watchlist')
     description = data.get('description', '')
     # Check if user exists
-    user = users.get(user_id)
+    user = users.get(token_user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
     # Generate watchlist ID
@@ -151,7 +151,7 @@ def create_watchlist():
     # Create watchlist object
     new_watchlist = {
         "id": watchlist_id,
-        "user_id": user_id,
+        "user_id": token_user_id,
         "name": name,
         "description": description,
         "movies": []
@@ -163,18 +163,16 @@ def create_watchlist():
     #  currently we have a watchlists DB, and each user has a field with their watchlists ids
     # Update user's watchlist IDs
     user.setdefault('watchlists', []).append(watchlist_id)
-    users[user_id] = user
+    users[token_user_id] = user
 
     return jsonify(new_watchlist), 201
 
 
 @app.route('/api/watchlists/<watchlist_id>', methods=['GET'])
-# @auth_required
-def get_watchlist(watchlist_id):
+@auth_required
+def get_watchlist(token_info, watchlist_id):
     watchlist = watchlists.get(watchlist_id)
-    data = request.json
     # TODO - should watchlists be public? if so, no token or auth required....
-    # TODO add token check
     if watchlist:
         return jsonify(watchlist)
     else:
@@ -185,11 +183,15 @@ def get_watchlist(watchlist_id):
 
 
 @app.route('/api/users/<user_id>/watchlists', methods=['GET'])
-# @auth_required
-def get_user_watchlists(user_id):
+@auth_required
+def get_user_watchlists(token_info, user_id):
     data = request.json
     # Check that the user actually exists...
     user = users.get(user_id)
+    token_user_id = token_info.get('sub')
+    # Check that the user_id provided actually belongs to the logged in user
+    if token_user_id != user_id:
+        return jsonify({'error': 'User not authorized to perform this action'}), 400
     if user:
         user_watchlist_ids = user.get('watchlists', [])
         user_watchlists = [watchlists[watchlist_id] for watchlist_id in user_watchlist_ids]
@@ -202,14 +204,17 @@ def get_user_watchlists(user_id):
 
 
 @app.route('/api/watchlists/<watchlist_id>', methods=['DELETE'])
-# @auth_required
-def delete_user_watchlist(watchlist_id):
+@auth_required
+def delete_user_watchlist(token_info, watchlist_id):
     watchlist = watchlists.get(watchlist_id)
+    user_id = watchlist['user_id']
+    token_user_id = token_info.get('sub')
+    if token_user_id != user_id:
+        return jsonify({'error': "User not authorized to perform this action"}), 400
     if watchlist:
         # Remove watchlist from watchlists DB
         del watchlists[watchlist_id]
         # Remove watchlist from user's list
-        user_id = watchlist['user_id']
         user = users.get(user_id)
         if user and 'watchlists' in user:
             user['watchlists'].remove(watchlist_id)
@@ -220,11 +225,15 @@ def delete_user_watchlist(watchlist_id):
 
 
 @app.route('/api/watchlists/<watchlist_id>', methods=['PUT'])
-# @auth_required
-def update_watchlist(watchlist_id):
-    data = request.json
+@auth_required
+def update_watchlist(token_info, watchlist_id):
     watchlist = watchlists.get(watchlist_id)
     if watchlist:
+        user_id = watchlist['user_id']
+        token_user_id = token_info.get('sub')
+        # Make sure that the watchlist belongs to the currently logged-in user
+        if token_user_id != user_id:
+            return jsonify({'error': f"the watchlist does not belong to the currently logged-in user"}), 400
         data = request.json
         if 'name' in data:
             # Update name
@@ -249,13 +258,17 @@ def update_watchlist(watchlist_id):
 
 
 @app.route('/api/watchlists/<watchlist_id>/movies/<movie_id>', methods=['DELETE'])
-# @auth_required
-def delete_movie_from_watchlist(watchlist_id, movie_id):
-    data = request.json
+@auth_required
+def delete_movie_from_watchlist(token_info, watchlist_id, movie_id):
     watchlist = watchlists.get(watchlist_id)
     if not watchlist:
         return jsonify({"error": "Watchlist not found"}), 404
     # Check if movie exists in the watchlist
+    user_id = watchlist['user_id']
+    token_user_id = token_info.get('sub')
+    # Make sure that the watchlist belongs to the currently logged-in user
+    if token_user_id != user_id:
+        return jsonify({'error': f"the watchlist does not belong to the currently logged-in user"}), 400
     for movie in watchlist['movies']:
         if movie['id'] == movie_id:
             # Delete the movie from the watchlist
@@ -268,17 +281,18 @@ def delete_movie_from_watchlist(watchlist_id, movie_id):
 
 
 @app.route('/api/posts', methods=['POST'])
-# @auth_required
-def create_post():
+@auth_required
+def create_post(token_info):
     data = request.json
+    user_id = token_info.get('sub')
     # Basic input validation
-    if not all(key in data for key in ('text', 'user_id', 'token')):
+    if 'text' not in data or 'mentioned_id' not in data:
         return jsonify({"error": "Missing required fields"}), 400
     # Create post object
     new_post = {
         "text": data['text'],
-        "mentioned_user_id": data.get('mentioned_user_id'),
-        "user_id": data['user_id']
+        "mentioned_id": data.get['mentioned_id'],
+        "user_id": user_id
     }
     # Save post to database or perform further actions
     # For demonstration, just append to posts list
