@@ -1,23 +1,32 @@
 from functools import wraps
-from flask import request, jsonify
-from basic_server_user_api import google
+import jwt
+from flask import request, jsonify, Flask
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your_secret_key'
 
 
+# Decorator to protect API endpoints
 def auth_required(f):
     @wraps(f)
-    def decorated_function(*args, **kwargs):
-        token = request.headers.get('Authorization')
-        if not token:
-            return jsonify({"error": "Token is missing"}), 401
-        # Assuming AuthJS validates the token and returns the user_id if valid, None otherwise
-        # TODO find out how to perform this validation and access of user_id
-        user_id = google.validate_token(token)
-        if not user_id:
-            return jsonify({"error": "Invalid token"}), 401
-        # Check if the user_id from the token matches the user_id from the route
-        if str(user_id) != str(kwargs['user_id']):
-            return jsonify({"error": "Token does not match user_id"}), 401
-        # If token is valid and matches the user_id, continue with the request
-        return f(*args, **kwargs)
+    def decorated(*args, **kwargs):
+        token = None
 
-    return decorated_function
+        # Check if the request contains an access token in the Authorization header
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization']
+
+        if not token:
+            return jsonify({'message': 'Token is missing'}), 401
+
+        try:
+            # Decode and verify the access token
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            current_user = data['user']  # Extract user information from the token
+        except:
+            return jsonify({'message': 'Token is invalid'}), 401
+
+        # Pass the current user to the protected endpoint
+        return f(current_user, *args, **kwargs)
+
+    return decorated

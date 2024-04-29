@@ -1,7 +1,11 @@
-from flask import Flask, request, jsonify, url_for, redirect, session
-from authlib.integrations.flask_client import OAuth
+from flask import Flask, request, jsonify, url_for, redirect, session, abort
+from urllib.parse import urlencode
+from dotenv import load_dotenv
 from auth import auth_required
+import jwt
 import requests
+import os
+import secrets
 
 app = Flask(__name__)
 
@@ -27,75 +31,103 @@ posts = {}
 
 # TODO add function to validate email format, password strength, etc
 
-# Configure OAuth
-oauth = OAuth(app)
-google = oauth.remote_app(
-    'google',
-    consumer_key='your_google_client_id',
-    consumer_secret='your_google_client_secret',
-    request_token_params={
-        'scope': 'email'
-    },
-    base_url='https://www.googleapis.com/oauth2/v1/',
-    request_token_url=None,
-    access_token_method='POST',
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-)
+# OAuth Implementation
+
+app.config['SECRET_KEY'] = 'top secret!'
+app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
+app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
+app.config['GOOGLE_AUTHORIZE_URL'] = 'https://accounts.google.com/o/oauth2/auth'
+app.config['GOOGLE_TOKEN_URL'] = 'https://oauth2.googleapis.com/token'
+app.config['GOOGLE_USERINFO_URL'] = 'https://www.googleapis.com/oauth2/v3/userinfo'
+app.config['GOOGLE_SCOPES'] = ['https://www.googleapis.com/auth/userinfo.email',
+                               'https://www.googleapis.com/auth/userinfo.profile']
 
 
-# API endpoints
+@app.route("/")
+def home():
+    return redirect(url_for('oauth2_authorize'))
 
 
-@app.route('/')
-def index():
-    return 'Placeholder'
-
-
-@app.route('/login/authorized')
-def authorized():
-    resp = google.authorized_response()
-    if resp is None or resp.get('access_token') is None:
-        return 'Access denied: reason={}, error={}'.format(
-            request.args['error_reason'],
-            request.args['error_description']
-        )
-
-    session['google_token'] = (resp['access_token'], '')
-    # Call your callback function here
-    return callback()
-
-
-# OAuth Callback Route
-@app.route('/callback')
+@app.route("/callback")
 def callback():
-    token = session.get('google_token')
-    if not token:
-        return 'Access denied: Missing access token'
-    # Use the token to authenticate the user, extract user information, etc.
-    # Retrieve user information from AuthJS userinfo endpoint
-    user_info = google.get('userinfo').json()
-    user_id = user_info.get('sub')
-    user_name = user_info.get('name')
-    user_pic = user_info.get('picture')
-    # Authenticate the user and establish a session
-    # Return a json including redirection to the index, the authjs token, and some user info
-    return jsonify({'redirect_url': url_for('index'), 'token': token[0], 'user_id': user_id,
-                    'user_name': user_name, 'user_pic': user_pic})
+    provider_data = {
+        'client_id': app.config['GOOGLE_CLIENT_ID'],
+        'client_secret': app.config['GOOGLE_CLIENT_SECRET'],
+        'token_url': app.config['GOOGLE_TOKEN_URL'],
+        'userinfo': {
+            'url': app.config['GOOGLE_USERINFO_URL'],
+            'name': lambda json: json['name'],
+            'email': lambda json: json['email'],
+            'user_id': lambda json: json['sub'],
+        },
+    }
+
+    # Make sure that the state parameter matches the one we created in the authorization request
+    if request.args['state'] != session.get('oauth2_state'):
+        abort(401)
+
+    # Make sure that the authorization code is present
+    if 'code' not in request.args:
+        abort(401)
+
+    # Exchange the authorization code for an access token
+    response = requests.post(provider_data['token_url'], data={
+        'client_id': provider_data['client_id'],
+        'client_secret': provider_data['client_secret'],
+        'code': request.args['code'],
+        'grant_type': 'authorization_code',
+        'redirect_uri': url_for('callback', _external=True),
+    }, headers={'Accept': 'application/json'})
+
+    if response.status_code != 200:
+        abort(401)
+
+    oauth2_token = response.json().get('access_token')
+    if not oauth2_token:
+        abort(401)
+
+    # Use the access token to get the user's email address
+    response = requests.get(provider_data['userinfo']['url'], headers={
+        'Authorization': 'Bearer ' + oauth2_token,
+        'Accept': 'application/json',
+    })
+
+    if response.status_code != 200:
+        abort(401)
+
+    user_info = {
+        'name': provider_data['userinfo']['name'](response.json()),
+        'email': provider_data['userinfo']['email'](response.json()),
+        'user_id': provider_data['userinfo']['user_id'](response.json())
+    }
+
+    # TODO add a check if the user already exists in our DB
+    # TODO if exists, retrieve the user's content and send to client
+    # TODO if user doesn't exist, create a new DB entry with the user's info
+
+    # Perform actions if valid
+    if user_info['name'] and user_info['email'] and user_info['user_id']:
+        return jsonify(user_info)
+    else:
+        return "Failed to fetch user information"
 
 
-# Login Route - Redirect to AuthJS Authorization Endpoint
-@app.route('/login')
-def login():
-    # Upon authorization, redirect to callback so the needed details are then transferred back to the client
-    return oauth.authorize(callback=url_for('authorized', _external=True))
+@app.route('/authorize')
+def oauth2_authorize():
+    # generate a random string for the state parameter
+    session['oauth2_state'] = secrets.token_urlsafe(16)
 
+    # create a query string with all the OAuth2 parameters
+    qs = urlencode({
+        'client_id': app.config['GOOGLE_CLIENT_ID'],
+        'redirect_uri': url_for('callback', _external=True),
+        'response_type': 'code',
+        'scope': ' '.join(app.config['GOOGLE_SCOPES']),
+        'state': session['oauth2_state'],
+    })
 
-@app.route('/logout')
-def logout():
-    # Clear the session data to log out the user
-    session.clear()
-    return jsonify({'message': 'Logged out successfully'})
+    # redirect the user to the Google OAuth2 provider authorization URL
+    return redirect(app.config['GOOGLE_AUTHORIZE_URL'] + '?' + qs)
 
 
 @app.route('/api/watchlists', methods=['POST'])
@@ -137,7 +169,7 @@ def create_watchlist():
 
 
 @app.route('/api/watchlists/<watchlist_id>', methods=['GET'])
-@auth_required
+# @auth_required
 def get_watchlist(watchlist_id):
     watchlist = watchlists.get(watchlist_id)
     data = request.json
@@ -153,7 +185,7 @@ def get_watchlist(watchlist_id):
 
 
 @app.route('/api/users/<user_id>/watchlists', methods=['GET'])
-@auth_required
+# @auth_required
 def get_user_watchlists(user_id):
     data = request.json
     # Check that the user actually exists...
@@ -170,7 +202,7 @@ def get_user_watchlists(user_id):
 
 
 @app.route('/api/watchlists/<watchlist_id>', methods=['DELETE'])
-@auth_required
+# @auth_required
 def delete_user_watchlist(watchlist_id):
     watchlist = watchlists.get(watchlist_id)
     if watchlist:
@@ -187,8 +219,8 @@ def delete_user_watchlist(watchlist_id):
             return jsonify({"error": f"Watchlist not found"}), 404
 
 
-@app.route('api/watchlists/<watchlist_id', method=['PUT'])
-@auth_required
+@app.route('/api/watchlists/<watchlist_id>', methods=['PUT'])
+# @auth_required
 def update_watchlist(watchlist_id):
     data = request.json
     watchlist = watchlists.get(watchlist_id)
@@ -217,7 +249,7 @@ def update_watchlist(watchlist_id):
 
 
 @app.route('/api/watchlists/<watchlist_id>/movies/<movie_id>', methods=['DELETE'])
-@auth_required
+# @auth_required
 def delete_movie_from_watchlist(watchlist_id, movie_id):
     data = request.json
     watchlist = watchlists.get(watchlist_id)
@@ -236,7 +268,7 @@ def delete_movie_from_watchlist(watchlist_id, movie_id):
 
 
 @app.route('/api/posts', methods=['POST'])
-@auth_required
+# @auth_required
 def create_post():
     data = request.json
     # Basic input validation
