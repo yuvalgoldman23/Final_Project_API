@@ -1,93 +1,142 @@
-**README - Server Program**
+# Flask API README
 
-This server program provides an API for managing users, watchlists, posts, and retrieving streaming providers. Below are instructions on how to run the server and how to use its API.
+This Flask API provides endpoints for managing user watchlists, creating posts, fetching posts, and retrieving streaming providers, all while performing authorization of client requests via Google OAuth.
 
-**Running the Server:**
-1. Ensure you have Python installed on your system. If not, download and install it from [python.org](https://www.python.org/).
-2. Install Flask, a Python web framework, by running `pip install Flask` in your terminal or command prompt.
-3. Copy the provided server code into a Python file, for example, `server.py`.
-4. Open a terminal or command prompt in the directory containing `server.py`.
-5. Run the server by executing the command `python server.py`.
+## Installation
 
-**Using the API:**
-- **Create User:**
-  - Endpoint: `POST /api/users`
-  - Request Body: JSON object containing `username`, `email`, and `password`.
-  - Example: `{"username": "john_doe", "email": "john.doe@example.com", "password": "your_password"}`
-  
-- **Get User Details:**
-  - Endpoint: `GET /api/users/<user_id>`
-  - Example: `GET /api/users/1`
+To run this API, make sure you have Python installed on your system. Clone the repository and install the dependencies using the `requirements.txt` file:
 
-- **Update User Details:**
-  - Endpoint: `PUT /api/users/<user_id>/details`
-  - Request Body: JSON object containing fields to be updated.
-  - Example: `PUT /api/users/1/details`
-  
-- **Delete User:**
-  - Endpoint: `DELETE /api/users/<user_id>`
-  - Example: `DELETE /api/users/1`
+```bash
+git clone https://github.com/yuvalgoldman23/Final_Project_API.git
+cd Final_Project_API
+pip install -r requ.txt
+```
 
-- **User Login:**
-  - Endpoint: `POST /api/login`
-  - Request Body: JSON object containing `email` and `password`.
-  - Example: `{"email": "john.doe@example.com", "password": "your_password"}`
+## Usage
 
-- **Forgot Password:**
-  - Endpoint: `POST /api/forgot-password`
-  - Request Body: JSON object containing `email`.
-  - Example: `{"email": "john.doe@example.com"}`
+To start the Flask server, run the following command:
 
-- **Reset Password:**
-  - Endpoint: `POST /api/reset-password`
-  - Request Body: JSON object containing `email` and `new_password`.
-  - Example: `{"email": "john.doe@example.com", "new_password": "new_password"}`
+```bash
+python app.py
+```
 
-- **Create Watchlist:**
-  - Endpoint: `POST /api/watchlists`
-  - Request Body: JSON object containing `user_id`, `token`, `name`, and `description`.
-  - Example: `{"user_id": "1", "token": "dummy_token", "name": "My Watchlist", "description": "Favorite movies"}`
+By default, the server will run on `http://127.0.0.1:5000/`.
 
-- **Get Watchlist:**
-  - Endpoint: `GET /api/watchlists/<watchlist_id>`
-  - Example: `GET /api/watchlists/1`
+## Endpoints
 
-- **Get User's Watchlists:**
-  - Endpoint: `GET /api/users/<user_id>/watchlists`
-  - Example: `GET /api/users/1/watchlists`
+### 1. Create Watchlist
 
-- **Delete Watchlist:**
-  - Endpoint: `DELETE /api/watchlists/<watchlist_id>`
-  - Example: `DELETE /api/watchlists/1`
+- **URL:** `/api/watchlists`
+- **Method:** `POST`
+- **Description:** Creates a new watchlist for the authenticated user.
+- **Parameters:**
+  - `name`: (Optional) Name of the watchlist (default: "Untitled Watchlist").
+  - `description`: (Optional) Description of the watchlist.
+- **Authorization:** Token-based authentication required.
+- **Response:** Returns the newly created watchlist object with status code `201 Created`.
 
-- **Update Watchlist:**
-  - Endpoint: `PUT /api/watchlists/<watchlist_id>`
-  - Request Body: JSON object containing fields to be updated.
-  - Example: `PUT /api/watchlists/1`
+### 2. Get Watchlist
 
-- **Delete Movie from Watchlist:**
-  - Endpoint: `DELETE /api/watchlists/<watchlist_id>/movies/<movie_id>`
-  - Example: `DELETE /api/watchlists/1/movies/123`
+- **URL:** `/api/watchlists/<watchlist_id>`
+- **Method:** `GET`
+- **Description:** Retrieves details of a specific watchlist.
+- **Parameters:**
+  - `watchlist_id`: ID of the watchlist to retrieve.
+- **Authorization:** Token-based authentication required.
+- **Response:** Returns the watchlist object if found, else returns an error with status code `404 Not Found`.
 
-- **Create Post:**
-  - Endpoint: `POST /api/posts`
-  - Request Body: JSON object containing `text`, `user_id`, and `token`.
-  - Example: `{"text": "Hello, world!", "user_id": "1", "token": "dummy_token"}`
+### 3. Get User's Watchlists
 
-- **Load Last 20 Posts:**
-  - Endpoint: `GET /api/posts`
+- **URL:** `/api/users/<user_id>/watchlists`
+- **Method:** `GET`
+- **Description:** Retrieves all watchlists of a specific user.
+- **Parameters:**
+  - `user_id`: ID of the user whose watchlists to retrieve.
+- **Authorization:** Token-based authentication required.
+- **Response:** Returns an array of watchlist objects belonging to the specified user.
 
-- **Get Mentioned Content ID:**
-  - Endpoint: `GET /api/posts/<post_id>/mention`
-  - Example: `GET /api/posts/1/mention`
+### 4. Delete Watchlist
 
-- **Get Posts Mentioning Content ID:**
-  - Endpoint: `GET /api/posts/mentions/<content_id>`
-  - Example: `GET /api/posts/mentions/movie_123`
+- **URL:** `/api/watchlists/<watchlist_id>`
+- **Method:** `DELETE`
+- **Description:** Deletes a specific watchlist.
+- **Parameters:**
+  - `watchlist_id`: ID of the watchlist to delete.
+- **Authorization:** Token-based authentication required.
+- **Response:** Returns a success message if the watchlist is deleted successfully.
 
-- **Get Streaming Providers:**
-  - Endpoint: `GET /api/streaming-providers`
-  - Query Parameters: `content_id`, `territory`, and `content_type`.
-  - Example: `GET /api/streaming-providers?content_id=123&territory=US&content_type=movie`
+### 5. Update Watchlist
 
-**Note:** Ensure to replace placeholder values like `dummy_token`, `YOUR_TMDB_API_KEY`, etc., with actual values and implement necessary security measures before deploying this server in a production environment.
+- **URL:** `/api/watchlists/<watchlist_id>`
+- **Method:** `PUT`
+- **Description:** Updates details of a specific watchlist.
+- **Parameters:**
+  - `watchlist_id`: ID of the watchlist to update.
+  - `name`: (Optional) New name for the watchlist.
+  - `description`: (Optional) New description for the watchlist.
+  - `movie_id`: (Optional) ID of the movie to add to the watchlist.
+- **Authorization:** Token-based authentication required.
+- **Response:** Returns the updated watchlist object.
+
+### 6. Delete Movie from Watchlist
+
+- **URL:** `/api/watchlists/<watchlist_id>/movies/<movie_id>`
+- **Method:** `DELETE`
+- **Description:** Removes a specific movie from the specified watchlist.
+- **Parameters:**
+  - `watchlist_id`: ID of the watchlist from which to remove the movie.
+  - `movie_id`: ID of the movie to remove from the watchlist.
+- **Authorization:** Token-based authentication required.
+- **Response:** Returns a success message if the movie is deleted from the watchlist.
+
+### 7. Create Post
+
+- **URL:** `/api/posts`
+- **Method:** `POST`
+- **Description:** Creates a new post with optional mentioned content ID.
+- **Parameters:**
+  - `text`: Text content of the post.
+  - `mentioned_id`: (Optional) ID of the mentioned content.
+- **Authorization:** Token-based authentication required.
+- **Response:** Returns the newly created post object.
+
+### 8. Load Last 20 Posts
+
+- **URL:** `/api/posts`
+- **Method:** `GET`
+- **Description:** Retrieves the last 20 posts.
+- **Authorization:** Not required.
+- **Response:** Returns an array of the last 20 posts.
+
+### 9. Get Mentioned Content ID
+
+- **URL:** `/api/posts/<post_id>/mention`
+- **Method:** `GET`
+- **Description:** Retrieves the mentioned content ID from a specific post.
+- **Parameters:**
+  - `post_id`: ID of the post to retrieve the mentioned content ID from.
+- **Authorization:** Not required.
+- **Response:** Returns the mentioned content ID.
+
+### 10. Get Last 20 Posts Mentioning Content ID
+
+- **URL:** `/api/posts/mentions/<content_id>`
+- **Method:** `GET`
+- **Description:** Retrieves the last 20 posts mentioning a specific content ID.
+- **Parameters:**
+  - `content_id`: ID of the content being mentioned.
+- **Authorization:** Not required.
+- **Response:** Returns an array of the last 20 posts mentioning the specified content ID.
+
+### 11. Get Streaming Providers
+
+- **URL:** `/api/streaming-providers`
+- **Method:** `GET`
+- **Description:** Retrieves streaming providers for a specific content ID and territory.
+- **Parameters:**
+  - `content_id`: ID of the content.
+  - `territory`: Territory code for streaming availability.
+  - `content_type`: Type of content ('tv' or 'movie').
+- **Authorization:** Not required.
+- **Response:** Returns an array of streaming provider names.
+- **Note:** this endpoint requires a TMDB API key. Replace the dummy key before usage.
