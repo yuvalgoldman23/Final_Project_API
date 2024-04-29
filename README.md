@@ -1,93 +1,120 @@
 **README - Server Program**
 
-This server program provides an API for managing users, watchlists, posts, and retrieving streaming providers. Below are instructions on how to run the server and how to use its API.
+This server program provides an API for managing watchlists, posts, and retrieving streaming providers. Below are instructions on how to run the server and how to use its API.
+Users are required to authenticate via Google OAuth2. To initiate the authentication flow, access /authorize endpoint. Upon successful authentication, users are redirected to /callback
 
-**Running the Server:**
-1. Ensure you have Python installed on your system. If not, download and install it from [python.org](https://www.python.org/).
-2. Install Flask, a Python web framework, by running `pip install Flask` in your terminal or command prompt.
-3. Copy the provided server code into a Python file, for example, `server.py`.
-4. Open a terminal or command prompt in the directory containing `server.py`.
-5. Run the server by executing the command `python server.py`.
+## Installation
 
-**Using the API:**
-- **Create User:**
-  - Endpoint: `POST /api/users`
-  - Request Body: JSON object containing `username`, `email`, and `password`.
-  - Example: `{"username": "john_doe", "email": "john.doe@example.com", "password": "your_password"}`
-  
-- **Get User Details:**
-  - Endpoint: `GET /api/users/<user_id>`
-  - Example: `GET /api/users/1`
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/awesome-flask-app.git
+   ```
 
-- **Update User Details:**
-  - Endpoint: `PUT /api/users/<user_id>/details`
-  - Request Body: JSON object containing fields to be updated.
-  - Example: `PUT /api/users/1/details`
-  
-- **Delete User:**
-  - Endpoint: `DELETE /api/users/<user_id>`
-  - Example: `DELETE /api/users/1`
+2. Install dependencies:
+   ```bash
+   pip install -r req.txt
+   ```
 
-- **User Login:**
-  - Endpoint: `POST /api/login`
-  - Request Body: JSON object containing `email` and `password`.
-  - Example: `{"email": "john.doe@example.com", "password": "your_password"}`
+3. Set up environment variables:
+   - Create a `.env` file in the root directory.
+   - Add the following variables:
+     ```
+     SECRET_KEY=your_secret_key
+     GOOGLE_CLIENT_ID=your_google_client_id
+     GOOGLE_CLIENT_SECRET=your_google_client_secret
+     ```
 
-- **Forgot Password:**
-  - Endpoint: `POST /api/forgot-password`
-  - Request Body: JSON object containing `email`.
-  - Example: `{"email": "john.doe@example.com"}`
+4. Run the application:
+   ```bash
+   python app.py
+   ```
 
-- **Reset Password:**
-  - Endpoint: `POST /api/reset-password`
-  - Request Body: JSON object containing `email` and `new_password`.
-  - Example: `{"email": "john.doe@example.com", "new_password": "new_password"}`
-
-- **Create Watchlist:**
-  - Endpoint: `POST /api/watchlists`
-  - Request Body: JSON object containing `user_id`, `token`, `name`, and `description`.
-  - Example: `{"user_id": "1", "token": "dummy_token", "name": "My Watchlist", "description": "Favorite movies"}`
+## API Documentation
 
 - **Get Watchlist:**
   - Endpoint: `GET /api/watchlists/<watchlist_id>`
   - Example: `GET /api/watchlists/1`
+  - Description: Retrieves details of a specific watchlist by its ID.
 
-- **Get User's Watchlists:**
-  - Endpoint: `GET /api/users/<user_id>/watchlists`
-  - Example: `GET /api/users/1/watchlists`
+- **Create Watchlist:**
+  - Endpoint: `POST /api/watchlists`
+  - Example: `POST /api/watchlists`
+  - Description: Creates a new watchlist.
+  - Request Body:
+    ```json
+    {
+        "user_id": "1",
+        "name": "My Watchlist",
+        "description": "A list of my favorite movies"
+    }
+    ```
+  - Response Body:
+    ```json
+    {
+        "id": "2",
+        "user_id": "1",
+        "name": "My Watchlist",
+        "description": "A list of my favorite movies",
+        "movies": []
+    }
+    ```
 
 - **Delete Watchlist:**
   - Endpoint: `DELETE /api/watchlists/<watchlist_id>`
-  - Example: `DELETE /api/watchlists/1`
+  - Example: `DELETE /api/watchlists/2`
+  - Description: Deletes a watchlist by its ID.
 
 - **Update Watchlist:**
   - Endpoint: `PUT /api/watchlists/<watchlist_id>`
-  - Request Body: JSON object containing fields to be updated.
-  - Example: `PUT /api/watchlists/1`
-
-- **Delete Movie from Watchlist:**
-  - Endpoint: `DELETE /api/watchlists/<watchlist_id>/movies/<movie_id>`
-  - Example: `DELETE /api/watchlists/1/movies/123`
+  - Example: `PUT /api/watchlists/2`
+  - Description: Updates an existing watchlist by its ID.
+  - Request Body:
+    ```json
+    {
+        "name": "Updated Watchlist Name",
+        "description": "Updated watchlist description"
+    }
+    ```
 
 - **Create Post:**
   - Endpoint: `POST /api/posts`
-  - Request Body: JSON object containing `text`, `user_id`, and `token`.
-  - Example: `{"text": "Hello, world!", "user_id": "1", "token": "dummy_token"}`
+  - Example: `POST /api/posts`
+  - Description: Creates a new post.
+  - Request Body:
+    ```json
+    {
+        "text": "Hello, world!",
+        "user_id": "1",
+        "token": "your_access_token"
+    }
+    ```
+  - Response Body:
+    ```json
+    {
+        "text": "Hello, world!",
+        "mentioned_user_id": null,
+        "user_id": "1"
+    }
+    ```
 
-- **Load Last 20 Posts:**
+- **Get Last 20 Posts:**
   - Endpoint: `GET /api/posts`
+  - Example: `GET /api/posts`
+  - Description: Retrieves the last 20 posts.
 
 - **Get Mentioned Content ID:**
   - Endpoint: `GET /api/posts/<post_id>/mention`
-  - Example: `GET /api/posts/1/mention`
+  - Example: `GET /api/posts/123/mention`
+  - Description: Retrieves the mentioned content ID from a post.
 
-- **Get Posts Mentioning Content ID:**
+- **Get Last 20 Posts Mentioning Content ID:**
   - Endpoint: `GET /api/posts/mentions/<content_id>`
   - Example: `GET /api/posts/mentions/movie_123`
+  - Description: Retrieves the last 20 posts mentioning a specific content ID.
 
 - **Get Streaming Providers:**
   - Endpoint: `GET /api/streaming-providers`
-  - Query Parameters: `content_id`, `territory`, and `content_type`.
-  - Example: `GET /api/streaming-providers?content_id=123&territory=US&content_type=movie`
+  - Example: `GET /api/streaming-providers?content_id=movie_123&territory=US&content_type=movie`
+  - Description: Retrieves the streaming providers for a given content ID in a specific territory.
 
 **Note:** Ensure to replace placeholder values like `dummy_token`, `YOUR_TMDB_API_KEY`, etc., with actual values and implement necessary security measures before deploying this server in a production environment.
