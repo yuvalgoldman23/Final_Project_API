@@ -1,9 +1,21 @@
 from functools import wraps
-import jwt
 from flask import request, jsonify, Flask
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
+
+
+# Function to verify Google OAuth2 token
+def verify_google_token(token):
+    token_info_endpoint = 'https://oauth2.googleapis.com/tokeninfo'
+    response = requests.get(token_info_endpoint, params={'access_token': token})
+
+    if response.status_code == 200:
+        token_info = response.json()
+        if not token_info.get('error'):
+            return token_info
+    return None
 
 
 # Decorator to protect API endpoints
@@ -19,14 +31,12 @@ def auth_required(f):
         if not token:
             return jsonify({'message': 'Token is missing'}), 401
 
-        try:
-            # Decode and verify the access token
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-            current_user = data['user']  # Extract user information from the token
-        except:
-            return jsonify({'message': 'Token is invalid'}), 401
+        # Verify Google OAuth2 token
+        token_info = verify_google_token(token)
+        if not token_info or not token_info.get('sub'):
+            return jsonify({'message': 'Token is invalid or verification failed'}), 401
 
-        # Pass the current user to the protected endpoint
-        return f(current_user, *args, **kwargs)
+        # Pass the token info to the protected endpoint
+        return f(token_info, *args, **kwargs)
 
     return decorated
