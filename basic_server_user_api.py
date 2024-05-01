@@ -7,7 +7,10 @@ import requests
 import os
 import secrets
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)
 
 # Dummy database for storing user data
 users = {"1": {
