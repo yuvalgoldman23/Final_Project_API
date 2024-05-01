@@ -17,7 +17,7 @@ pip install -r requ.txt
 To start the Flask server, run the following command:
 
 ```bash
-python app.py
+python basic_server_user_api.py
 ```
 
 By default, the server will run on `http://127.0.0.1:5000/`.
