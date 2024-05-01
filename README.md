@@ -139,4 +139,4 @@ By default, the server will run on `http://127.0.0.1:5000/`.
   - `content_type`: Type of content ('tv' or 'movie').
 - **Authorization:** Not required.
 - **Response:** Returns an array of streaming provider names.
-- **Note:** this endpoint requires a TMDB API key. Paste your TMDB api key to the template file provided before usage.
+- **Note:** this endpoint requires a TMDB API key.
