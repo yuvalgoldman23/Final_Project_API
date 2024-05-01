@@ -13,8 +13,8 @@ streaming_providers_routes = Blueprint('streaming_providers_routes', __name__)
 # Fetch TMDB API key from environment variables
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
-
-# TODO remove territory from this request?
+# TODO add a function to return by  territory?
+#  TODO check whether TMDB returns no territory if available worldwide on same service
 @streaming_providers_routes.route('/api/streaming-providers', methods=['GET'])
 def get_streaming_providers():
     content_id = request.args.get('content_id')
@@ -27,15 +27,14 @@ def get_streaming_providers():
     # Fetch streaming providers from TMDB
     tmdb_url = f"https://api.themoviedb.org/3/{content_type}/{content_id}/watch/providers"
     headers = {
-        "Authorization": f"Bearer {TMDB_API_KEY}",
+        "api_key": f"{TMDB_API_KEY}",
         "accept": "application/json"
     }
-    params = {
-        "territory": territory
-    }
+
+    params = {"api_key": TMDB_API_KEY}
 
     try:
-        response = requests.get(tmdb_url, headers=headers, params=params)
+        response = requests.get(tmdb_url, params=params)
         response.raise_for_status()
         data = response.json()
         streaming_providers = data.get("results", {}).get(territory, {}).get("flatrate", [])

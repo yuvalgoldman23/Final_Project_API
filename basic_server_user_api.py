@@ -346,15 +346,14 @@ def get_streaming_providers():
     # Fetch streaming providers from TMDB
     tmdb_url = f"https://api.themoviedb.org/3/{content_type}/{content_id}/watch/providers"
     headers = {
-        "Authorization": f"Bearer {TMDB_API_KEY}",
+        "api_key": f"{TMDB_API_KEY}",
         "accept": "application/json"
     }
-    params = {
-        "territory": territory
-    }
+
+    params = {"api_key": TMDB_API_KEY}
 
     try:
-        response = requests.get(tmdb_url, headers=headers, params=params)
+        response = requests.get(tmdb_url, params=params)
         response.raise_for_status()
         data = response.json()
         streaming_providers = data.get("results", {}).get(territory, {}).get("flatrate", [])
