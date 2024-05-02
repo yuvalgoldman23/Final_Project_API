@@ -22,6 +22,13 @@ python basic_server_user_api.py
 
 By default, the server will run on `http://127.0.0.1:5000/`.
 
+**IMPORTANT**
+For the purpose of testing, API endpoints that require authorization should be accessed via Postman with the following fields:
+Headers: 
+        Authroization "Google OAuth 2.0 User Login token"
+        Content Type "application/json"
+
+
 ## Endpoints
 
 ### 1. Create Watchlist
@@ -29,7 +36,7 @@ By default, the server will run on `http://127.0.0.1:5000/`.
 - **URL:** `/api/watchlists`
 - **Method:** `POST`
 - **Description:** Creates a new watchlist for the authenticated user.
-- **Parameters:**
+- **Body:**
   - `name`: (Optional) Name of the watchlist (default: "Untitled Watchlist").
   - `description`: (Optional) Description of the watchlist.
 - **Authorization:** Token-based authentication required.
@@ -72,6 +79,7 @@ By default, the server will run on `http://127.0.0.1:5000/`.
 - **Description:** Updates details of a specific watchlist.
 - **Parameters:**
   - `watchlist_id`: ID of the watchlist to update.
+- **Body:**
   - `name`: (Optional) New name for the watchlist.
   - `description`: (Optional) New description for the watchlist.
   - `movie_id`: (Optional) ID of the movie to add to the watchlist.
@@ -94,7 +102,7 @@ By default, the server will run on `http://127.0.0.1:5000/`.
 - **URL:** `/api/posts`
 - **Method:** `POST`
 - **Description:** Creates a new post with optional mentioned content ID.
-- **Parameters:**
+- **Body:**
   - `text`: Text content of the post.
   - `mentioned_id`: (Optional) ID of the mentioned content.
 - **Authorization:** Token-based authentication required.
@@ -133,7 +141,7 @@ By default, the server will run on `http://127.0.0.1:5000/`.
 - **URL:** `/api/streaming-providers`
 - **Method:** `GET`
 - **Description:** Retrieves streaming providers for a specific content ID and territory.
-- **Parameters:**
+- **Body:**
   - `content_id`: ID of the content.
   - `territory`: Territory code for streaming availability.
   - `content_type`: Type of content ('tv' or 'movie').
