@@ -7,11 +7,14 @@ import requests
 import os
 import secrets
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)
 
 # Dummy database for storing user data
-users = {"1": {
-    "id": "1",
+users = {"113749586527602021810": {
+    "id": "113749586527602021810",
     "username": "john_doe",
     "email": "john.doe@example.com",
     "password": "hashed_password",
@@ -21,17 +24,15 @@ users = {"1": {
         "age": 30,
         "location": "New York"
     }
-}}
+    }
+}
 
 # Dummy database for storing watchlists
-watchlists = {}
+watchlists = [{'id': '1', 'user_id' : '12', 'name' : 'testing'}]
 
 # Dummy database for storing posts
 posts = {}
 
-# TODO add function to validate email format, password strength, etc
-
-# TODO - the following is probably redundant, and belongs in the client only
 '''
 # OAuth Implementation
 
@@ -100,7 +101,8 @@ def callback():
     user_info = {
         'name': provider_data['userinfo']['name'](response.json()),
         'email': provider_data['userinfo']['email'](response.json()),
-        'user_id': provider_data['userinfo']['user_id'](response.json())
+        'user_id': provider_data['userinfo']['user_id'](response.json()),
+        'token' : oauth2_token
     }
 
     # TODO add a check if the user already exists in our DB
@@ -108,7 +110,7 @@ def callback():
     # TODO if user doesn't exist, create a new DB entry with the user's info
 
     # Perform actions if valid
-    if user_info['name'] and user_info['email'] and user_info['user_id']:
+    if user_info['name'] and user_info['email'] and user_info['user_id'] and oauth2_token:
         return jsonify(user_info)
     else:
         return "Failed to fetch user information"
@@ -132,15 +134,16 @@ def oauth2_authorize():
     return redirect(app.config['GOOGLE_AUTHORIZE_URL'] + '?' + qs)
 '''
 
-
 @app.route('/api/watchlists', methods=['POST'])
 @auth_required
 def create_watchlist(token_info):
     data = request.json
+    print("here")
     # Basic input validation
     token_user_id = token_info.get('sub')
     # TODO add a check for name length? probably more fitting to do in the client
     name = data.get('name', 'Untitled Watchlist')
+    print("here")
     description = data.get('description', '')
     # Check if user exists
     user = users.get(token_user_id)
@@ -156,25 +159,29 @@ def create_watchlist(token_info):
         "description": description,
         "movies": []
     }
-
     # Save watchlist to database
-    watchlists[watchlist_id] = new_watchlist
+    watchlists.append(new_watchlist)
     # TODO - decide how watchlists are saved
     #  currently we have a watchlists DB, and each user has a field with their watchlists ids
     # Update user's watchlist IDs
     user.setdefault('watchlists', []).append(watchlist_id)
     users[token_user_id] = user
-
+    print(users)
     return jsonify(new_watchlist), 201
 
 
 @app.route('/api/watchlists/<watchlist_id>', methods=['GET'])
 @auth_required
 def get_watchlist(token_info, watchlist_id):
-    watchlist = watchlists.get(watchlist_id)
+    # PLACEHOLDER until DB implementation and queries
+    my_watchlist = None
+    for watchlist in watchlists:
+        if watchlist['id'] == watchlist_id:
+            my_watchlist = watchlist
+            break
     # TODO - should watchlists be public? if so, no token or auth required....
-    if watchlist:
-        return jsonify(watchlist)
+    if my_watchlist:
+        return jsonify(my_watchlist)
     else:
         return jsonify({"error": "Watchlist not found"}), 404
 
@@ -194,7 +201,7 @@ def get_user_watchlists(token_info, user_id):
         return jsonify({'error': 'User not authorized to perform this action'}), 400
     if user:
         user_watchlist_ids = user.get('watchlists', [])
-        user_watchlists = [watchlists[watchlist_id] for watchlist_id in user_watchlist_ids]
+        user_watchlists = [watchlist for watchlist in watchlists if watchlist.get('id') in user_watchlist_ids]
         return jsonify(user_watchlists)
     else:
         return jsonify({"error": "User not found"}), 404
@@ -206,14 +213,20 @@ def get_user_watchlists(token_info, user_id):
 @app.route('/api/watchlists/<watchlist_id>', methods=['DELETE'])
 @auth_required
 def delete_user_watchlist(token_info, watchlist_id):
-    watchlist = watchlists.get(watchlist_id)
-    user_id = watchlist['user_id']
+    my_watchlist = None
+    for watchlist in watchlists:
+        if watchlist['id'] == watchlist_id:
+            my_watchlist = watchlist
+            break
+    if not my_watchlist:
+        return jsonify({"error": f"Watchlist not found"}), 404
+    user_id = my_watchlist['user_id']
     token_user_id = token_info.get('sub')
     if token_user_id != user_id:
         return jsonify({'error': "User not authorized to perform this action"}), 400
-    if watchlist:
+    if my_watchlist:
         # Remove watchlist from watchlists DB
-        del watchlists[watchlist_id]
+        watchlists.remove(watchlist_id)
         # Remove watchlist from user's list
         user = users.get(user_id)
         if user and 'watchlists' in user:
@@ -337,28 +350,36 @@ TMDB_API_KEY = 'f3ca6c11eaf43465a1814fa3a2440f37'
 @app.route('/api/streaming-providers', methods=['GET'])
 def get_streaming_providers():
     content_id = request.args.get('content_id')
-    territory = request.args.get('territory')
+    territory = request.args.get('territory', None)
     # Content type is 'tv' or 'movie'
     content_type = request.args.get('content_type')
-    if not content_id or not territory:
+    if not content_id:
         return jsonify({"error": "Content ID and territory are required"}), 400
-
     # Fetch streaming providers from TMDB
     tmdb_url = f"https://api.themoviedb.org/3/{content_type}/{content_id}/watch/providers"
     headers = {
         "api_key": f"{TMDB_API_KEY}",
         "accept": "application/json"
     }
-
     params = {"api_key": TMDB_API_KEY}
-
     try:
         response = requests.get(tmdb_url, params=params)
         response.raise_for_status()
         data = response.json()
+        # 'flatrate' means "available on streaming"
         streaming_providers = data.get("results", {}).get(territory, {}).get("flatrate", [])
-        provider_names = [provider.get("provider_name") for provider in streaming_providers]
-        return jsonify({"streaming_providers": provider_names}), 200
+        # TODO - think about what to return if streaming_providers== None due to no flatrate available
+        provider_info = [
+            {
+                "name": provider.get("provider_name"),
+                "logo_path": provider.get("logo_path"),
+                "provider_id": provider.get("provider_id"),
+                "display_priority": provider.get("display_priority")
+            }
+            for provider in streaming_providers
+        ]
+        # todo return logo for a provider or let a different API endpoint do that from our local DB?
+        return jsonify({"providers": provider_info}), 200
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
 

@@ -9,10 +9,12 @@ watchlists_routes = Blueprint('watchlists_routes', __name__)
 @auth_required
 def create_watchlist(token_info):
     data = request.json
+    print("here")
     # Basic input validation
     token_user_id = token_info.get('sub')
     # TODO add a check for name length? probably more fitting to do in the client
     name = data.get('name', 'Untitled Watchlist')
+    print("here")
     description = data.get('description', '')
     # Check if user exists
     user = users.get(token_user_id)
@@ -28,25 +30,29 @@ def create_watchlist(token_info):
         "description": description,
         "movies": []
     }
-
     # Save watchlist to database
-    watchlists[watchlist_id] = new_watchlist
+    watchlists.append(new_watchlist)
     # TODO - decide how watchlists are saved
     #  currently we have a watchlists DB, and each user has a field with their watchlists ids
     # Update user's watchlist IDs
     user.setdefault('watchlists', []).append(watchlist_id)
     users[token_user_id] = user
-
+    print(users)
     return jsonify(new_watchlist), 201
 
 
 @watchlists_routes.route('/api/watchlists/<watchlist_id>', methods=['GET'])
 @auth_required
 def get_watchlist(token_info, watchlist_id):
-    watchlist = watchlists.get(watchlist_id)
+    # PLACEHOLDER until DB implementation and queries
+    my_watchlist = None
+    for watchlist in watchlists:
+        if watchlist['id'] == watchlist_id:
+            my_watchlist = watchlist
+            break
     # TODO - should watchlists be public? if so, no token or auth required....
-    if watchlist:
-        return jsonify(watchlist)
+    if my_watchlist:
+        return jsonify(my_watchlist)
     else:
         return jsonify({"error": "Watchlist not found"}), 404
 
@@ -66,7 +72,7 @@ def get_user_watchlists(token_info, user_id):
         return jsonify({'error': 'User not authorized to perform this action'}), 400
     if user:
         user_watchlist_ids = user.get('watchlists', [])
-        user_watchlists = [watchlists[watchlist_id] for watchlist_id in user_watchlist_ids]
+        user_watchlists = [watchlist for watchlist in watchlists if watchlist.get('id') in user_watchlist_ids]
         return jsonify(user_watchlists)
     else:
         return jsonify({"error": "User not found"}), 404
@@ -78,14 +84,20 @@ def get_user_watchlists(token_info, user_id):
 @watchlists_routes.route('/api/watchlists/<watchlist_id>', methods=['DELETE'])
 @auth_required
 def delete_user_watchlist(token_info, watchlist_id):
-    watchlist = watchlists.get(watchlist_id)
-    user_id = watchlist['user_id']
+    my_watchlist = None
+    for watchlist in watchlists:
+        if watchlist['id'] == watchlist_id:
+            my_watchlist = watchlist
+            break
+    if not my_watchlist:
+        return jsonify({"error": f"Watchlist not found"}), 404
+    user_id = my_watchlist['user_id']
     token_user_id = token_info.get('sub')
     if token_user_id != user_id:
         return jsonify({'error': "User not authorized to perform this action"}), 400
-    if watchlist:
+    if my_watchlist:
         # Remove watchlist from watchlists DB
-        del watchlists[watchlist_id]
+        watchlists.remove(watchlist_id)
         # Remove watchlist from user's list
         user = users.get(user_id)
         if user and 'watchlists' in user:

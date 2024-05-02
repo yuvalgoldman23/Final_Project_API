@@ -23,11 +23,9 @@ def auth_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
-
         # Check if the request contains an access token in the Authorization header
         if 'Authorization' in request.headers:
             token = request.headers['Authorization']
-
         if not token:
             return jsonify({'message': 'Token is missing'}), 401
 
