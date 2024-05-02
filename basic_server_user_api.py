@@ -33,7 +33,7 @@ watchlists = [{'id': '1', 'user_id' : '12', 'name' : 'testing'}]
 # Dummy database for storing posts
 posts = {}
 
-'''
+
 # OAuth Implementation
 
 app.config['SECRET_KEY'] = 'top secret!'
@@ -132,7 +132,7 @@ def oauth2_authorize():
 
     # redirect the user to the Google OAuth2 provider authorization URL
     return redirect(app.config['GOOGLE_AUTHORIZE_URL'] + '?' + qs)
-'''
+
 
 @app.route('/api/watchlists', methods=['POST'])
 @auth_required
@@ -226,7 +226,12 @@ def delete_user_watchlist(token_info, watchlist_id):
         return jsonify({'error': "User not authorized to perform this action"}), 400
     if my_watchlist:
         # Remove watchlist from watchlists DB
-        watchlists.remove(watchlist_id)
+        for watchlist in watchlists:
+            if watchlist["id"] == watchlist_id:
+                # Remove the dictionary from the list
+                print(watchlist)
+                watchlists.remove(watchlist)
+                break  # Exit the loop after the first occurrence is removed
         # Remove watchlist from user's list
         user = users.get(user_id)
         if user and 'watchlists' in user:
@@ -388,4 +393,4 @@ def get_streaming_providers():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

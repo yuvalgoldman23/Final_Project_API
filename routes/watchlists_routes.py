@@ -97,7 +97,12 @@ def delete_user_watchlist(token_info, watchlist_id):
         return jsonify({'error': "User not authorized to perform this action"}), 400
     if my_watchlist:
         # Remove watchlist from watchlists DB
-        watchlists.remove(watchlist_id)
+        for watchlist in watchlists:
+            if watchlist["id"] == watchlist_id:
+                # Remove the dictionary from the list
+                print(watchlist)
+                watchlists.remove(watchlist)
+                break  # Exit the loop after the first occurrence is removed
         # Remove watchlist from user's list
         user = users.get(user_id)
         if user and 'watchlists' in user:
