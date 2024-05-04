@@ -1,7 +1,15 @@
 from flask import Blueprint, request, jsonify
 from auth import auth_required
+import datetime
 
 feed_routes = Blueprint('feed_routes', __name__)
+
+
+def validate_user_post(post, token_id):
+    if post['user_id'] != token_id:
+        return jsonify({'error': f"the post does not belong to the currently logged-in user"}), 400
+    else:
+        return True
 
 
 @feed_routes.route('/api/posts', methods=['POST'])
@@ -16,13 +24,58 @@ def create_post(token_info):
     new_post = {
         "text": data['text'],
         "mentioned_id": data['mentioned_id'],
-        "user_id": user_id
+        "user_id": user_id,
+        "created_at": datetime.datetime.now(),
+        "post_id": len(posts) + 1
     }
     # Save post to database or perform further actions
     # For demonstration, just append to posts list
     posts.append(new_post)
+    # TODO should post IDs be added to a user's DB? if so then add it here, and make sure to update accordingly at removal too
 
     return jsonify(new_post), 201
+
+
+@feed_routes.route('/api/posts/<post_id>', methods=['DELETE'])
+@auth_required
+def delete_post(token_info, post_id):
+    user_id = token_info.get('sub')
+    # Find post in DB
+    my_post = None
+    for post in posts:
+        if post['post_id'] == post_id:
+            my_post = post
+            break
+    if not my_post:
+        return jsonify({'error': f"the post id provided doesn't exist"}), 400
+    elif validate_user_post(my_post, user_id):
+            posts.remove(my_post)
+            # TODO reload posts on client  side?
+            return jsonify({'success': f"post deleted successfully"}), 201
+
+
+@feed_routes.route('/api/posts/<post_id>', methods=['PUT'])
+@auth_required
+def edit_post(token_info, post_id):
+    data = request.json
+    user_id = token_info.get('sub')
+
+    # Find post in DB
+    for post in posts:
+        if post['post_id'] == post_id:
+            if not validate_user_post(post, user_id):
+                break
+            # Update post content if data contains a value for it
+            if 'text' in data:
+                post['text'] = data['text']
+            if 'content_id' in data:
+                post['content_id'] = data['content_id']
+            # TODO - ADD 'update_date' field to the post???
+            # TODO: Reload posts on the client side if needed
+            # Return the newly edited post
+            return jsonify({'post': post, 'success': f"post updated successfully"}), 201
+    # If reached here, post not found, thus return an error
+    return jsonify({'error': f"the post id provided doesn't exist"}), 400
 
 
 @feed_routes.route('/api/posts', methods=['GET'])
