@@ -146,7 +146,22 @@ Headers:
 - **Authorization:** Required.
 - **Response:** Returns a success or fail message.
 
-### 12. Get Streaming Providers
+### 12. Edit Post
+
+- **URL:** `/api/posts/<post_id>`
+- **Method:** `PUT`
+- **Description:** Allows an authenticated user to edit a specific post identified by its `post_id`.
+- **Parameters:**
+  - `post_id`: The unique identifier of the post to be edited.
+- **Authorization:** Required. A valid JWT token should be included in the request headers.
+- **Request Body:**
+  - `text` (optional): Updated text content of the post.
+  - `content_id` (optional): Updated content ID of the post.
+- **Response:**
+  - `200 OK`: If the post is successfully edited.
+  - `400 Bad Request`: If the post ID provided does not exist or if the user is not authorized to edit the post.
+
+### 13. Get Streaming Providers
 
 - **URL:** `/api/streaming-providers`
 - **Method:** `GET`
