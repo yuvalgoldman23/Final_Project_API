@@ -9,7 +9,7 @@ To run this API, make sure you have Python installed on your system. Clone the r
 ```bash
 git clone https://github.com/yuvalgoldman23/Final_Project_API.git
 cd Final_Project_API
-pip install -r requ.txt
+pip install -r requirements.txt
 ```
 
 ## Usage
