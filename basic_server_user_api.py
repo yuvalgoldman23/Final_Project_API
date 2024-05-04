@@ -6,6 +6,7 @@ import jwt
 import requests
 import os
 import secrets
+import datetime
 
 from flask_cors import CORS
 
@@ -31,9 +32,9 @@ users = {"113749586527602021810": {
 watchlists = [{'id': '1', 'user_id' : '12', 'name' : 'testing'}]
 
 # Dummy database for storing posts
-posts = {}
+posts = []
 
-'''
+
 # OAuth Implementation
 
 app.config['SECRET_KEY'] = 'top secret!'
@@ -132,7 +133,7 @@ def oauth2_authorize():
 
     # redirect the user to the Google OAuth2 provider authorization URL
     return redirect(app.config['GOOGLE_AUTHORIZE_URL'] + '?' + qs)
-'''
+
 
 @app.route('/api/watchlists', methods=['POST'])
 @auth_required
@@ -226,7 +227,12 @@ def delete_user_watchlist(token_info, watchlist_id):
         return jsonify({'error': "User not authorized to perform this action"}), 400
     if my_watchlist:
         # Remove watchlist from watchlists DB
-        watchlists.remove(watchlist_id)
+        for watchlist in watchlists:
+            if watchlist["id"] == watchlist_id:
+                # Remove the dictionary from the list
+                print(watchlist)
+                watchlists.remove(watchlist)
+                break  # Exit the loop after the first occurrence is removed
         # Remove watchlist from user's list
         user = users.get(user_id)
         if user and 'watchlists' in user:
@@ -293,6 +299,13 @@ def delete_movie_from_watchlist(token_info, watchlist_id, movie_id):
     return jsonify({"error": f"Movie with ID {movie_id} not found in the watchlist"}), 404
 
 
+def validate_user_post(post, token_id):
+    if post['user_id'] != token_id:
+        return jsonify({'error': f"the post does not belong to the currently logged-in user"}), 400
+    else:
+        return True
+
+
 @app.route('/api/posts', methods=['POST'])
 @auth_required
 def create_post(token_info):
@@ -305,13 +318,62 @@ def create_post(token_info):
     new_post = {
         "text": data['text'],
         "mentioned_id": data['mentioned_id'],
-        "user_id": user_id
+        "user_id": user_id,
+        "created_at": datetime.datetime.now(),
+        "post_id" : len(posts) + 1
     }
     # Save post to database or perform further actions
     # For demonstration, just append to posts list
     posts.append(new_post)
+    # TODO should post IDs be added to a user's DB? if so then add it here, and make sure to update accordingly at removal too
 
     return jsonify(new_post), 201
+
+
+@app.route('/api/posts/<post_id>', methods=['DELETE'])
+@auth_required
+def delete_post(token_info, post_id):
+    user_id = token_info.get('sub')
+    # Find post in DB
+    my_post = None
+    for post in posts:
+        if post['post_id'] == post_id:
+            my_post = post
+            break
+    if not my_post:
+        return jsonify({'error': f"the post id provided doesn't exist"}), 400
+    else:
+        if my_post['user_id'] != user_id:
+            return jsonify({'error': f"the post does not belong to the currently logged-in user"}), 400
+        else:
+            posts.remove(my_post)
+            # TODO reload posts on client  side?
+            return jsonify({'success': f"post deleted successfully"}), 201
+
+
+
+@app.route('/api/posts/<post_id>', methods=['PUT'])
+@auth_required
+def edit_post(token_info, post_id):
+    data = request.json
+    user_id = token_info.get('sub')
+
+    # Find post in DB
+    for post in posts:
+        if post['post_id'] == post_id:
+            if not validate_user_post(post, user_id):
+                break
+            # Update post content if data contains a value for it
+            if 'text' in data:
+                post['text'] = data['text']
+            if 'content_id' in data:
+                post['content_id'] = data['content_id']
+            # TODO - ADD 'update_date' field to the post???
+            # TODO: Reload posts on the client side if needed
+            # Return the newly edited post
+            return jsonify({'post': post, 'success': f"post updated successfully"}), 201
+    # If reached here, post not found, thus return an error
+    return jsonify({'error': f"the post id provided doesn't exist"}), 400
 
 
 @app.route('/api/posts', methods=['GET'])
@@ -388,4 +450,4 @@ def get_streaming_providers():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
