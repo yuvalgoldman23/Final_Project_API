@@ -136,7 +136,17 @@ Headers:
 - **Authorization:** Not required.
 - **Response:** Returns an array of the last 20 posts mentioning the specified content ID.
 
-### 11. Get Streaming Providers
+### 11. Delete Post
+
+- **URL:** `/api/posts/<post_id>`
+- **Method:** `DELETE`
+- **Description:** Delete's a post
+- **Parameters:**
+  - `post_id`: ID of the post to be removed.
+- **Authorization:** Required.
+- **Response:** Returns a success or fail message.
+
+### 12. Get Streaming Providers
 
 - **URL:** `/api/streaming-providers`
 - **Method:** `GET`
