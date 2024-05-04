@@ -299,6 +299,13 @@ def delete_movie_from_watchlist(token_info, watchlist_id, movie_id):
     return jsonify({"error": f"Movie with ID {movie_id} not found in the watchlist"}), 404
 
 
+def validate_user_post(post, token_id):
+    if post['user_id'] != token_id:
+        return jsonify({'error': f"the post does not belong to the currently logged-in user"}), 400
+    else:
+        return True
+
+
 @app.route('/api/posts', methods=['POST'])
 @auth_required
 def create_post(token_info):
