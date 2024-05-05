@@ -54,11 +54,9 @@ Headers:
 
 ### 3. Get User's Watchlists
 
-- **URL:** `/api/users/<user_id>/watchlists`
+- **URL:** `/api/users/watchlists`
 - **Method:** `GET`
 - **Description:** Retrieves all watchlists of a specific user.
-- **Parameters:**
-  - `user_id`: ID of the user whose watchlists to retrieve.
 - **Authorization:** Token-based authentication required.
 - **Response:** Returns an array of watchlist objects belonging to the specified user.
 
