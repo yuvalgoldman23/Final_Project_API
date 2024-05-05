@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, url_for, redirect, session, abort
 from urllib.parse import urlencode
 from dotenv import load_dotenv
 from auth import auth_required
-import jwt
 import requests
 import os
 import secrets
@@ -134,17 +133,14 @@ def oauth2_authorize():
     # redirect the user to the Google OAuth2 provider authorization URL
     return redirect(app.config['GOOGLE_AUTHORIZE_URL'] + '?' + qs)
 
-
 @app.route('/api/watchlists', methods=['POST'])
 @auth_required
 def create_watchlist(token_info):
     data = request.json
-    print("here")
     # Basic input validation
     token_user_id = token_info.get('sub')
     # TODO add a check for name length? probably more fitting to do in the client
     name = data.get('name', 'Untitled Watchlist')
-    print("here")
     description = data.get('description', '')
     # Check if user exists
     user = users.get(token_user_id)
@@ -190,16 +186,12 @@ def get_watchlist(token_info, watchlist_id):
 # TODO change/add to this so it only returns results for the currently logged in user??
 
 
-@app.route('/api/users/<user_id>/watchlists', methods=['GET'])
+@app.route('/api/users/watchlists', methods=['GET'])
 @auth_required
-def get_user_watchlists(token_info, user_id):
-    data = request.json
+def get_user_watchlists(token_info):
     # Check that the user actually exists...
+    user_id = token_info.get('sub')
     user = users.get(user_id)
-    token_user_id = token_info.get('sub')
-    # Check that the user_id provided actually belongs to the logged in user
-    if token_user_id != user_id:
-        return jsonify({'error': 'User not authorized to perform this action'}), 400
     if user:
         user_watchlist_ids = user.get('watchlists', [])
         user_watchlists = [watchlist for watchlist in watchlists if watchlist.get('id') in user_watchlist_ids]
