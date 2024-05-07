@@ -31,6 +31,16 @@ Headers:
 
 ## Endpoints
 
+
+### 0. Login
+
+- **URL:** `/api/login`
+- **Method:** `POST`
+- **Description:** Logs the user in, registers a new user along the way.
+- **Authorization:** Token-based authentication required.
+- **Response:** Returns a success or failure json message.
+
+
 ### 1. Create Watchlist
 
 - **URL:** `/api/watchlists`
@@ -74,23 +84,24 @@ Headers:
 
 - **URL:** `/api/watchlists/<watchlist_id>`
 - **Method:** `PUT`
-- **Description:** Updates details of a specific watchlist.
+- **Description:** Updates details and/or adds movies to a specific watchlist.
 - **Parameters:**
   - `watchlist_id`: ID of the watchlist to update.
 - **Body:**
   - `name`: (Optional) New name for the watchlist.
   - `description`: (Optional) New description for the watchlist.
-  - `movie_id`: (Optional) ID of the movie to add to the watchlist.
+  - `movie_id`: (Optional) ID a new movie to add to the watchlist.
 - **Authorization:** Token-based authentication required.
 - **Response:** Returns the updated watchlist object.
 
 ### 6. Delete Movie from Watchlist
 
-- **URL:** `/api/watchlists/<watchlist_id>/movies/<movie_id>`
+- **URL:** `/api/watchlists/<watchlist_id>/movies`
 - **Method:** `DELETE`
 - **Description:** Removes a specific movie from the specified watchlist.
 - **Parameters:**
   - `watchlist_id`: ID of the watchlist from which to remove the movie.
+- **Body**
   - `movie_id`: ID of the movie to remove from the watchlist.
 - **Authorization:** Token-based authentication required.
 - **Response:** Returns a success message if the movie is deleted from the watchlist.

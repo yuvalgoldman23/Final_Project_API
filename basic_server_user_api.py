@@ -16,23 +16,14 @@ CORS(app)
 users = {"113749586527602021810": {
     "id": "113749586527602021810",
     "username": "john_doe",
-    "email": "john.doe@example.com",
-    "password": "hashed_password",
-    "name": "John Doe",
-    "profile_pic": "https://example.com/profile_pic.jpg",
-    "other_details": {
-        "age": 30,
-        "location": "New York"
-    }
-    }
+}
 }
 
 # Dummy database for storing watchlists
-watchlists = [{'id': '1', 'user_id' : '12', 'name' : 'testing'}]
+watchlists = [{'id': '1', 'user_id': '12', 'name': 'testing'}]
 
 # Dummy database for storing posts
 posts = []
-
 
 # OAuth Implementation
 
@@ -102,7 +93,7 @@ def callback():
         'name': provider_data['userinfo']['name'](response.json()),
         'email': provider_data['userinfo']['email'](response.json()),
         'user_id': provider_data['userinfo']['user_id'](response.json()),
-        'token' : oauth2_token
+        'token': oauth2_token
     }
 
     # TODO add a check if the user already exists in our DB
@@ -132,6 +123,22 @@ def oauth2_authorize():
 
     # redirect the user to the Google OAuth2 provider authorization URL
     return redirect(app.config['GOOGLE_AUTHORIZE_URL'] + '?' + qs)
+
+
+@app.route('/api/login', methods=['POST'])
+@auth_required
+def create_new_user(token_info):
+    user_id = token_info.get('sub')
+    if user_id not in users:
+        # Create a new user entry for the logged in user, including his id and username
+        # TODO currently dummy, replace with true DB implementation upon completion
+        # TODO currently a user's DB entry only includes his ID (and potentially his watchlist IDs) - add fields, if needed
+        users[user_id] = {'id': user_id}
+        return jsonify({"success": f"New user created"}), 200
+    return jsonify({"success": "Existing user logged in"}), 200
+
+
+# TODO create a new user endpoint - whether an api endpoint or a transparent function that only runs if the user isn't known to us
 
 @app.route('/api/watchlists', methods=['POST'])
 @auth_required
@@ -268,9 +275,13 @@ def update_watchlist(token_info, watchlist_id):
         return jsonify({"error": f"Watchlist not found"}), 400
 
 
-@app.route('/api/watchlists/<watchlist_id>/movies/<movie_id>', methods=['DELETE'])
+@app.route('/api/watchlists/<watchlist_id>/movies', methods=['DELETE'])
 @auth_required
-def delete_movie_from_watchlist(token_info, watchlist_id, movie_id):
+def delete_movie_from_watchlist(token_info, watchlist_id):
+    data = request.json()
+    if 'movie_id' not in data:
+        return jsonify({"error": "No movie id provided in the request"}), 400
+    movie_id = data['movie_id']
     watchlist = watchlists.get(watchlist_id)
     if not watchlist:
         return jsonify({"error": "Watchlist not found"}), 404
@@ -312,7 +323,7 @@ def create_post(token_info):
         "mentioned_id": data['mentioned_id'],
         "user_id": user_id,
         "created_at": datetime.datetime.now(),
-        "post_id" : len(posts) + 1
+        "post_id": len(posts) + 1
     }
     # Save post to database or perform further actions
     # For demonstration, just append to posts list
@@ -341,7 +352,6 @@ def delete_post(token_info, post_id):
             posts.remove(my_post)
             # TODO reload posts on client  side?
             return jsonify({'success': f"post deleted successfully"}), 201
-
 
 
 @app.route('/api/posts/<post_id>', methods=['PUT'])
@@ -375,6 +385,7 @@ def load_last_20_posts():
     return jsonify({"posts": posts[-20:]}), 200
 
 
+# TODO probably not needed, the client could just send the server that content id instead, in order to load its page
 @app.route('/api/posts/<post_id>/mention', methods=['GET'])
 def get_mentioned_content_id(post_id):
     # Dummy implementation to return mentioned content ID from a post
@@ -384,6 +395,8 @@ def get_mentioned_content_id(post_id):
     return jsonify({"mentioned_content_id": mentioned_content_id}), 200
 
 
+# Return the 20 last posts mentioning a certain content id
+# To be used for content pages, displaying "their own feed" solely centred on the content
 @app.route('/api/posts/mentions/<content_id>', methods=['GET'])
 def get_last_20_posts_mentioning_content_id(content_id):
     # Dummy implementation to return last 20 posts mentioning a specific content ID
