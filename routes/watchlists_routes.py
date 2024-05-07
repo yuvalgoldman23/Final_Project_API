@@ -48,7 +48,7 @@ def get_watchlist(token_info, watchlist_id):
     my_watchlist = None
     for watchlist in watchlists:
         if watchlist['id'] == watchlist_id:
-            my_watchlist = watchlist
+            my_watchlist = produce_watchlist(watchlist)
             break
     # TODO - should watchlists be public? if so, no token or auth required....
     if my_watchlist:
@@ -57,19 +57,23 @@ def get_watchlist(token_info, watchlist_id):
         return jsonify({"error": "Watchlist not found"}), 404
 
 
+
+# Receive a watchlist, which consists only of content IDs, and returns a website ready object including all needed details about its contents
+# TODO  - finish after understanding the movies API
+def produce_watchlist(watchlist):
+    finished_watchlist = watchlist
+    return finished_watchlist
+
+
 # TODO change/add to this so it only returns results for the currently logged in user??
 
 
-@watchlists_routes.route('/api/users/<user_id>/watchlists', methods=['GET'])
+@watchlists_routes.route('/api/users/watchlists', methods=['GET'])
 @auth_required
-def get_user_watchlists(token_info, user_id):
-    data = request.json
+def get_user_watchlists(token_info):
     # Check that the user actually exists...
+    user_id = token_info.get('sub')
     user = users.get(user_id)
-    token_user_id = token_info.get('sub')
-    # Check that the user_id provided actually belongs to the logged in user
-    if token_user_id != user_id:
-        return jsonify({'error': 'User not authorized to perform this action'}), 400
     if user:
         user_watchlist_ids = user.get('watchlists', [])
         user_watchlists = [watchlist for watchlist in watchlists if watchlist.get('id') in user_watchlist_ids]
@@ -115,7 +119,7 @@ def delete_user_watchlist(token_info, watchlist_id):
 
 @watchlists_routes.route('/api/watchlists/<watchlist_id>', methods=['PUT'])
 @auth_required
-def update_watchlist(token_info, watchlist_id):
+def update_watchlist_details(token_info, watchlist_id):
     watchlist = watchlists.get(watchlist_id)
     if watchlist:
         user_id = watchlist['user_id']
@@ -146,9 +150,13 @@ def update_watchlist(token_info, watchlist_id):
         return jsonify({"error": f"Watchlist not found"}), 400
 
 
-@watchlists_routes.route('/api/watchlists/<watchlist_id>/movies/<movie_id>', methods=['DELETE'])
+@watchlists_routes.route('/api/watchlists/<watchlist_id>/movies', methods=['DELETE'])
 @auth_required
-def delete_movie_from_watchlist(token_info, watchlist_id, movie_id):
+def delete_movie_from_watchlist(token_info, watchlist_id):
+    data = request.json()
+    if 'movie_id' not in data:
+        return jsonify({"error": "No movie id provided in the request"}), 400
+    movie_id = data['movie_id']
     watchlist = watchlists.get(watchlist_id)
     if not watchlist:
         return jsonify({"error": "Watchlist not found"}), 404
@@ -167,3 +175,23 @@ def delete_movie_from_watchlist(token_info, watchlist_id, movie_id):
             return jsonify({"message": f"Movie with ID {movie_id} has been deleted from the watchlist"}), 200
 
     return jsonify({"error": f"Movie with ID {movie_id} not found in the watchlist"}), 404
+
+
+@watchlists_routes.route('/api/watchlists/<watchlist_id/movies', methods=['PUT'])
+@auth_required
+def add_movie_to_watchlist(token_info, watchlist_id):
+    data = request.json()
+    if 'movie_id' not in data:
+        return jsonify({"error": "No movie id provided in the request"}), 400
+    movie_id = data['movie_id']
+    watchlist = watchlists.get(watchlist_id)
+    if not watchlist:
+        return jsonify({"error": "Watchlist not found"}), 404
+    user_id = watchlist['user_id']
+    token_user_id = token_info.get('sub')
+    # Make sure that the watchlist belongs to the currently logged-in user
+    if token_user_id != user_id:
+        return jsonify({'error': f"the watchlist does not belong to the currently logged-in user"}), 400
+    watchlist['movies'].append(movie_id)
+    watchlists[watchlist] = watchlist
+    return jsonify({"message": f"Movie with ID {movie_id} has been added to the watchlist"}), 200

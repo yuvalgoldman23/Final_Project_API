@@ -49,9 +49,9 @@ def delete_post(token_info, post_id):
     if not my_post:
         return jsonify({'error': f"the post id provided doesn't exist"}), 400
     elif validate_user_post(my_post, user_id):
-            posts.remove(my_post)
-            # TODO reload posts on client  side?
-            return jsonify({'success': f"post deleted successfully"}), 201
+        posts.remove(my_post)
+        # TODO reload posts on client  side?
+        return jsonify({'success': f"post deleted successfully"}), 201
 
 
 @feed_routes.route('/api/posts/<post_id>', methods=['PUT'])
@@ -85,6 +85,7 @@ def load_last_20_posts():
     return jsonify({"posts": posts[-20:]}), 200
 
 
+# TODO probably not needed, the client could just send the server that content id instead, in order to load its page
 @feed_routes.route('/api/posts/<post_id>/mention', methods=['GET'])
 def get_mentioned_content_id(post_id):
     # Dummy implementation to return mentioned content ID from a post
@@ -94,6 +95,8 @@ def get_mentioned_content_id(post_id):
     return jsonify({"mentioned_content_id": mentioned_content_id}), 200
 
 
+# Return the 20 last posts mentioning a certain content id
+# To be used for content pages, displaying "their own feed" solely centred on the content
 @feed_routes.route('/api/posts/mentions/<content_id>', methods=['GET'])
 def get_last_20_posts_mentioning_content_id(content_id):
     # Dummy implementation to return last 20 posts mentioning a specific content ID

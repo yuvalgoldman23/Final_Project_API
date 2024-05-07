@@ -33,7 +33,6 @@ def auth_required(f):
         token_info = verify_google_token(token)
         if not token_info or not token_info.get('sub'):
             return jsonify({'message': 'Token is invalid or verification failed'}), 401
-
         # Pass the token info to the protected endpoint
         return f(token_info, *args, **kwargs)
 
