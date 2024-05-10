@@ -1,7 +1,7 @@
 import requests
-from flask import Flask, request, jsonify
+#from flask import Flask, request, jsonify
 
-app = Flask(__name__)
+#app = Flask(__name__)
 api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
 def get_all_movies(api_key):
     all_movies = []
@@ -25,7 +25,7 @@ def get_all_movies(api_key):
         if page >100:
             break
     return all_movies
-
+''''
 def main():
     # Replace 'YOUR_API_KEY' with your actual API key
     movie_id = 1011985
@@ -37,7 +37,7 @@ def main():
     movie_cast=get_movie_cast(api_key, movie_id)
     print (  get_trending_movies(api_key))
     t=5
-
+'''
 @app.route('/data/tv/trand', methods=['GET'])
 def get_trending_tv_shows():
     url = f"https://api.themoviedb.org/3/trending/tv/week?api_key={api_key}"
@@ -115,7 +115,7 @@ def get_movie_info(movie_id):
 
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
    # main()
-   app.run(debug=True)
+  # app.run(debug=True)
 

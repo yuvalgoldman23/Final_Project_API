@@ -7,10 +7,13 @@ import os
 import secrets
 import datetime
 
+
 from flask_cors import CORS
 
 app = Flask(__name__)
+
 CORS(app)
+import tmdbapi
 
 # Dummy database for storing user data
 users = {"113749586527602021810": {
