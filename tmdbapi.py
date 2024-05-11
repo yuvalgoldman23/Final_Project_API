@@ -1,7 +1,7 @@
 import requests
-#from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify
 
-#app = Flask(__name__)
+app = Flask(__name__)
 api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
 def get_all_movies(api_key):
     all_movies = []
@@ -25,6 +25,7 @@ def get_all_movies(api_key):
         if page >100:
             break
     return all_movies
+
 ''''
 def main():
     # Replace 'YOUR_API_KEY' with your actual API key
@@ -115,7 +116,8 @@ def get_movie_info(movie_id):
 
 
 
-#if __name__ == "__main__":
-   # main()
-  # app.run(debug=True)
+if __name__ == "__main__":
+
+   #main()
+    app.run(debug=False)
 
