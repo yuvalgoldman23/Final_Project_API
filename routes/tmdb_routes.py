@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from auth import auth_required
+import requests
 
 tmdb_routes = Blueprint('tmdb_routes', __name__)
 
@@ -35,7 +35,7 @@ def get_all_movies():
 @tmdb_routes.route('/api/tv/trending', methods=['GET'])
 def get_trending_tv_shows():
     url = f"https://api.themoviedb.org/3/trending/tv/week?api_key={api_key}"
-    response = request.get(url)
+    response = requests.get(url)
     if response.status_code == 200:
         trending_tv_shows = response.json().get('results', [])
         return trending_tv_shows
