@@ -19,7 +19,7 @@ def get_all_movies():
             "page": page
         }
 
-        response = request.get(url, params=params)
+        response = requests.get(url, params=params)
         data = response.json()
 
         if 'results' in data and len(data['results']) > 0:
@@ -38,7 +38,7 @@ def get_trending_tv_shows():
     response = requests.get(url)
     if response.status_code == 200:
         trending_tv_shows = response.json().get('results', [])
-        return trending_tv_shows
+        return jsonify(trending_tv_shows)
     else:
         print("Failed to fetch trending TV shows:", response.status_code)
         return []
@@ -50,7 +50,7 @@ def get_trending_movies():
     response = requests.get(url)
     if response.status_code == 200:
         trending_tv_shows = response.json().get('results', [])
-        return trending_tv_shows
+        return jsonify(trending_tv_shows)
     else:
         print("Failed to fetch trending TV shows:", response.status_code)
         return []
@@ -65,8 +65,7 @@ def get_tv_show_info(tv_show_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-
-    return data
+    return jsonify(data)
 
 
 @tmdb_routes.route('/api/tv/cast/<string:tv_show_id>', methods=['GET'])
@@ -78,8 +77,7 @@ def get_tv_cast(tv_show_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-
-    return data['cast']
+    return jsonify(data['cast'])
 
 
 @tmdb_routes.route('/api/movie/cast/<string:movie_id>', methods=['GET'])
@@ -91,8 +89,7 @@ def get_movie_cast(movie_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-
-    return data['cast']
+    return jsonify(data['cast'])
 
 
 @tmdb_routes.route('/api/movie/<string:movie_id>', methods=['GET'])
@@ -104,5 +101,4 @@ def get_movie_info(movie_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-
-    return data
+    return jsonify(data)
