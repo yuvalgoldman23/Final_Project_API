@@ -517,7 +517,6 @@ def get_tv_show_info(tv_show_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-
     return jsonify(data)
 
 
@@ -530,7 +529,6 @@ def get_tv_cast(tv_show_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-
     return jsonify(data['cast'])
 
 
@@ -543,7 +541,6 @@ def get_movie_cast(movie_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-
     return jsonify(data['cast'])
 
 
@@ -556,7 +553,6 @@ def get_movie_info(movie_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-
     return jsonify(data)
 
 
