@@ -226,23 +226,6 @@ Headers:
   - **Content Type:** application/json
   - **Description:** Returns an error if the post ID provided doesn't exist or if the post does not belong to the currently logged-in user.
 ---
-### 11. Delete Post
-
-- **URL:** `/api/posts/<post_id>`
-- **Method:** `DELETE`
-- **Description:** Deletes a post.
-- **Parameters:**
-  - `post_id` (string, number): ID of the post to be removed.
-- **Authorization:** Required.
-- **Success Response:**
-  - **Status Code:** 201 Created
-  - **Content Type:** application/json
-  - **Description:** Returns a success message if the post is deleted successfully.
-- **Failure Response:**
-  - **Status Code:** 400 Bad Request
-  - **Content Type:** application/json
-  - **Description:** Returns an error if the post ID provided doesn't exist or if the post does not belong to the currently logged-in user.
----
 ### 12. Edit Post
 
 - **URL:** `/api/posts/<post_id>`
@@ -250,7 +233,7 @@ Headers:
 - **Description:** Allows an authenticated user to edit a specific post identified by its `post_id`.
 - **Parameters:**
   - `post_id`: The unique identifier of the post to be edited.
-- **Authorization:** Required. A valid JWT token should be included in the request headers.
+- **Authorization:** Required. A valid Google OAuth token should be included in the request headers.
 - **Request Body:**
   - `text` (string, text) (optional): Updated text content of the post.
   - `content_id` (string, text) (optional): Updated content ID of the post.
