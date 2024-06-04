@@ -7,31 +7,6 @@ tmdb_routes = Blueprint('tmdb_routes', __name__)
 api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
 
 
-@tmdb_routes.route('/api/movie/all', methods=['GET'])
-def get_all_movies():
-    all_movies = []
-    page = 1
-
-    while True:
-        url = f"https://api.themoviedb.org/3/discover/movie"
-        params = {
-            "api_key": api_key,
-            "page": page
-        }
-
-        response = requests.get(url, params=params)
-        data = response.json()
-
-        if 'results' in data and len(data['results']) > 0:
-            all_movies.extend(data['results'])
-            page += 1
-        else:
-            break
-        if page > 100:
-            break
-    return all_movies
-
-
 @tmdb_routes.route('/api/tv/trending', methods=['GET'])
 def get_trending_tv_shows():
     url = f"https://api.themoviedb.org/3/trending/tv/week?api_key={api_key}"

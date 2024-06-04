@@ -1,3 +1,5 @@
+import sys
+
 from flask import Flask, request, jsonify, url_for, redirect, session, abort
 from urllib.parse import urlencode
 from dotenv import load_dotenv
@@ -6,6 +8,10 @@ import requests
 import os
 import secrets
 import datetime
+
+sys.path.append(os.path.abspath('app/Database'))
+
+from connect_To_Database import login_google
 
 from flask_cors import CORS
 
@@ -127,15 +133,14 @@ def oauth2_authorize():
 
 @app.route('/api/login', methods=['POST'])
 @auth_required
-def create_new_user(token_info):
+def login(token_info):
     user_id = token_info.get('sub')
-    if user_id not in users:
+    user_email = token_info.get('email')
+    '''if user_id not in users:
         # Create a new user entry for the logged in user, including his id and username
-        # TODO currently dummy, replace with true DB implementation upon completion
-        # TODO currently a user's DB entry only includes his ID (and potentially his watchlist IDs) - add fields, if needed
-        users[user_id] = {'id': user_id}
-        return jsonify({"success": f"New user created"}), 200
-    return jsonify({"success": "Existing user logged in"}), 200
+        # TODO currently a user's DB entry only includes his ID (and potentially his watchlist IDs) - add fields, if needed'''
+    # Return statement as returned from the DB
+    return jsonify(login_google(user_id, user_email)), 200
 
 
 # TODO create a new user endpoint - whether an api endpoint or a transparent function that only runs if the user isn't known to us
@@ -151,6 +156,7 @@ def create_watchlist(token_info):
     description = data.get('description', '')
     # Check if user exists
     user = users.get(token_user_id)
+    # TODO update this after we have a user details retrieval function from the DB
     if not user:
         return jsonify({"error": "User not found"}), 404
     # Generate watchlist ID
@@ -164,10 +170,12 @@ def create_watchlist(token_info):
         "movies": []
     }
     # Save watchlist to database
+    # TODO replace with addition to DB function after we have one
     watchlists.append(new_watchlist)
     # TODO - decide how watchlists are saved
     #  currently we have a watchlists DB, and each user has a field with their watchlists ids
     # Update user's watchlist IDs
+    # TODO change to addition to users DB function when we have one - PROBABLY NO NEED, JUST SEARCH BY USER ID
     user.setdefault('watchlists', []).append(watchlist_id)
     users[token_user_id] = user
     print(users)
@@ -275,7 +283,7 @@ def update_watchlist_details(token_info, watchlist_id):
         return jsonify({"error": f"Watchlist not found"}), 400
 
 
-@app.route('/api/watchlists/<watchlist_id/movies', methods=['PUT'])
+@app.route('/api/watchlists/<watchlist_id>/movies', methods=['PUT'])
 @auth_required
 def add_movie_to_watchlist(token_info, watchlist_id):
     data = request.json()
@@ -293,6 +301,7 @@ def add_movie_to_watchlist(token_info, watchlist_id):
     watchlist['movies'].append(movie_id)
     watchlists[watchlist] = watchlist
     return jsonify({"message": f"Movie with ID {movie_id} has been added to the watchlist"}), 200
+
 
 @app.route('/api/watchlists/<watchlist_id>/movies', methods=['DELETE'])
 @auth_required
