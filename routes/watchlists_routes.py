@@ -177,7 +177,7 @@ def delete_movie_from_watchlist(token_info, watchlist_id):
     return jsonify({"error": f"Movie with ID {movie_id} not found in the watchlist"}), 404
 
 
-@watchlists_routes.route('/api/watchlists/<watchlist_id/movies', methods=['PUT'])
+@watchlists_routes.route('/api/watchlists/<watchlist_id>/movies', methods=['PUT'])
 @auth_required
 def add_movie_to_watchlist(token_info, watchlist_id):
     data = request.json()

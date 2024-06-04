@@ -3,6 +3,7 @@
 from flask import Flask
 from routes import watchlists_routes, feed_routes, streaming_providers_routes, user_routes, tmdb_routes
 from flask_cors import CORS
+import database_connector
 
 app = Flask(__name__)
 CORS(app)
