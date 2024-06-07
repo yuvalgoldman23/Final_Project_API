@@ -1,11 +1,13 @@
-# routes/watchlists_routes.py
+# routes/lists_routes.py
 
 from flask import Blueprint, request, jsonify
 from auth import auth_required
 
-watchlists_routes = Blueprint('watchlists_routes', __name__)
+lists_routes = Blueprint('lists_routes', __name__)
 
-@watchlists_routes.route('/api/watchlists', methods=['POST'])
+# TODO currently, this consists of the old watchlists routes, where  we let a user create multiple watchlists
+
+@lists_routes.route('/api/watchlists', methods=['POST'])
 @auth_required
 def create_watchlist(token_info):
     data = request.json
@@ -41,7 +43,7 @@ def create_watchlist(token_info):
     return jsonify(new_watchlist), 201
 
 
-@watchlists_routes.route('/api/watchlists/<watchlist_id>', methods=['GET'])
+@lists_routes.route('/api/watchlists/<watchlist_id>', methods=['GET'])
 @auth_required
 def get_watchlist(token_info, watchlist_id):
     # PLACEHOLDER until DB implementation and queries
@@ -68,7 +70,7 @@ def produce_watchlist(watchlist):
 # TODO change/add to this so it only returns results for the currently logged in user??
 
 
-@watchlists_routes.route('/api/users/watchlists', methods=['GET'])
+@lists_routes.route('/api/users/watchlists', methods=['GET'])
 @auth_required
 def get_user_watchlists(token_info):
     # Check that the user actually exists...
@@ -85,7 +87,7 @@ def get_user_watchlists(token_info):
 # TODO after finishing the Movies API, add a method to convert a watchlist's movie id's to a list of movie details?
 
 
-@watchlists_routes.route('/api/watchlists/<watchlist_id>', methods=['DELETE'])
+@lists_routes.route('/api/watchlists/<watchlist_id>', methods=['DELETE'])
 @auth_required
 def delete_user_watchlist(token_info, watchlist_id):
     my_watchlist = None
@@ -117,7 +119,7 @@ def delete_user_watchlist(token_info, watchlist_id):
             return jsonify({"error": f"Watchlist not found"}), 404
 
 
-@watchlists_routes.route('/api/watchlists/<watchlist_id>', methods=['PUT'])
+@lists_routes.route('/api/watchlists/<watchlist_id>', methods=['PUT'])
 @auth_required
 def update_watchlist_details(token_info, watchlist_id):
     watchlist = watchlists.get(watchlist_id)
@@ -150,7 +152,7 @@ def update_watchlist_details(token_info, watchlist_id):
         return jsonify({"error": f"Watchlist not found"}), 400
 
 
-@watchlists_routes.route('/api/watchlists/<watchlist_id>/movies', methods=['DELETE'])
+@lists_routes.route('/api/watchlists/<watchlist_id>/movies', methods=['DELETE'])
 @auth_required
 def delete_movie_from_watchlist(token_info, watchlist_id):
     data = request.json()
@@ -177,7 +179,7 @@ def delete_movie_from_watchlist(token_info, watchlist_id):
     return jsonify({"error": f"Movie with ID {movie_id} not found in the watchlist"}), 404
 
 
-@watchlists_routes.route('/api/watchlists/<watchlist_id>/movies', methods=['PUT'])
+@lists_routes.route('/api/watchlists/<watchlist_id>/movies', methods=['PUT'])
 @auth_required
 def add_movie_to_watchlist(token_info, watchlist_id):
     data = request.json()

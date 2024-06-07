@@ -1,9 +1,11 @@
 import mysql.connector
 from mysql.connector import errorcode
+import json
+from flask import  jsonify
 connection = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
-    password="password",
+    password="yanovsky",
     database="final_project_db"
 )
 
@@ -11,6 +13,7 @@ connection = mysql.connector.connect(
 if connection.is_connected():
     print("Connected to MySQL database")
     cursor = connection.cursor()
+    cursor2 = connection.cursor(dictionary=True)
 
 def addmsg(msg):
     query="INSERT INTO `final_project_db`.`messages`(`message_text`) VALUES (%s);"
@@ -35,9 +38,9 @@ def login_google(id,email):
                 insert_query = f"INSERT INTO `final_project_db`.`users` (id,username,password,email,google_auth) VALUES (%s,%s,%s,%s,%s)"
                 cursor.execute(insert_query, (id,email.split("@")[0],id,email,1))
                 connection.commit()
-                return(f"ID {id}'s, email {email} registration has been successfully completed.")
+                print(f"ID {id} was added to the table .")
             else:
-                return(f"ID {id}, email {email} is already registered.")
+                print(f"ID {id} already exists in the table .")
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -49,10 +52,87 @@ def login_google(id,email):
 
 
 
-def Write_review_or_comment(Writer_ID,media_ID,TEXT,IsReview):
+def get_user_details(id):
+    try:
+        query = f"SELECT EXISTS(SELECT 1 FROM `final_project_db`.`users` WHERE id = %s)"
+        cursor.execute(query, (id,))
+        exists = cursor.fetchone()[0]
+        if exists:
+         query = f"SELECT * FROM `final_project_db`.`users` WHERE id = %s"
+         cursor2.execute(query, (id,))
+         return jsonify(cursor2.fetchall()[0])
+        else:
+            return None
+
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+def get_user_watchlist(user_id):
+
+    try:
+
+         query = f"SELECT * FROM `final_project_db`.`watch_list` WHERE Owner_ID = %s"
+         cursor2.execute(query, (user_id,))
+         return jsonify(cursor2.fetchall())
+
+
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+
+def get_rewies_by_parent(parent_id):
+
+    try:
+
+         query = f"SELECT * FROM `final_project_db`.`revies` WHERE Parent_ID = %s"
+         cursor2.execute(query, (parent_id,))
+         return jsonify(cursor2.fetchall())
+
+
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+
+def get_rewies_of_user(user_id):
+
+    try:
+
+         query = f"SELECT * FROM `final_project_db`.`revies` WHERE Writer_ID = %s"
+         cursor2.execute(query, (user_id,))
+         return jsonify(cursor2.fetchall())
+
+
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
+
+
+
+
+def Write_review_or_comment(Writer_ID,Parent_ID,TEXT,IsReview):
        try:
            insert_query = f"INSERT INTO `final_project_db`.`reviews`(`Writer_ID`,`TText`,`IsReview`,`Parent_ID`) VALUES (%s,%s,%s,%s) "
-           cursor.execute(insert_query, (Writer_ID, TEXT, IsReview, media_ID))
+           cursor.execute(insert_query, (Writer_ID, TEXT, IsReview, Parent_ID))
            connection.commit()
        except mysql.connector.Error as err:
            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -142,7 +222,7 @@ def update_Rating (Watch_item_id,user_id,Rating):
             else:
                 print(err)
         t=6
-def upsate_Comment (Watch_item_id,user_id,Comment):
+def update_Comment (Watch_item_id,user_id,Comment):
     try:
         update_query = "UPDATE FROM `final_project_db`.`watch_list` SET `Comment`=%s WHERE `ID`= %s AND `Owner_ID`= %s ;"
         cursor.execute(update_query, (Comment, Watch_item_id, user_id))
@@ -169,7 +249,6 @@ def update_Progress (Watch_item_id,user_id,Progress):
         else:
             print(err)
     t = 6
-
 
 
 

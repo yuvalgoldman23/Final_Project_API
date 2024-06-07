@@ -11,3 +11,4 @@ connection = mysql.connector.connect(
 if connection.is_connected():
     print("Connected to MySQL database")
     cursor = connection.cursor()
+    cursor2 = connection.cursor(dictionary=True)

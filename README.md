@@ -1,10 +1,21 @@
-# Flask API README
+# Flask Server README
 
-This Flask API provides endpoints for managing user watchlists, creating posts, fetching posts, performing content related queries and retrieving streaming providers, all while performing authorization of client requests via Google OAuth.
+This Flask server + MySQL Database provides endpoints for managing user watchlists, creating posts, fetching posts, performing content related queries and retrieving streaming providers, all while performing authorization of client requests via Google OAuth.
 
 ## Installation
 
-To run this API, make sure you have Python installed on your system. Clone the repository and install the dependencies using the `requirements.txt` file:
+**Database Setup:**
+
+To run the database, make sure you have a MySQL server program, such as MySQL Workbench, installed. In that program, create a new connection, then run the following SQL command:
+```sql
+CREATE DATABASE final_project_DB;
+```
+Then, through the program, import the data from the "DataBase_Export" directory into the SQL server.
+After finishing this step, you're all set to continue to setting up the Flask server.
+
+**Flask server Setup:**
+
+To run this server, make sure you have Python installed on your system. Clone the repository and install the dependencies using the `requirements.txt` file:
 
 ```bash
 git clone https://github.com/yuvalgoldman23/Final_Project_API.git
@@ -17,7 +28,7 @@ pip install -r requirements.txt
 To start the Flask server, run the following command:
 
 ```bash
-python basic_server_user_api.py
+python app.py
 ```
 
 By default, the server will run on `http://127.0.0.1:5000/`.
@@ -31,7 +42,7 @@ Headers:
 
 ## Endpoints
 
-### 0. Login
+### 1. Login
 
 - **URL:** `/api/login`
 - **Method:** `POST`
@@ -44,31 +55,26 @@ Headers:
   - **Content Type:** application/json
   - **Description:** Returns a success or failure JSON message.
 ---
-### 1. Create Watchlist
+  ### 2. Get User Details
 
-- **URL:** `/api/watchlists`
-- **Method:** `POST`
-- **Description:** Creates a new watchlist for the authenticated user.
-- **Authorization:** Token-based authentication required.
-- **Request Body:**
-  - `name` (string, text): (Optional) Name of the watchlist (default: "Untitled Watchlist").
-  - `description` (string, text): (Optional) Description of the watchlist.
-- **Success Response:**
-  - **Status Code:** 201 Created
-  - **Content Type:** application/json
-  - **Description:** Returns the newly created watchlist object.
-- **Failure Response:**
-  - **Status Code:** 404 Not Found
-  - **Content Type:** application/json
-  - **Description:** Returns an error if the user is not found.
----
-### 2. Get Watchlist
-
-- **URL:** `/api/watchlists/<watchlist_id>`
+- **URL:** `/api/user`
 - **Method:** `GET`
-- **Description:** Retrieves details of a specific watchlist.
+- **Description:** Returns some of the logged-in user's details.
+- **Authorization:** Token-based authentication required.
+- **Response:** 
+  - **Status Code:**     
+    - 200 Success
+  - **Content Type:** application/json
+  - **Description:** Returns a success or failure JSON message. 
+  - In case of success, returns the following details:  "email", "firstname", "lastname", "username"
+---
+### 3. Get Watchlist
+
+- **URL:** `/api/watchlist`
+- **Method:** `GET`
+- **Description:** Retrieves details of the logged-in user's watchlist.
 - **Parameters:**
-  - `watchlist_id` (string, text): ID of the watchlist to retrieve.
+  - None
 - **Authorization:** Token-based authentication required.
 - **Success Response:**
   - **Status Code:** 200 OK if watchlist found
@@ -78,51 +84,18 @@ Headers:
   - **Status Code:** 404 Not Found if watchlist not found
   - **Content Type:** application/json
   - **Description:** Returns an error if the watchlist is not found.
+  - If watchlist found, returns an object like this:
+    - { "Comment": "fefse", "ID": "4741735bb7e6", "Is_Movie": 1, "Media_ID": "123", "Owner_ID": "2", "Progress": "fefs", "Rating": 10.0, "Time_Updated": "Tue, 04 Jun 2024 20:45:42 GMT", "Watched": 1 }, { "Comment": "fefse", "ID": "ad85ef514915", "Is_Movie": 1, "Media_ID": "65656", "Owner_ID": "2", "Progress": "fefs", "Rating": 10.0, "Time_Updated": "Tue, 04 Jun 2024 20:46:43 GMT", "Watched": 1 }
 ---
-### 3. Get Logged-In User's Watchlists
 
-- **URL:** `/api/users/watchlists`
-- **Method:** `GET`
-- **Description:** Retrieves all watchlists of the logged-in user.
-- **Authorization:** Token-based authentication required.
-- **Success Response:**
-  - **Status Code:** 200 OK
-  - **Content Type:** application/json
-  - **Description:** Returns an array of watchlist objects belonging to the specified user.
-- **Failure Response:**
-  - **Status Code:** 404 Not Found
-  - **Content Type:** application/json
-  - **Description:** Returns an error if the user is not found.
----
-### 4. Delete Watchlist
+### 4. Add Movie/Show to Watchlist
 
-- **URL:** `/api/watchlists/<watchlist_id>`
-- **Method:** `DELETE`
-- **Description:** Deletes a specific watchlist.
-- **Parameters:**
-  - `watchlist_id` (string, number): ID of the watchlist to delete.
-- **Authorization:** Token-based authentication required.
-- **Success Response:**
-  - **Status Code:** 200 OK
-  - **Content Type:** application/json
-  - **Description:** Returns a success message if the watchlist is deleted successfully.
-- **Failure Response:**
-  - **Status Code:** 404 Not Found
-  - **Content Type:** application/json
-  - **Description:** Returns an error if the watchlist is not found.
----
-### 5. Update Watchlist
-
-- **URL:** `/api/watchlists/<watchlist_id>`
+- **URL:** `/api/watchlist/content`
 - **Method:** `PUT`
-- **Description:** Updates details and/or adds movies to a specific watchlist.
-- **Parameters:**
-  - `watchlist_id` (string, text): ID of the watchlist to update.
+- **Description:** Adds a new movie/show to the logged-in user's watchlist.
 - **Authorization:** Token-based authentication required.
 - **Request Body:**
-  - `name` (string, text): (Optional) New name for the watchlist.
-  - `description` (string, text): (Optional) New description for the watchlist.
-  - `movie_id` (string, text): (Optional) ID of a new movie to add to the watchlist.
+  - `content_id` (string, text): ID of a new movie/show to add to the watchlist.
 - **Success Response:**
   - **Status Code:** 200 OK
   - **Content Type:** application/json
@@ -132,20 +105,18 @@ Headers:
   - **Content Type:** application/json
   - **Description:** Returns an error if the watchlist is not found.
 ---
-### 6. Delete Movie from Watchlist
+### 5. Delete Movie/Show from Watchlist
 
-- **URL:** `/api/watchlists/<watchlist_id>/movies`
+- **URL:** `/api/watchlist/content`
 - **Method:** `DELETE`
-- **Description:** Removes a specific movie from the specified watchlist.
-- **Parameters:**
-  - `watchlist_id` (string, text): ID of the watchlist from which to remove the movie.
+- **Description:** Removes a specific movie/show from the logged-in user's watchlist.
 - **Authorization:** Token-based authentication required.
 - **Request Body:**
-  - `movie_id` (string, text): ID of the movie to remove from the watchlist.
+  - `content_id` (string, text): ID of the watchlist item to be removed.
 - **Success Response:**
   - **Status Code:** 200 OK
   - **Content Type:** application/json
-  - **Description:** Returns a success message if the movie is deleted from the watchlist.
+  - **Description:** Returns a success message if the movie/show is deleted from the watchlist.
 - **Failure Response:**
   - **Status Code:** 404 Not Found
   - **Content Type:** application/json
