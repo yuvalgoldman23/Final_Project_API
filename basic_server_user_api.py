@@ -1,3 +1,5 @@
+import sys
+
 from flask import Flask, request, jsonify, url_for, redirect, session, abort
 from urllib.parse import urlencode
 from dotenv import load_dotenv
@@ -6,6 +8,10 @@ import requests
 import os
 import secrets
 import datetime
+
+sys.path.append(os.path.abspath('app/Database'))
+
+from connect_To_Database import login_google
 
 from flask_cors import CORS
 
@@ -127,15 +133,14 @@ def oauth2_authorize():
 
 @app.route('/api/login', methods=['POST'])
 @auth_required
-def create_new_user(token_info):
+def login(token_info):
     user_id = token_info.get('sub')
-    if user_id not in users:
+    user_email = token_info.get('email')
+    '''if user_id not in users:
         # Create a new user entry for the logged in user, including his id and username
-        # TODO currently dummy, replace with true DB implementation upon completion
-        # TODO currently a user's DB entry only includes his ID (and potentially his watchlist IDs) - add fields, if needed
-        users[user_id] = {'id': user_id}
-        return jsonify({"success": f"New user created"}), 201
-    return jsonify({"success": "Existing user logged in"}), 200
+        # TODO currently a user's DB entry only includes his ID (and potentially his watchlist IDs) - add fields, if needed'''
+    # Return statement as returned from the DB
+    return jsonify(login_google(user_id, user_email)), 200
 
 
 # TODO create a new user endpoint - whether an api endpoint or a transparent function that only runs if the user isn't known to us
@@ -151,6 +156,7 @@ def create_watchlist(token_info):
     description = data.get('description', '')
     # Check if user exists
     user = users.get(token_user_id)
+    # TODO update this after we have a user details retrieval function from the DB
     if not user:
         return jsonify({"error": "User not found"}), 404
     # Generate watchlist ID
@@ -164,10 +170,12 @@ def create_watchlist(token_info):
         "movies": []
     }
     # Save watchlist to database
+    # TODO replace with addition to DB function after we have one
     watchlists.append(new_watchlist)
     # TODO - decide how watchlists are saved
     #  currently we have a watchlists DB, and each user has a field with their watchlists ids
     # Update user's watchlist IDs
+    # TODO change to addition to users DB function when we have one - PROBABLY NO NEED, JUST SEARCH BY USER ID
     user.setdefault('watchlists', []).append(watchlist_id)
     users[token_user_id] = user
     print(users)
@@ -244,7 +252,7 @@ def delete_user_watchlist(token_info, watchlist_id):
 
 @app.route('/api/watchlists/<watchlist_id>', methods=['PUT'])
 @auth_required
-def update_watchlist(token_info, watchlist_id):
+def update_watchlist_details(token_info, watchlist_id):
     watchlist = watchlists.get(watchlist_id)
     if watchlist:
         user_id = watchlist['user_id']
@@ -273,6 +281,26 @@ def update_watchlist(token_info, watchlist_id):
         watchlists[watchlist_id] = watchlist
     else:
         return jsonify({"error": f"Watchlist not found"}), 400
+
+
+@app.route('/api/watchlists/<watchlist_id>/movies', methods=['PUT'])
+@auth_required
+def add_movie_to_watchlist(token_info, watchlist_id):
+    data = request.json()
+    if 'movie_id' not in data:
+        return jsonify({"error": "No movie id provided in the request"}), 400
+    movie_id = data['movie_id']
+    watchlist = watchlists.get(watchlist_id)
+    if not watchlist:
+        return jsonify({"error": "Watchlist not found"}), 404
+    user_id = watchlist['user_id']
+    token_user_id = token_info.get('sub')
+    # Make sure that the watchlist belongs to the currently logged-in user
+    if token_user_id != user_id:
+        return jsonify({'error': f"the watchlist does not belong to the currently logged-in user"}), 400
+    watchlist['movies'].append(movie_id)
+    watchlists[watchlist] = watchlist
+    return jsonify({"message": f"Movie with ID {movie_id} has been added to the watchlist"}), 200
 
 
 @app.route('/api/watchlists/<watchlist_id>/movies', methods=['DELETE'])
@@ -452,108 +480,6 @@ def get_streaming_providers():
 
 
 # TODO - add an endpoint that returns the logo of a streaming provider?
-
-
-# TODO from here til the end - Daniel's TMDB API
-
-api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
-
-
-@app.route('/api/movie/all', methods=['GET'])
-def get_all_movies():
-    all_movies = []
-    page = 1
-
-    while True:
-        url = f"https://api.themoviedb.org/3/discover/movie"
-        params = {
-            "api_key": api_key,
-            "page": page
-        }
-
-        response = requests.get(url, params=params)
-        data = response.json()
-
-        if 'results' in data and len(data['results']) > 0:
-            all_movies.extend(data['results'])
-            page += 1
-        else:
-            break
-        if page > 100:
-            break
-    return all_movies
-
-
-@app.route('/api/tv/trending', methods=['GET'])
-def get_trending_tv_shows():
-    url = f"https://api.themoviedb.org/3/trending/tv/week?api_key={api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        trending_tv_shows = response.json().get('results', [])
-        return jsonify(trending_tv_shows)
-    else:
-        print("Failed to fetch trending TV shows:", response.status_code)
-        return []
-
-
-@app.route('/api/movie/trending', methods=['GET'])
-def get_trending_movies():
-    url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        trending_tv_shows = response.json().get('results', [])
-        return jsonify(trending_tv_shows)
-    else:
-        print("Failed to fetch trending TV shows:", response.status_code)
-        return []
-
-
-@app.route('/api/tv/<string:tv_show_id>', methods=['GET'])
-def get_tv_show_info(tv_show_id):
-    url = f"https://api.themoviedb.org/3/tv/{tv_show_id}"
-    params = {
-        "api_key": api_key
-    }
-
-    response = requests.get(url, params=params)
-    data = response.json()
-    return jsonify(data)
-
-
-@app.route('/api/tv/cast/<string:tv_show_id>', methods=['GET'])
-def get_tv_cast(tv_show_id):
-    url = f"https://api.themoviedb.org/3/tv/{tv_show_id}/credits"
-    params = {
-        "api_key": api_key
-    }
-
-    response = requests.get(url, params=params)
-    data = response.json()
-    return jsonify(data['cast'])
-
-
-@app.route('/api/movie/cast/<string:movie_id>', methods=['GET'])
-def get_movie_cast(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}/credits"
-    params = {
-        "api_key": api_key
-    }
-
-    response = requests.get(url, params=params)
-    data = response.json()
-    return jsonify(data['cast'])
-
-
-@app.route('/api/movie/<string:movie_id>', methods=['GET'])
-def get_movie_info(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}"
-    params = {
-        "api_key": api_key
-    }
-
-    response = requests.get(url, params=params)
-    data = response.json()
-    return jsonify(data)
 
 
 if __name__ == '__main__':
