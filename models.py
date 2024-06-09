@@ -1,3 +1,0 @@
-# models.py
-
-# Database models
