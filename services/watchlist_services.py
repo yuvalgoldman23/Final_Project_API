@@ -109,4 +109,43 @@ def remove_watch_list(userID,watch_list_item_id):
         else:
             print(err)
             return err
+			
+def get_user_watchlists(user_id):
+
+    try:
+
+         query = f"SELECT * FROM `final_project_db`.`watch_lists_names` WHERE User_ID = %s"
+         cursor2.execute(query, (user_id,))
+         return jsonify(cursor2.fetchall())
+
+
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return jsonify({"Something is wrong with your user name or password"}), 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return jsonify({"Database does not exist"}), 404
+        else:
+            print(err)
+            return err
+
+def get_watch_list_objects_of_watch_list(watchlist_ID):
+    try:
+
+        query = f"SELECT * FROM `final_project_db`.`watch_lists_objects` WHERE Parent_ID = %s"
+        cursor2.execute(query, (watchlist_ID,))
+        return jsonify(cursor2.fetchall())
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return jsonify({"Something is wrong with your user name or password"}), 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return jsonify({"Database does not exist"}), 404
+        else:
+            print(err)
+            return err
 
