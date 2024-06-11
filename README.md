@@ -70,11 +70,11 @@ Headers:
 ---
 ### 3. Get Watchlist
 
-- **URL:** `/api/watchlist`
+- **URL:** `/api/watchlists`
 - **Method:** `GET`
-- **Description:** Retrieves details of the logged-in user's watchlist.
+- **Description:** Retrieves details of a watchlist.
 - **Parameters:**
-  - None
+  - (Optional) `wathclist_id` (string, numbers):  returns the watchlist. If no ID has been provided, returns the user's 'Main' watchlist.
 - **Authorization:** Token-based authentication required.
 - **Success Response:**
   - **Status Code:** 200 OK if watchlist found
@@ -90,12 +90,14 @@ Headers:
 
 ### 4. Add Movie/Show to Watchlist
 
-- **URL:** `/api/watchlist/content`
+- **URL:** `/api/watchlists/content`
 - **Method:** `PUT`
 - **Description:** Adds a new movie/show to the logged-in user's watchlist.
 - **Authorization:** Token-based authentication required.
 - **Request Body:**
   - `content_id` (string, text): ID of a new movie/show to add to the watchlist.
+    - `is_movie` (boolean): True if movie, False otherwise
+    - `comment` (Optional: string, text): User's personal comment on media
 - **Success Response:**
   - **Status Code:** 200 OK
   - **Content Type:** application/json
@@ -107,12 +109,12 @@ Headers:
 ---
 ### 5. Delete Movie/Show from Watchlist
 
-- **URL:** `/api/watchlist/content`
+- **URL:** `/api/watchlists/content`
 - **Method:** `DELETE`
 - **Description:** Removes a specific movie/show from the logged-in user's watchlist.
 - **Authorization:** Token-based authentication required.
 - **Request Body:**
-  - `content_id` (string, text): ID of the watchlist item to be removed.
+  - `watchlist_item_id` (string, text): ID of the watchlist item to be removed. Specific to each watchlist.
 - **Success Response:**
   - **Status Code:** 200 OK
   - **Content Type:** application/json
@@ -121,6 +123,39 @@ Headers:
   - **Status Code:** 404 Not Found
   - **Content Type:** application/json
   - **Description:** Returns an error if the movie or watchlist is not found.
+---
+
+### 6. Create new watchlist
+
+- **URL:** `/api/watchlists`
+- **Method:** `POST`
+- **Description:** Removes a specific movie/show from the logged-in user's watchlist.
+- **Authorization:** Token-based authentication required.
+- **Request Body:**
+  - `watchlist_name` (Optional: string, text): the new watchlist's name.
+- **Success Response:**
+  - **Status Code:** 200 OK
+  - **Content Type:** application/json
+  - **Description:** 'ID': Returns the new watchlist's ID upon success.
+- **Failure Response:**
+  - **Status Code:** 404 Not Found
+  - **Content Type:** application/json
+  - **Description:** Returns an error if the movie or watchlist is not found.
+---
+### 7. Get all of user's watchlist's
+
+- **URL:** `/api/watchlists/all`
+- **Method:** `GET`
+- **Description:** Returns all the logged-in user's watchlists.
+- **Authorization:** Token-based authentication required.
+- **Success Response:**
+  - **Status Code:** 200 OK
+  - **Content Type:** application/json
+  - **Description:** 'watchlists' :Returns an object of watchlists.
+- **Failure Response:**
+  - **Status Code:** 404 Not Found
+  - **Content Type:** application/json
+  - **Description:** Returns an error if there's a DB issue.
 ---
 ### 7. Create Post
 
@@ -197,23 +232,6 @@ Headers:
   - **Content Type:** application/json
   - **Description:** Returns an error if the post ID provided doesn't exist or if the post does not belong to the currently logged-in user.
 ---
-### 11. Delete Post
-
-- **URL:** `/api/posts/<post_id>`
-- **Method:** `DELETE`
-- **Description:** Deletes a post.
-- **Parameters:**
-  - `post_id` (string, number): ID of the post to be removed.
-- **Authorization:** Required.
-- **Success Response:**
-  - **Status Code:** 201 Created
-  - **Content Type:** application/json
-  - **Description:** Returns a success message if the post is deleted successfully.
-- **Failure Response:**
-  - **Status Code:** 400 Bad Request
-  - **Content Type:** application/json
-  - **Description:** Returns an error if the post ID provided doesn't exist or if the post does not belong to the currently logged-in user.
----
 ### 12. Edit Post
 
 - **URL:** `/api/posts/<post_id>`
@@ -249,27 +267,6 @@ Headers:
     - `logo_path` (string): The path to the logo of the streaming provider.
     - `provider_id` (string): The ID of the streaming provider.
     - `display_priority` (int): The priority of the provider's display.
-- **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
-  - Content: Empty array.
-
----
-
-### 14. Get All Movies
-
-- **URL:** `/api/movie/all`
-
-#### Description
-
-Retrieves all movies available in the database.
-
-#### Parameters
-
-None
-
-#### Responses
-
-- **200 OK** - Successfully retrieved all movies.
-  - Content: List of movie objects.
 - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
   - Content: Empty array.
 

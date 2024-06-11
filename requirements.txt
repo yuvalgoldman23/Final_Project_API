@@ -4,3 +4,4 @@ python-dotenv==0.19.2
 PyJWT==2.3.0
 Flask-CORS==3.0.10
 Werkzeug==2.2.2
+mysql~=0.0.3
