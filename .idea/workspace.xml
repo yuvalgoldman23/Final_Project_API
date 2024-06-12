@@ -4,20 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Update">
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Final_Project_API.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Final_Project_API.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated and (re-) added some watchlist routes. Updated Some services naming, fixed some indentation issues in 'services', updated README with new routes for watchlists">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/streaming_providers_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/streaming_providers_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/user_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/user_services.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/watchlist_services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -45,6 +35,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -96,7 +94,10 @@
       <updated>1715272690014</updated>
       <workItem from="1717953097152" duration="613000" />
       <workItem from="1718128743739" duration="992000" />
-      <workItem from="1718129954395" duration="5312000" />
+      <workItem from="1718129954395" duration="5350000" />
+      <workItem from="1718136486077" duration="1672000" />
+      <workItem from="1718138269275" duration="275000" />
+      <workItem from="1718180562322" duration="1377000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -105,7 +106,14 @@
       <option name="project" value="LOCAL" />
       <updated>1718128859500</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Updated and (re-) added some watchlist routes. Updated Some services naming, fixed some indentation issues in 'services', updated README with new routes for watchlists">
+      <created>1718135329964</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1718135329964</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -124,7 +132,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Update" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update" />
+    <MESSAGE value="Updated and (re-) added some watchlist routes. Updated Some services naming, fixed some indentation issues in 'services', updated README with new routes for watchlists" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated and (re-) added some watchlist routes. Updated Some services naming, fixed some indentation issues in 'services', updated README with new routes for watchlists" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -101,6 +101,7 @@ def get_user_watchlists(user_id):
 
         query = f"SELECT * FROM `final_project_db`.`watch_lists_names` WHERE User_ID = %s"
         cursor2.execute(query, (user_id,))
+        # TODO no need to jsonify here? since it'll get processed by the server before sending to client
         return jsonify(cursor2.fetchall())
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -118,6 +119,7 @@ def get_watchlist_by_id(watchlist_id):
     try:
         query = f"SELECT * FROM `final_project_db`.`watch_lists_objects` WHERE Parent_ID = %s"
         cursor2.execute(query, (watchlist_id,))
+        # TODO no need to jsonify here? since it'll get processed by the server before sending to client
         return jsonify(cursor2.fetchall())
 
     except mysql.connector.Error as err:

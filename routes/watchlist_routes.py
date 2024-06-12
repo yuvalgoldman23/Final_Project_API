@@ -1,11 +1,11 @@
 # routes/watchlist_routes.py
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, json
 
 import utils
 from auth import auth_required
 import services.watchlist_services as service
-
+import tmdb_routes as tmdb
 watchlists_routes = Blueprint('watchlists_routes', __name__)
 
 
@@ -13,7 +13,19 @@ watchlists_routes = Blueprint('watchlists_routes', __name__)
 # TODO  - finish after understanding the movies API
 # TODO after finishing the Movies API, add a method to convert a watchlist's movie id's to a list of movie details?
 def produce_client_ready_watchlist(watchlist):
-    finished_watchlist = watchlist
+    finished_watchlist = []
+    for watchlist_object in watchlist:
+        media_info = {}
+        if watchlist_object.is_movie:
+            tmdb_info = json.loads(tmdb.get_movie_info(watchlist_object.tmdb_id))
+        else:
+            tmdb_info = json.loads(tmdb.get_tv_show_info(watchlist_object.tmdb_id))
+        media_info['title'] = tmdb_info['title']
+        media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
+        # TODO change poster size to be editable by client request?
+        media_info['poster_path'] = "https://image.tmdb.org/t/p/w94_and_h141_bestv2/" + tmdb_info['poster_path']
+        # TODO add here the logos of the streaming services for this media in the USA? do that using my streaming function
+        finished_watchlist.append(media_info)
     return finished_watchlist
 
 
@@ -26,7 +38,7 @@ def get_main_watchlist(token_info):
     if utils.is_db_response_error(db_response):
         return jsonify({'Error': db_response}), 404
     else:
-        return db_response
+        return produce_client_ready_watchlist(watchlist=db_response)
 
 @watchlists_routes.route('/api/watchlists', methods=['POST'])
 @auth_required
@@ -66,7 +78,7 @@ def get_watchlist_by_id(token_info, watchlist_id):
     if utils.is_db_response_error(db_response):
         return jsonify({'Error': db_response}), 404
     else:
-        return db_response
+        return produce_client_ready_watchlist(watchlist=db_response)
 
 
 @watchlists_routes.route('/api/users/watchlists/all', methods=['GET'])
@@ -79,6 +91,7 @@ def get_user_watchlists(token_info):
         return jsonify({'Error': db_response}), 404
     else:
         return db_response
+    # TODO here run the produce_client_ready_watchlist in a loop on all watchlists received here and return an object of watchlists, each being a return value from the produce function
 
 
 @watchlists_routes.route('/api/watchlists/content', methods=['PUT'])
