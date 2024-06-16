@@ -37,6 +37,7 @@ CREATE TABLE `watch_lists_names` (
 
 LOCK TABLES `watch_lists_names` WRITE;
 /*!40000 ALTER TABLE `watch_lists_names` DISABLE KEYS */;
+INSERT INTO `watch_lists_names` VALUES ('01b2f2e91bfa','543534','fsefe',1),('12345','543534','fsefe',1),('428fe4a2984e','5645','fesf',0),('94a159e09303','432423','Main',1),('f95ef1aad369','543534','two',0);
 /*!40000 ALTER TABLE `watch_lists_names` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -49,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-06-11 11:12:35
+-- Dump completed on 2024-06-16 23:14:41
