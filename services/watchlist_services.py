@@ -43,7 +43,7 @@ def remove_watch_list_item(userID,watch_list_item_id):
             return err
 
 
-def add_watch_list(user_id,name,Is_main):
+def create_watchlist(user_id,name,Is_main):
     try:
      if (Is_main):
          query = f"SELECT EXISTS(SELECT 1 FROM `final_project_db`.`users` WHERE User_ID = %s AND Main= %s)"
@@ -126,7 +126,8 @@ def get_watchlist_by_id(watchlist_ID):
 
         query = f"SELECT * FROM `final_project_db`.`watch_lists_objects` WHERE Parent_ID = %s"
         cursor2.execute(query, (watchlist_ID,))
-        return jsonify(cursor2.fetchall())
+        results = cursor2.fetchall()
+        return results
 
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:

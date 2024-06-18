@@ -4,11 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Started preparing watchlists for web display, started working on the streaming recommendation algorithm">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Fixed naming issues">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_comments.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_feed_items.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_likes.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_messages.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_rating.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_reviews.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_users.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_watch_list.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_watch_lists_names.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_watch_lists_objects.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/readme.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/user_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/user_services.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/watchlist_services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -55,26 +64,26 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 4
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2gEpevinZcgYbZnjtZuYtKsBo2r" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Final_Project_API.executor": "Run",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Final_Project_API.executor&quot;: &quot;Run&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Final_Project_API" type="PythonConfigurationType" factoryName="Python">
       <module name="Final_Project_API" />
@@ -123,7 +132,9 @@
       <workItem from="1718138269275" duration="275000" />
       <workItem from="1718180562322" duration="1417000" />
       <workItem from="1718267297049" duration="46000" />
-      <workItem from="1718733210781" duration="1072000" />
+      <workItem from="1718733210781" duration="1393000" />
+      <workItem from="1718734882463" duration="2524000" />
+      <workItem from="1718737648313" duration="166000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -146,7 +157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718181979884</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Fixed naming issues">
+      <option name="closed" value="true" />
+      <created>1718734322778</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1718734322778</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -167,7 +186,8 @@
     <MESSAGE value="Update" />
     <MESSAGE value="Updated and (re-) added some watchlist routes. Updated Some services naming, fixed some indentation issues in 'services', updated README with new routes for watchlists" />
     <MESSAGE value="Started preparing watchlists for web display, started working on the streaming recommendation algorithm" />
-    <option name="LAST_COMMIT_MESSAGE" value="Started preparing watchlists for web display, started working on the streaming recommendation algorithm" />
+    <MESSAGE value="Fixed naming issues" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed naming issues" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -181,6 +201,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1718734264804" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1718737331993" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

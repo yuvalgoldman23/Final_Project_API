@@ -16,11 +16,12 @@ def produce_client_ready_watchlist(watchlist):
     finished_watchlist = []
     for watchlist_object in watchlist:
         media_info = {}
-        if watchlist_object.is_movie:
-            tmdb_info = json.loads(tmdb.get_movie_info(watchlist_object.tmdb_id))
+        if watchlist_object['is_movie']:
+            tmdb_info = (tmdb.get_movie_info(watchlist_object['TMDB_ID']))
         else:
-            tmdb_info = json.loads(tmdb.get_tv_show_info(watchlist_object.tmdb_id))
-        media_info['title'] = tmdb_info['title']
+            tmdb_info = tmdb.get_tv_show_info(watchlist_object.tmdb_id)
+        tmdb_info = tmdb_info.json
+        media_info['title'] = tmdb_info['original_title']
         media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
         # TODO change poster size to be editable by client request?
         media_info['poster_path'] = "https://image.tmdb.org/t/p/w94_and_h141_bestv2/" + tmdb_info['poster_path']
@@ -29,7 +30,7 @@ def produce_client_ready_watchlist(watchlist):
     return finished_watchlist
 
 
-@watchlists_routes.route('/api/watchlists', methods=['GET'])
+'''@watchlists_routes.route('/api/watchlists', methods=['GET'])
 @auth_required
 def get_main_watchlist(token_info):
     user_id = token_info.get('sub')
@@ -39,6 +40,7 @@ def get_main_watchlist(token_info):
         return jsonify({'Error': db_response}), 404
     else:
         return produce_client_ready_watchlist(watchlist=db_response)
+'''
 
 @watchlists_routes.route('/api/watchlists', methods=['POST'])
 @auth_required
@@ -46,7 +48,7 @@ def create_watchlist(token_info):
     data = request.json
     user_id = token_info.get('sub')
     watchlist_name = data['watchlist_name', '']
-    db_response = service.create_watchlist(user_id, watchlist_name, is_main=False)
+    db_response = service.create_watchlist(user_id, watchlist_name, False)
     if utils.is_db_response_error(db_response):
         return jsonify({"Error": db_response}), 404
     else:
@@ -70,15 +72,19 @@ def delete_content_from_watchlist(token_info):
         return db_response
 
 @watchlists_routes.route('/api/watchlists/<watchlist_id>', methods=['GET'])
-@auth_required
-def get_watchlist_by_id(token_info, watchlist_id):
+
+def get_watchlist_by_id(watchlist_id):
     # TODO add user's watchlist ownership validation or not needed?
-    user_id = token_info.get('sub')
+    # If wanting to protect by id, as toke_info and auth_required, and compare watchlist's owner id to the user id in token
+    #user_id = token_info.get('sub')
     db_response = service.get_watchlist_by_id(watchlist_id)
     if utils.is_db_response_error(db_response):
+        print("error")
         return jsonify({'Error': db_response}), 404
     else:
-        return produce_client_ready_watchlist(watchlist=db_response)
+        client_watchlist = produce_client_ready_watchlist(watchlist=db_response)
+        print("client's watchlist is " , client_watchlist)
+        return jsonify(client_watchlist)
 
 
 @watchlists_routes.route('/api/users/watchlists/all', methods=['GET'])
