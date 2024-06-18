@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify, json
 import utils
 from auth import auth_required
 import services.watchlist_services as service
-import tmdb_routes as tmdb
+import routes.tmdb_routes as tmdb
 watchlists_routes = Blueprint('watchlists_routes', __name__)
 
 

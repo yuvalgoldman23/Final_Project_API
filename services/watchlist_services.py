@@ -63,7 +63,7 @@ def add_watch_list(user_id,name,Is_main):
          insert_query = f"INSERT INTO `final_project_db`.`watch_lists_names` (User_ID,name,Main) VALUES (%s,%s,%s)"
          cursor.execute(insert_query, (user_id, name, False))
          connection.commit()
-	except mysql.connector.Error as err:
+    except mysql.connector.Error as err:
 
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
 
@@ -121,7 +121,7 @@ def get_user_watchlists(user_id):
             return err
 
 
-def get_watch_list_objects_of_watch_list(watchlist_ID):
+def get_watchlist_by_id(watchlist_ID):
     try:
 
         query = f"SELECT * FROM `final_project_db`.`watch_lists_objects` WHERE Parent_ID = %s"
