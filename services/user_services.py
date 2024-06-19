@@ -8,21 +8,19 @@ from services import  watchlist_services as service
 def login_google(id,email):
 
         try:
-            # Connect to the MySQL database
-
-
             # Check if the ID exists
             query = f"SELECT EXISTS(SELECT 1 FROM `final_project_db`.`users` WHERE id = %s)"
             cursor.execute(query, (id,))
             exists = cursor.fetchone()[0]
 
             if not exists:
-                # Insert the ID if it does not exist
+                # Registration: Insert the ID if it does not exist
                 insert_query = f"INSERT INTO `final_project_db`.`users` (id,username,password,email,google_auth) VALUES (%s,%s,%s,%s,%s)"
                 cursor.execute(insert_query, (id,email.split("@")[0],id,email,1))
                 connection.commit()
                 print(f"ID {id} was added to the table .")
-                service.add_watch_list(id, "Main", True)
+                main_watchlist_id = service.create_watchlist(id, "Main", True)
+                return main_watchlist_id
             else:
                 print(f"ID {id} already exists in the table .")
 

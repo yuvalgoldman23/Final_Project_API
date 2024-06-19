@@ -15,7 +15,8 @@ def login(token_info):
         # Create a new user entry for the logged in user, including his id and username
         # TODO currently a user's DB entry only includes his ID (and potentially his watchlist IDs) - add fields, if needed'''
     # Return statement as returned from the DB
-    return jsonify(login_google(user_id, user_email)), 200
+    main_watchlist_id = login_google(user_id, user_email)
+    return jsonify(login_google(user_id, user_email), main_watchlist_id), 200
 
 @user_routes.route('/api/user', methods=['GET'])
 @auth_required

@@ -4,20 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Fixed naming issues">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Got the watchlists to work and produce a client-ready watchlist object">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_comments.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_feed_items.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_likes.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_messages.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_rating.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_reviews.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_users.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_watch_list.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_watch_lists_names.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/final_project_db_watch_lists_objects.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/readme.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/user_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/user_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/user_services.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/watchlist_services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -134,7 +125,8 @@
       <workItem from="1718267297049" duration="46000" />
       <workItem from="1718733210781" duration="1393000" />
       <workItem from="1718734882463" duration="2524000" />
-      <workItem from="1718737648313" duration="166000" />
+      <workItem from="1718737648313" duration="3459000" />
+      <workItem from="1718786194245" duration="9954000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -165,7 +157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718734322778</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Got the watchlists to work and produce a client-ready watchlist object">
+      <option name="closed" value="true" />
+      <created>1718737925666</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1718737925666</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -187,7 +187,8 @@
     <MESSAGE value="Updated and (re-) added some watchlist routes. Updated Some services naming, fixed some indentation issues in 'services', updated README with new routes for watchlists" />
     <MESSAGE value="Started preparing watchlists for web display, started working on the streaming recommendation algorithm" />
     <MESSAGE value="Fixed naming issues" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed naming issues" />
+    <MESSAGE value="Got the watchlists to work and produce a client-ready watchlist object" />
+    <option name="LAST_COMMIT_MESSAGE" value="Got the watchlists to work and produce a client-ready watchlist object" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -201,6 +202,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1718737331993" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1718822432743" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
