@@ -366,14 +366,14 @@ Headers:
 
 
 ### 21. Get Actor Information
-    - **URL:** `/api/actor/<string:actor_id>`
+- **URL:** `/api/actor/<string:actor_id>`
 - **Method:** `GET`
 - **Description:** Retrieves information about a specific Actor.
 - **Parameters:** 
   - `actor_id` (string, required): The ID of the Actor.
 - **Authorization:** Not required.
 - **Response:** 
-  - **200 OK** - Successfully retrieved movie information.
+  - **200 OK** - Successfully retrieved actor information.
     - Content:
       example:
 ```Json
@@ -397,5 +397,66 @@ Headers:
 ```
   - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
     - Content: Empty object.
+   
+### 20. Get combine serch result:
+
+- **URL:** `/api/Media_search?query={query}`
+- **Method:** `GET`
+- **Description:** Retrieves information about a specific movie.
+- **Parameters:** 
+  - `query` (string,get varible, required): the media you want to serch.
+- **Authorization:** Not required.
+- **Response:** 
+  - **200 OK** - Successfully retrieved serch results.
+    - Content: example
+```Json
+[
+{
+    "adult": false, 
+    "backdrop_path": "/fY3lD0jM5AoHJMunjGWqJ0hRteI.jpg", 
+    "genre_ids": [
+      878, 
+      27, 
+      28
+    ], 
+    "id": 940721, 
+    "original_language": "ja", 
+    "original_title": "\u30b4\u30b8\u30e9-1.0", 
+    "overview": "In postwar Japan, Godzilla brings new devastation to an already scorched landscape. With no military intervention or government help in sight, the survivors must join together in the face of despair and fight back against an unrelenting horror.", 
+    "popularity": 487.791, 
+    "poster_path": "/hkxxMIGaiCTmrEArK7J56JTKUlB.jpg", 
+    "release_date": "2023-11-03", 
+    "title": "Godzilla Minus One", 
+    "video": false, 
+    "vote_average": 7.619, 
+    "vote_count": 1716
+  }, 
+  {
+    "adult": false, 
+    "backdrop_path": "/ftiQHOrAGTGXVsJ1pcAVC5Dau78.jpg", 
+    "first_air_date": "1999-10-25", 
+    "genre_ids": [
+      10766, 
+      35, 
+      18
+    ], 
+    "id": 16286, 
+    "name": "I am Betty, the Ugly one", 
+    "origin_country": [
+      "CO"
+    ], 
+    "original_language": "es", 
+    "original_name": "Yo soy Betty, la fea", 
+    "overview": "Taking place mainly in Bogot\u00e1, Colombia, Betty La Fea is essentially a Cinderella comedy about the rise of poor, ugly 'Betty' Pinz\u00f3n and the fall of rich, handsome Armando Mendoza. Armando is a very incompetent playboy with a scheme to turn a huge profit as the new President of Eco Moda, a famous clothing manufacturing company, but his scheme is doomed because of his faulty mathematics. Because Betty, his secretary (and economics wizard), is in love with him, she helps Armando deceive the Board of Directors as he loses money and brings the company to ruin.\n\nBetty, la Fea is arguably the most successful telenovela of all time and one of the most popular television shows in the world. It is the first telenovela to have been remade worldwide and has been regarded as bringing the telenovela to new levels of success.", 
+    "popularity": 234.021, 
+    "poster_path": "/iEBOiXiDGaxVR6w8aKgG5MEusuO.jpg", 
+    "vote_average": 8.35, 
+    "vote_count": 3283
+  }
+]
+```
+  - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
+    - Content: Empty object.
+
 
 
