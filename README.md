@@ -397,8 +397,75 @@ Headers:
 ```
   - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
     - Content: Empty object.
-   
-### 20. Get combine serch result:
+
+### 22. Get Actor media aperance  Information
+
+- **URL:** `/api/actor/combine_credits/<string:actor_id>`
+- **Method:** `GET`
+- **Description:** Retrieves information about the aperance of an actor in a media
+- **Parameters:** 
+  - `actor_id` (string, required): The ID of the actor.
+- **Authorization:** Not required.
+- **Response:** 
+  - **200 OK** - Successfully retrieved media apperance.
+    - Content example:
+```Json
+{
+ "cast": [
+    {
+      "adult": false, 
+      "character": "Self", 
+      "first_air_date": "1996-07-22", 
+      "id": 2224, 
+      "name": "The Daily Show", 
+      "original_name": "The Daily Show", 
+      "popularity": 2067.696, 
+      "poster_path": "/ixcfyK7it6FjRM36Te4OdblAq4X.jpg"
+    }, 
+    {
+      "adult": false, 
+      "character": "Himself", 
+      "first_air_date": "2003-01-26", 
+      "id": 1489, 
+      "name": "Jimmy Kimmel Live!", 
+      "original_name": "Jimmy Kimmel Live!", 
+      "popularity": 494.357, 
+      "poster_path": "/6uKEYejjR88GwHgNq6NAQ30glTx.jpg"
+    }
+        ],
+    "crew": [
+    {
+      "adult": false, 
+      "department": "Writing", 
+      "id": 9428, 
+      "job": "Writer", 
+      "original_title": "The Royal Tenenbaums", 
+      "popularity": 26.071, 
+      "poster_path": "/hwklEwhBhLVI6v3ISlquFTeQIml.jpg", 
+      "release_date": "2001-10-05", 
+      "title": "The Royal Tenenbaums", 
+      "video": false
+    }, 
+    {
+      "adult": false, 
+      "department": "Production", 
+      "id": 9428, 
+      "job": "Executive Producer", 
+      "original_title": "The Royal Tenenbaums", 
+      "popularity": 26.071, 
+      "poster_path": "/hwklEwhBhLVI6v3ISlquFTeQIml.jpg", 
+      "release_date": "2001-10-05", 
+      "title": "The Royal Tenenbaums", 
+      "video": false
+    }
+  ]
+}
+```
+  
+  - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
+    - Content: Empty object.
+
+### 23. Get combine serch result:
 
 - **URL:** `/api/Media_search?query={query}`
 - **Method:** `GET`
