@@ -142,12 +142,14 @@ def add_movie_to_watchlist(token_info):
         if user_id != get_watchlist_owner(watchlist_id):
             return jsonify({"error": "You are not allowed to modify this watchlist"}), 403
     # TODO is the user_id necessary here? where is the validation that the watchlist belongs to the user adding the content?
-    db_response = service.add_watch_list_item(user_id, content_id, watchlist_id, is_movie)
-    print("db response is " , db_response)
+    db_response, status = service.add_watch_list_item(user_id, content_id, watchlist_id, is_movie)
     if utils.is_db_response_error(db_response):
         return jsonify({'Error': db_response}), 404
     else:
-        return db_response
+        if status == 200:
+            return jsonify({'Success': f'Added {content_id} to watchlist', 'watchlist_object_id': db_response}), 200
+        else:
+            return jsonify({'Message': db_response}), 201
 
 @watchlists_routes.route('/api/watchlists', methods=['DELETE'])
 @auth_required

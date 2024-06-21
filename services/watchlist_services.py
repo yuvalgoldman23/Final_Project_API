@@ -7,11 +7,24 @@ from flask import jsonify
 
 
 def add_watch_list_item(userID,Media_TMDB_ID,Parent_ID, is_movie):
+    # Query to get the last inserted id for the given user_id
+    watchlist_id_query = "SELECT ID FROM `final_project_db`.`watch_lists_objects` WHERE User_ID = %s ORDER BY ID DESC LIMIT 1"
     try:
-        insert_query = f"INSERT INTO `final_project_db`.`watch_lists_objects`(`User_ID`,`TMDB_ID`,`Parent_ID`, `is_movie`) VALUES (%s,%s,%s, %s) "
-        cursor.execute(insert_query, (userID,Media_TMDB_ID ,Parent_ID, is_movie))
-        connection.commit()
-        return "Added movie {} to watchlist {}".format(Media_TMDB_ID, Parent_ID)
+        select_query = "SELECT COUNT(*) FROM `final_project_db`.`watch_lists_objects` WHERE `TMDB_ID` = %s AND `Parent_ID` = %s;"
+        # Execute the SELECT query
+        cursor.execute(select_query, (Media_TMDB_ID, Parent_ID))
+        result = cursor.fetchone()
+        if result[0] == 0:
+            insert_query = f"INSERT INTO `final_project_db`.`watch_lists_objects`(`User_ID`,`TMDB_ID`,`Parent_ID`, `is_movie`) VALUES (%s,%s,%s, %s) "
+            cursor.execute(insert_query, (userID,Media_TMDB_ID ,Parent_ID, is_movie))
+            connection.commit()
+            cursor.execute(watchlist_id_query, (userID,))
+            main_watchlist_id = cursor.fetchone()[0]
+            print("Added movie {} to watchlist {}".format(Media_TMDB_ID, Parent_ID))
+            return main_watchlist_id, 200
+        else:
+            print("Content already in watchlist")
+            return "Content already in watchlist", 201
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
