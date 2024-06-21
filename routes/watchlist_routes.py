@@ -103,16 +103,19 @@ def get_watchlist_by_id(watchlist_id):
         return jsonify(client_watchlist), 200
 
 
-@watchlists_routes.route('/api/users/watchlists/all', methods=['GET'])
+@watchlists_routes.route('/api/watchlists/all', methods=['GET'])
 @auth_required
 def get_user_watchlists(token_info):
+    print("in get all")
     user_id = token_info.get('sub')
     db_response = service.get_user_watchlists(user_id)
+    print("db response " , db_response)
     # Check whether the DB has returned watchlists or an error
     if utils.is_db_response_error(db_response):
         return jsonify({'Error': db_response}), 404
     else:
         all_watchlists = []
+        print("db response is " , db_response)
         for watchlist in db_response:
             watchlist_id = watchlist.get('ID')
             watchlist, status = (get_watchlist_by_id(watchlist_id))

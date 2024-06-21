@@ -158,11 +158,10 @@ def get_watchlist_by_id(watchlist_ID):
 
 def get_watchlist_details_only(watchlist_ID):
     try:
-
         query = f"SELECT * FROM `final_project_db`.`watch_lists_names` WHERE ID = %s"
         cursor2.execute(query, (watchlist_ID,))
         results = cursor2.fetchall()
-        print(results)
+        print("watchlist deets " , results, "watchlist id " , watchlist_ID)
         return results[0]
 
     except mysql.connector.Error as err:
