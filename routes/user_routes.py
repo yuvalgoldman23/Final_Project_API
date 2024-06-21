@@ -12,13 +12,13 @@ def login(token_info):
     user_id = token_info.get('sub')
     user_email = token_info.get('email')
     '''if user_id not in users:
-        # Create a new user entry for the logged in user, including his id and username
-        # TODO currently a user's DB entry only includes his ID (and potentially his watchlist IDs) - add fields, if needed'''
+        # Create a new user entry for the logged in user, including his id and username'''
     # Return statement as returned from the DB
     return_val, status = login_google(user_id, user_email)
-    if status == 200:
+    if status != 200:
+        return jsonify({'Error' : return_val}), status
+    elif status == 200:
         return jsonify({'main_watchlist_id': return_val}), 200
-    return jsonify({'Message': return_val}), status
 
 @user_routes.route('/api/user', methods=['GET'])
 @auth_required

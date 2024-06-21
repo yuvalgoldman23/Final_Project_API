@@ -23,7 +23,8 @@ def login_google(id,email):
                 return main_watchlist_id, 200
             else:
                 print(f"ID {id} already exists in the table .")
-                return f"Logged in user {id} with email {email}", 201
+                main_watchlist_id = service.get_main_watchlist(id)[0].get('ID')
+                return main_watchlist_id, 200
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:

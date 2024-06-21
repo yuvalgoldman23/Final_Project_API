@@ -51,7 +51,6 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
 def get_main_watchlist(token_info):
     user_id = token_info.get('sub')
     db_response = service.get_main_watchlist(user_id)
-    # TODO add user's watchlist ownership validation or not needed?
     if utils.is_db_response_error(db_response):
         return jsonify({'Error': db_response}), 404
     else:

@@ -42,20 +42,39 @@ Headers:
 
 ## Endpoints
 
-### 1. Login
+## 1. Login
+**URL:** `/api/login`  
+**Method:** `POST`  
+**Description:** Logs the user in using Google authentication, creating a new user if necessary, and returns the ID of the main watchlist.  
+**Authorization:** Token-based authentication required.
 
-- **URL:** `/api/login`
-- **Method:** `POST`
-- **Description:** Logs the user in, registers a new user along the way.
-- **Authorization:** Token-based authentication required.
-- **Response:** 
-  - **Status Code:**     
-    - 200 Success if new user created
-    - 201 Success if existing user logged in
-  - **Content Type:** application/json
-  - **Description:** Returns a success or failure JSON message.
----
-  ### 2. Get User Details
+**Request Body:**
+```json
+{
+  // No request body parameters required as the user information is derived from the token.
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "main_watchlist_id": "string"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** Varies (e.g., `400 Bad Request`, `401 Unauthorized`, `500 Internal Server Error`)
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Message": "string"
+  }
+  ```
+  ### 2. Get User Details (Inactive as of now!)
 
 - **URL:** `/api/user`
 - **Method:** `GET`
@@ -68,94 +87,250 @@ Headers:
   - **Description:** Returns a success or failure JSON message. 
   - In case of success, returns the following details:  "email", "firstname", "lastname", "username"
 ---
-### 3. Get Watchlist
 
-- **URL:** `/api/watchlists`
-- **Method:** `GET`
-- **Description:** Retrieves details of a watchlist.
-- **Parameters:**
-  - (Optional) `wathclist_id` (string, numbers):  returns the watchlist. If no ID has been provided, returns the user's 'Main' watchlist.
-- **Authorization:** Token-based authentication required.
-- **Success Response:**
-  - **Status Code:** 200 OK if watchlist found
-  - **Content Type:** application/json
-  - **Description:** Returns the watchlist object if found.
-- **Failure Response:**
-  - **Status Code:** 404 Not Found if watchlist not found
-  - **Content Type:** application/json
-  - **Description:** Returns an error if the watchlist is not found.
-  - If watchlist found, returns an object like this:
-    - { "Comment": "fefse", "ID": "4741735bb7e6", "Is_Movie": 1, "Media_ID": "123", "Owner_ID": "2", "Progress": "fefs", "Rating": 10.0, "Time_Updated": "Tue, 04 Jun 2024 20:45:42 GMT", "Watched": 1 }, { "Comment": "fefse", "ID": "ad85ef514915", "Is_Movie": 1, "Media_ID": "65656", "Owner_ID": "2", "Progress": "fefs", "Rating": 10.0, "Time_Updated": "Tue, 04 Jun 2024 20:46:43 GMT", "Watched": 1 }
----
+### 3. Get Main Watchlist
+**URL:** `/api/watchlists`  
+**Method:** `GET`  
+**Description:** Retrieves the main watchlist of the logged-in user.  
+**Authorization:** Token-based authentication required.
 
-### 4. Add Movie/Show to Watchlist
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Content": [
+      {
+        "watchlist_item_id": "string",
+        "title": "string",
+        "genres": ["string"],
+        "poster_path": "string"
+      }
+    ],
+    "Name": "string",
+    "ID": "string"
+  }
+  ```
 
-- **URL:** `/api/watchlists/content`
-- **Method:** `PUT`
-- **Description:** Adds a new movie/show to the logged-in user's watchlist.
-- **Authorization:** Token-based authentication required.
-- **Request Body:**
-  - `content_id` (string, text): ID of a new movie/show to add to the watchlist.
-    - `is_movie` (boolean): True if movie, False otherwise
-    - `comment` (Optional: string, text): User's personal comment on media
-- **Success Response:**
-  - **Status Code:** 200 OK
-  - **Content Type:** application/json
-  - **Description:** Returns the updated watchlist object.
-- **Failure Response:**
-  - **Status Code:** 404 Not Found
-  - **Content Type:** application/json
-  - **Description:** Returns an error if the watchlist is not found.
----
-### 5. Delete Movie/Show from Watchlist
+**Failure Response:**
+- **Status Code:** `404 Not Found`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Error": "string"
+  }
+  ```
 
-- **URL:** `/api/watchlists/content`
-- **Method:** `DELETE`
-- **Description:** Removes a specific movie/show from the logged-in user's watchlist.
-- **Authorization:** Token-based authentication required.
-- **Request Body:**
-  - `watchlist_item_id` (string, text): ID of the watchlist item to be removed. Specific to each watchlist.
-- **Success Response:**
-  - **Status Code:** 200 OK
-  - **Content Type:** application/json
-  - **Description:** Returns a success message if the movie/show is deleted from the watchlist.
-- **Failure Response:**
-  - **Status Code:** 404 Not Found
-  - **Content Type:** application/json
-  - **Description:** Returns an error if the movie or watchlist is not found.
----
+### 4. Create Watchlist
+**URL:** `/api/watchlists`  
+**Method:** `POST`  
+**Description:** Creates a new watchlist for the logged-in user.  
+**Authorization:** Token-based authentication required.  
 
-### 6. Create new watchlist
+**Request Body:**
+```json
+{
+  "watchlist_name": "string (optional)"
+}
+```
 
-- **URL:** `/api/watchlists`
-- **Method:** `POST`
-- **Description:** Removes a specific movie/show from the logged-in user's watchlist.
-- **Authorization:** Token-based authentication required.
-- **Request Body:**
-  - `watchlist_name` (Optional: string, text): the new watchlist's name.
-- **Success Response:**
-  - **Status Code:** 200 OK
-  - **Content Type:** application/json
-  - **Description:** 'ID': Returns the new watchlist's ID upon success.
-- **Failure Response:**
-  - **Status Code:** 404 Not Found
-  - **Content Type:** application/json
-  - **Description:** Returns an error if the movie or watchlist is not found.
----
-### 7. Get all of user's watchlist's
+**Success Response:**
+- **Status Code:** `201 Created`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "watchlist_id": "string"
+  }
+  ```
 
-- **URL:** `/api/watchlists/all`
-- **Method:** `GET`
-- **Description:** Returns all the logged-in user's watchlists.
-- **Authorization:** Token-based authentication required.
-- **Success Response:**
-  - **Status Code:** 200 OK
-  - **Content Type:** application/json
-  - **Description:** 'watchlists' :Returns an object of watchlists.
-- **Failure Response:**
-  - **Status Code:** 404 Not Found
-  - **Content Type:** application/json
-  - **Description:** Returns an error if there's a DB issue.
+**Failure Response:**
+- **Status Code:** `404 Not Found`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Error": "string"
+  }
+  ```
+
+### 5. Delete Content from Watchlist
+**URL:** `/api/watchlists/content`  
+**Method:** `DELETE`  
+**Description:** Removes a specific content item from the logged-in user's watchlist.  
+**Authorization:** Token-based authentication required.  
+
+**Request Body:**
+```json
+{
+  "watchlist_item_id": "string"
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Success": "string"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `404 Not Found`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Error": "string"
+  }
+  ```
+
+### 6. Get Watchlist by ID
+**URL:** `/api/watchlists/{watchlist_id}`  
+**Method:** `GET`  
+**Description:** Retrieves the watchlist by its ID.  
+**Authorization:** Not required.  
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Content": [
+      {
+        "watchlist_item_id": "string",
+        "title": "string",
+        "genres": ["string"],
+        "poster_path": "string"
+      }
+    ],
+    "Name": "string",
+    "ID": "string"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `404 Not Found`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Error": "string"
+  }
+  ```
+
+### 7. Get All User Watchlists
+**URL:** `/api/watchlists/all`  
+**Method:** `GET`  
+**Description:** Retrieves all watchlists of the logged-in user.  
+**Authorization:** Token-based authentication required.  
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "watchlists": [
+      {
+        "Content": [
+          {
+            "watchlist_item_id": "string",
+            "title": "string",
+            "genres": ["string"],
+            "poster_path": "string"
+          }
+        ],
+        "Name": "string",
+        "ID": "string"
+      }
+    ]
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `404 Not Found`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Error": "string"
+  }
+  ```
+
+### 8. Add Movie/Show to Watchlist
+**URL:** `/api/watchlists/content`  
+**Method:** `PUT`  
+**Description:** Adds a new movie/show to the logged-in user's watchlist.  
+**Authorization:** Token-based authentication required.  
+
+**Request Body:**
+```json
+{
+  "watchlist_id": "string",
+  "content_id": "string",
+  "is_movie": "boolean"
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Success": "string",
+    "watchlist_object_id": "string"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `404 Not Found`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Error": "string"
+  }
+  ```
+
+### 9. Delete User Watchlist
+**URL:** `/api/watchlists`  
+**Method:** `DELETE`  
+**Description:** Deletes a specific watchlist of the logged-in user.  
+**Authorization:** Token-based authentication required.  
+
+**Request Body:**
+```json
+{
+  "watchlist_id": "string"
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Success": "string"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `404 Not Found`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Error": "string"
+  }
+  ```
 ---
 ### 7. Create Post
 
