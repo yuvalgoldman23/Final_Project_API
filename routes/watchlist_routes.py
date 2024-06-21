@@ -41,7 +41,7 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
     # If watchlist name wasn't set, give the watchlist a default name by its ID
     if not watchlist_name:
         watchlist_name = "Watchlist #"+ watchlist_details['ID']
-    watchlist = {'Content': finished_watchlist, 'Name': watchlist_name}
+    watchlist = {'Content': finished_watchlist, 'Name': watchlist_name, 'ID': watchlist_details['ID']}
     print("finished watchlist" , finished_watchlist)
     return watchlist
 

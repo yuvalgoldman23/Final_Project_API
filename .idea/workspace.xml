@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added get_main_watchlist route">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Changed the 'get all watchlists' endpoint's url">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/watchlist_services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -129,7 +128,8 @@
       <workItem from="1718896468967" duration="211000" />
       <workItem from="1718971490011" duration="4088000" />
       <workItem from="1718981276462" duration="652000" />
-      <workItem from="1718982193306" duration="771000" />
+      <workItem from="1718982193306" duration="812000" />
+      <workItem from="1718983382823" duration="106000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -192,7 +192,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718981902472</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Changed the 'get all watchlists' endpoint's url">
+      <option name="closed" value="true" />
+      <created>1718983000230</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1718983000230</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -218,7 +226,8 @@
     <MESSAGE value="Watchlists routes fully integrated with DB, fully working and tested. Edited some services to make it work." />
     <MESSAGE value="Fixed new user registration and watchlist creation" />
     <MESSAGE value="Added get_main_watchlist route" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added get_main_watchlist route" />
+    <MESSAGE value="Changed the 'get all watchlists' endpoint's url" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed the 'get all watchlists' endpoint's url" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
