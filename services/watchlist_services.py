@@ -49,28 +49,25 @@ def remove_watch_list_item(userID,watch_list_item_id):
 
 def create_watchlist(user_id,name,Is_main):
     # Query to get the last inserted id for the given user_id
-    watchlist_id_query = """
-        SELECT id 
-        FROM `final_project_db`.`watch_lists_names` 
-        WHERE User_ID = %s 
-        ORDER BY id DESC 
-        LIMIT 1
-    """
+    watchlist_id_query = "SELECT ID FROM `final_project_db`.`watch_lists_names` WHERE User_ID = %s ORDER BY ID DESC LIMIT 1"
     try:
      if (Is_main):
-         query = f"SELECT EXISTS(SELECT 1 FROM `final_project_db`.`users` WHERE User_ID = %s AND Main= %s)"
+         query = f"SELECT EXISTS(SELECT 1 FROM `final_project_db`.`watch_lists_names` WHERE User_ID = %s AND Main= %s)"
          cursor.execute(query, (user_id,True))
          exists = cursor.fetchone()[0]
          if not exists:
              # Insert the ID if it does not exist
-             insert_query = f"INSERT INTO `final_project_db`.`watch_lists_names` User_ID,name,Main) VALUES (%s,%s,%s)"
-             cursor.execute(insert_query, (user_id,"Main",True ))
+             insert_query = "INSERT INTO `final_project_db`.`watch_lists_names` (User_ID, name, Main) VALUES (%s, %s, %s)"
+             cursor.execute(insert_query, (user_id,'Main',True ))
+             print(type(user_id))
              connection.commit()
              print(f"ID {user_id}  list was added to the table .")
-             cursor.execute(watchlist_id_query, user_id)
-             return cursor.fetchone()[0]
+             cursor.execute(watchlist_id_query, (user_id,))
+             main_watchlist_id = cursor.fetchone()[0]
+             return main_watchlist_id
          else:
              print(f"ID {user_id}  list main watchlist already exists in the table .")
+             return f"ID {user_id}  list main watchlist already exists in the table .", 201
      else :
          insert_query = f"INSERT INTO `final_project_db`.`watch_lists_names` (User_ID,name,Main) VALUES (%s,%s,%s)"
          cursor.execute(insert_query, (user_id, name, False))
@@ -165,6 +162,7 @@ def get_watchlist_details_only(watchlist_ID):
         query = f"SELECT * FROM `final_project_db`.`watch_lists_names` WHERE ID = %s"
         cursor2.execute(query, (watchlist_ID,))
         results = cursor2.fetchall()
+        print(results)
         return results[0]
 
     except mysql.connector.Error as err:
