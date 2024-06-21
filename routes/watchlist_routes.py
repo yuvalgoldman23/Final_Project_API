@@ -46,17 +46,18 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
     return watchlist
 
 
-'''@watchlists_routes.route('/api/watchlists', methods=['GET'])
+@watchlists_routes.route('/api/watchlists', methods=['GET'])
 @auth_required
 def get_main_watchlist(token_info):
     user_id = token_info.get('sub')
-    db_response = service.get_watchlist
+    db_response = service.get_main_watchlist(user_id)
     # TODO add user's watchlist ownership validation or not needed?
     if utils.is_db_response_error(db_response):
         return jsonify({'Error': db_response}), 404
     else:
-        return produce_client_ready_watchlist(watchlist=db_response)
-'''
+        watchlist_id = db_response[0].get('ID')
+        watchlist_object = service.get_watchlist_by_id(watchlist_id)
+        return produce_client_ready_watchlist(watchlist_id, watchlist_object)
 
 @watchlists_routes.route('/api/watchlists', methods=['POST'])
 @auth_required

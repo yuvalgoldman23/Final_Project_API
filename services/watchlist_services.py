@@ -176,3 +176,22 @@ def get_watchlist_details_only(watchlist_ID):
             print(err)
             return err
 
+
+def get_main_watchlist(user_ID):
+    try:
+
+        query = f"SELECT * FROM `final_project_db`.`watch_lists_names` WHERE User_ID = %s AND Main = 1"
+        cursor2.execute(query, (user_ID,))
+        results = cursor2.fetchall()
+        return results
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return jsonify({"type":"Error" ,"message":"Something is wrong with your user name or password"}), 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return jsonify({"type":"Error" ,"message":"Database does not exist"}), 404
+        else:
+            print(err)
+            return err
