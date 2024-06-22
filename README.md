@@ -343,6 +343,200 @@ Headers:
   }
   ```
 ---
+### 10. Write Review
+**URL:** `/api/reviews`  
+**Method:** `POST`  
+**Description:** Adds a review for a specific content item.  
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+```json
+{
+  "text": "string",
+  "content_id": "string"
+}
+```
+
+**Success Response:**
+- **Status Code:** `201 Created`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "success": "added a review for content_id",
+    "review_id": "string"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `400 Bad Request`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "error",
+    "message": "Missing text or content_id"
+  }
+  ```
+
+- **Status Code:** Varies (e.g., `500 Internal Server Error`)
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "error",
+    "message": "string"
+  }
+  ```
+---
+### 11. Get Reviews by User
+**URL:** `/api/users/reviews`  
+**Method:** `GET`  
+**Description:** Retrieves all reviews written by a specific user.  
+**Authorization:** Not required.
+
+**Request Body:**
+```json
+{
+  "user_id": "string"
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "reviews": [
+      {
+        "ID": "string",
+        "Parent_ID": "string",
+        "Text": "string",
+        "updated_at": "TIMESTAMP"
+      },
+      ...
+    ]
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `400 Bad Request`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "error",
+    "message": "Missing user_id"
+  }
+  ```
+
+- **Status Code:** Varies (e.g., `500 Internal Server Error`)
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "error",
+    "message": "string"
+  }
+  ```
+---
+### 11. Get Reviews by Content
+**URL:** `/api/reviews/content`  
+**Method:** `GET`  
+**Description:** Retrieves all reviews for a specific content item.  
+**Authorization:** Not required.
+
+**Request Body:**
+```json
+{
+  "content_id": "string"
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "reviews": [
+      {
+        "ID": "string",
+        "User_ID": "string",
+        "Text": "string",
+        "updated_at": "TIMESTAMP"
+      },
+      ...
+    ]
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `400 Bad Request`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "error",
+    "message": "Missing content_id"
+  }
+  ```
+
+- **Status Code:** Varies (e.g., `500 Internal Server Error`)
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "error",
+    "message": "string"
+  }
+  ```
+---
+### 12. Delete Review
+**URL:** `/api/reviews`  
+**Method:** `DELETE`  
+**Description:** Deletes a specific review written by the logged-in user.  
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+```json
+{
+  "review_id": "string"
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "success": "deleted review of id review_id"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `400 Bad Request`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "error",
+    "message": "Missing review_id"
+  }
+  ```
+
+- **Status Code:** Varies (e.g., `500 Internal Server Error`)
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "error",
+    "message": "string"
+  }
+  ```
+---
 ### 7. Create Post
 
 - **URL:** `/api/posts`
@@ -361,6 +555,7 @@ Headers:
   - **Content Type:** application/json
   - **Description:** Returns an error if required fields are missing in the request body.
 ---
+
 ### 8. Load Last 20 Posts
 
 - **URL:** `/api/posts`
