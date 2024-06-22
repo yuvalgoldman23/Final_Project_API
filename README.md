@@ -288,6 +288,17 @@ Headers:
     "watchlist_object_id": "string"
   }
   ```
+  
+
+**Duplicate Content Response:**
+- **Status Code:** `204`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Message": "string"
+  }
+  ```
 
 **Failure Response:**
 - **Status Code:** `404 Not Found`

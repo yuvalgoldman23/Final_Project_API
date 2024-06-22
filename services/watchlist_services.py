@@ -21,10 +21,10 @@ def add_watch_list_item(userID,Media_TMDB_ID,Parent_ID, is_movie):
             cursor.execute(watchlist_id_query, (userID,))
             main_watchlist_id = cursor.fetchone()[0]
             print("Added movie {} to watchlist {}".format(Media_TMDB_ID, Parent_ID))
-            return main_watchlist_id, 200
+            return main_watchlist_id, 201
         else:
             print("Content already in watchlist")
-            return "Content already in watchlist", 201
+            return "Content already in watchlist", 204
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")

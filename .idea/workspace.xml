@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added protection from adding same content more than once to the watchlist">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated the readme file to fit the new watchlist routes, update login readme">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/user_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/user_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/user_services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/watchlist_services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +131,8 @@
       <workItem from="1718981276462" duration="652000" />
       <workItem from="1718982193306" duration="812000" />
       <workItem from="1718983382823" duration="1520000" />
-      <workItem from="1719004037529" duration="996000" />
+      <workItem from="1719004037529" duration="1097000" />
+      <workItem from="1719044033478" duration="148000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -220,7 +219,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718984908417</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Updated the readme file to fit the new watchlist routes, update login readme">
+      <option name="closed" value="true" />
+      <created>1719005135351</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1719005135351</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -249,7 +256,8 @@
     <MESSAGE value="Changed the 'get all watchlists' endpoint's url" />
     <MESSAGE value="Added watchlist id to the watchlist object returned for client" />
     <MESSAGE value="Added protection from adding same content more than once to the watchlist" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added protection from adding same content more than once to the watchlist" />
+    <MESSAGE value="Updated the readme file to fit the new watchlist routes, update login readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the readme file to fit the new watchlist routes, update login readme" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
