@@ -550,3 +550,166 @@ Headers:
   - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
     - Content: Empty object.
 
+
+### 21. Get Actor Information
+- **URL:** `/api/actor/<string:actor_id>`
+- **Method:** `GET`
+- **Description:** Retrieves information about a specific Actor.
+- **Parameters:** 
+  - `actor_id` (string, required): The ID of the Actor.
+- **Authorization:** Not required.
+- **Response:** 
+  - **200 OK** - Successfully retrieved actor information.
+    - Content:
+      example:
+```Json
+{
+  "adult": false, 
+  
+  "biography": "Jackie Chan (Chinese: \u6210\u9f8d; born 7 April 1954), Chan Kong-sang, is a Hong Kong actor, action choreographer, filmmaker, comedian, producer, martial artist, screenwriter, entrepreneur, singer and stunt performer. In his movies, he is known for his acrobatic fighting style, comic timing, use of improvised weapons, and innovative stunts. Jackie Chan has been acting since the 1970s and has appeared in over 100 films.\n\nChan has received stars on the Hong Kong Avenue of Stars and the Hollywood Walk of Fame. As a cultural icon, Chan has been referenced in various pop songs, cartoons, and video games. Chan is also a Cantopop and Mandopop star, having released a number of albums and sung many of the theme songs for the films in which he has starred.\n\nChan was born on April 7, 1954, in Victoria Peak, in the former Crown colony of Hong Kong, as Chan Kong-sang (meaning \"born in Hong Kong\") to Charles and Lee-Lee Chan, refugees from the Chinese Civil War. He was nicknamed Paopao (Chinese: \u70ae\u70ae, literally meaning \"Cannonball\") because he was such a big baby, weighing 12 pounds, or about 5.4 kgs. Since his parents worked for the French Consul to Hong Kong, Chan spent his formative years within the grounds of the consul's residence in the Victoria Peak district. Chan attended the Nah-Hwa Primary School on Hong Kong Island, where he failed his first year, after which his parents withdrew him from the school.\n\nIn 1960, his father immigrated to Canberra, Australia, to work as the head cook for the American embassy, and Chan was sent to the China Drama Academy, a Peking Opera School run by Master Yu Jim-yuen. Chan trained rigorously for the next decade, excelling in martial arts and acrobatics. He eventually became part of the Seven Little Fortunes, a performance group made up of the school's best students, gaining the stage name Yuen Lo in homage to his master. Chan became close friends with fellow group members Sammo Hung and Yuen Biao, the three of them later to be known as the Three Brothers or Three Dragons. At the age of 17, he worked as a stuntman in the Bruce Lee films Fist of Fury and Enter the Dragon under the stage name Chan Yuen Lung. He received his first starring role later that year, in Little Tiger of Canton, which had a limited release in Hong Kong in 1973.", 
+  "birthday": "1954-04-07", 
+  "deathday": null, 
+  "gender": 2, 
+  "homepage": "http://jackiechan.com", 
+  "id": 18897, 
+  "imdb_id": "nm0000329", 
+  "known_for_department": "Acting", 
+  "name": "Jackie Chan", 
+  "place_of_birth": "Victoria Peak, Hong Kong", 
+  "popularity": 72.36, 
+  "profile_path": "/nraZoTzwJQPHspAVsKfgl3RXKKa.jpg"
+}
+
+```
+  - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
+    - Content: Empty object.
+
+### 22. Get Actor media aperance  Information
+
+- **URL:** `/api/actor/combine_credits/<string:actor_id>`
+- **Method:** `GET`
+- **Description:** Retrieves information about the aperance of an actor in a media
+- **Parameters:** 
+  - `actor_id` (string, required): The ID of the actor.
+- **Authorization:** Not required.
+- **Response:** 
+  - **200 OK** - Successfully retrieved media apperance.
+    - Content example:
+```Json
+{
+ "cast": [
+    {
+      "adult": false, 
+      "character": "Self", 
+      "first_air_date": "1996-07-22", 
+      "id": 2224, 
+      "name": "The Daily Show", 
+      "original_name": "The Daily Show", 
+      "popularity": 2067.696, 
+      "poster_path": "/ixcfyK7it6FjRM36Te4OdblAq4X.jpg"
+    }, 
+    {
+      "adult": false, 
+      "character": "Himself", 
+      "first_air_date": "2003-01-26", 
+      "id": 1489, 
+      "name": "Jimmy Kimmel Live!", 
+      "original_name": "Jimmy Kimmel Live!", 
+      "popularity": 494.357, 
+      "poster_path": "/6uKEYejjR88GwHgNq6NAQ30glTx.jpg"
+    }
+        ],
+    "crew": [
+    {
+      "adult": false, 
+      "department": "Writing", 
+      "id": 9428, 
+      "job": "Writer", 
+      "original_title": "The Royal Tenenbaums", 
+      "popularity": 26.071, 
+      "poster_path": "/hwklEwhBhLVI6v3ISlquFTeQIml.jpg", 
+      "release_date": "2001-10-05", 
+      "title": "The Royal Tenenbaums", 
+      "video": false
+    }, 
+    {
+      "adult": false, 
+      "department": "Production", 
+      "id": 9428, 
+      "job": "Executive Producer", 
+      "original_title": "The Royal Tenenbaums", 
+      "popularity": 26.071, 
+      "poster_path": "/hwklEwhBhLVI6v3ISlquFTeQIml.jpg", 
+      "release_date": "2001-10-05", 
+      "title": "The Royal Tenenbaums", 
+      "video": false
+    }
+  ]
+}
+```
+  
+  - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
+    - Content: Empty object.
+
+### 23. Get combine serch result:
+
+- **URL:** `/api/Media_search?query={query}`
+- **Method:** `GET`
+- **Description:** Retrieves information about a specific movie.
+- **Parameters:** 
+  - `query` (string,get varible, required): the media you want to serch.
+- **Authorization:** Not required.
+- **Response:** 
+  - **200 OK** - Successfully retrieved serch results.
+    - Content: example
+```Json
+[
+{
+    "adult": false, 
+    "backdrop_path": "/fY3lD0jM5AoHJMunjGWqJ0hRteI.jpg", 
+    "genre_ids": [
+      878, 
+      27, 
+      28
+    ], 
+    "id": 940721, 
+    "original_language": "ja", 
+    "original_title": "\u30b4\u30b8\u30e9-1.0", 
+    "overview": "In postwar Japan, Godzilla brings new devastation to an already scorched landscape. With no military intervention or government help in sight, the survivors must join together in the face of despair and fight back against an unrelenting horror.", 
+    "popularity": 487.791, 
+    "poster_path": "/hkxxMIGaiCTmrEArK7J56JTKUlB.jpg", 
+    "release_date": "2023-11-03", 
+    "title": "Godzilla Minus One", 
+    "video": false, 
+    "vote_average": 7.619, 
+    "vote_count": 1716
+  }, 
+  {
+    "adult": false, 
+    "backdrop_path": "/ftiQHOrAGTGXVsJ1pcAVC5Dau78.jpg", 
+    "first_air_date": "1999-10-25", 
+    "genre_ids": [
+      10766, 
+      35, 
+      18
+    ], 
+    "id": 16286, 
+    "name": "I am Betty, the Ugly one", 
+    "origin_country": [
+      "CO"
+    ], 
+    "original_language": "es", 
+    "original_name": "Yo soy Betty, la fea", 
+    "overview": "Taking place mainly in Bogot\u00e1, Colombia, Betty La Fea is essentially a Cinderella comedy about the rise of poor, ugly 'Betty' Pinz\u00f3n and the fall of rich, handsome Armando Mendoza. Armando is a very incompetent playboy with a scheme to turn a huge profit as the new President of Eco Moda, a famous clothing manufacturing company, but his scheme is doomed because of his faulty mathematics. Because Betty, his secretary (and economics wizard), is in love with him, she helps Armando deceive the Board of Directors as he loses money and brings the company to ruin.\n\nBetty, la Fea is arguably the most successful telenovela of all time and one of the most popular television shows in the world. It is the first telenovela to have been remade worldwide and has been regarded as bringing the telenovela to new levels of success.", 
+    "popularity": 234.021, 
+    "poster_path": "/iEBOiXiDGaxVR6w8aKgG5MEusuO.jpg", 
+    "vote_average": 8.35, 
+    "vote_count": 3283
+  }
+]
+```
+  - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
+    - Content: Empty object.
+
+
+
