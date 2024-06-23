@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Created a concurrent basic, working version of the streaming service recommendation engine. Currently returns the top service covering the watchlist.">
-      <change afterPath="$PROJECT_DIR$/routes/reviews_routes.py" afterDir="false" />
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added review routes, updated the readme accordingly">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/reviews_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/reviews_services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,7 +134,8 @@
       <workItem from="1719004037529" duration="1097000" />
       <workItem from="1719044033478" duration="4590000" />
       <workItem from="1719048715703" duration="334000" />
-      <workItem from="1719077934672" duration="4074000" />
+      <workItem from="1719077934672" duration="4211000" />
+      <workItem from="1719149162190" duration="357000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -256,7 +254,23 @@
       <option name="project" value="LOCAL" />
       <updated>1719049044662</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Added review routes, updated the readme accordingly">
+      <option name="closed" value="true" />
+      <created>1719082100719</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1719082100719</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Added review routes, updated the readme accordingly">
+      <option name="closed" value="true" />
+      <created>1719082124325</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1719082124325</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -289,7 +303,8 @@
     <MESSAGE value="Updated add watch  list item readme to include duplicate content addition protection" />
     <MESSAGE value="Created a basic, working version of the streaming service recommendation engine. Currently returns the top service covering the watchlist" />
     <MESSAGE value="Created a concurrent basic, working version of the streaming service recommendation engine. Currently returns the top service covering the watchlist." />
-    <option name="LAST_COMMIT_MESSAGE" value="Created a concurrent basic, working version of the streaming service recommendation engine. Currently returns the top service covering the watchlist." />
+    <MESSAGE value="Added review routes, updated the readme accordingly" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added review routes, updated the readme accordingly" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

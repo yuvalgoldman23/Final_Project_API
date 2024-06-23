@@ -105,7 +105,8 @@ Headers:
         "watchlist_item_id": "string",
         "title": "string",
         "genres": ["string"],
-        "poster_path": "string"
+        "poster_path": "string",
+        "tmdb_id":  "string"
       }
     ],
     "Name": "string",
@@ -206,7 +207,8 @@ Headers:
         "watchlist_item_id": "string",
         "title": "string",
         "genres": ["string"],
-        "poster_path": "string"
+        "poster_path": "string",
+         "tmdb_id":  "string"
       }
     ],
     "Name": "string",
@@ -243,7 +245,8 @@ Headers:
             "watchlist_item_id": "string",
             "title": "string",
             "genres": ["string"],
-            "poster_path": "string"
+            "poster_path": "string",
+            "tmdb_id":  "string"
           }
         ],
         "Name": "string",
