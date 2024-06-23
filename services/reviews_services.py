@@ -5,12 +5,12 @@ from flask import jsonify
 
 
 
-
 def Write_review(User_ID,Parent_ID,TEXT):
        try:
            insert_query = f"INSERT INTO `final_project_db`.`reviews`(`User_ID`,`TText`,`Parent_ID`) VALUES (%s,%s,%s,%s) "
            cursor.execute(insert_query, (User_ID, TEXT, Parent_ID))
            connection.commit()
+           return  jsonify({"succses"}), 200
        except mysql.connector.Error as err:
 
            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -34,10 +34,7 @@ def get_rewies_of_user(user_id):
 
          query = f"SELECT * FROM `final_project_db`.`revies` WHERE User_ID = %s"
          cursor2.execute(query, (user_id,))
-         return jsonify(cursor2.fetchall())
-
-
-
+         return jsonify(cursor2.fetchall()),200
 
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -59,9 +56,7 @@ def get_rewies_by_parent(parent_id):
 
          query = f"SELECT * FROM `final_project_db`.`revies` WHERE Parent_ID = %s"
          cursor2.execute(query, (parent_id,))
-         return jsonify(cursor2.fetchall())
-
-
+         return jsonify(cursor2.fetchall()),200
 
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
