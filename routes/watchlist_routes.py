@@ -77,11 +77,12 @@ def create_watchlist(token_info):
 @auth_required
 def delete_content_from_watchlist(token_info):
     data = request.json
-    if 'watchlist_item_id' not in data:
+    if 'content_id' not in data or 'watchlist_id' not in data:
         return jsonify({"error": "No content id provided in the request"}), 400
-    watchlist_item_id = data['watchlist_item_id']
+    watchlist_id = data['watchlist_id']
+    content_id = data['content_id']
     user_id = token_info.get('sub')
-    db_response = service.remove_watch_list_item(user_id, watchlist_item_id)
+    db_response = service.remove_watch_list_item(user_id, watchlist_id, content_id)
     if utils.is_db_response_error(db_response):
         return jsonify({'Error': db_response}), 404
     else:

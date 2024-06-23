@@ -166,7 +166,8 @@ Headers:
 **Request Body:**
 ```json
 {
-  "watchlist_item_id": "string"
+  "watchlist_id": "string",
+  "content_id": "string"
 }
 ```
 

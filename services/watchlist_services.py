@@ -38,14 +38,14 @@ def add_watch_list_item(userID,Media_TMDB_ID,Parent_ID, is_movie):
 
 
 
-def remove_watch_list_item(userID,watch_list_item_id):
+def remove_watch_list_item(userID,watch_list_id, content_id):
     try:
-        delete_query = "DELETE FROM `final_project_db`.`watch_lists_objects` WHERE `ID`= %s AND `User_ID`= %s ;"
-        cursor.execute(delete_query, (watch_list_item_id, userID))
+        delete_query = "DELETE FROM `final_project_db`.`watch_lists_objects` WHERE `Parent_ID`= %s AND `TMDB_ID` = %s AND `User_ID`= %s ;"
+        cursor.execute(delete_query, (watch_list_id, content_id, userID))
         connection.commit()
         if cursor.rowcount > 0:
-            print(f"Deletion of watchlist item {watch_list_item_id} successful")
-            return jsonify({"type": "success", "message": f"Removed item {watch_list_item_id}"}), 200
+            print(f"Deletion of watchlist item {content_id} successful")
+            return jsonify({"type": "success", "message": f"Removed item {content_id}"}), 200
         else:
             return jsonify({"type": "Failure", "message": "No item deleted. Please make sure it belongs to the logged in user"}), 200
     except mysql.connector.Error as err:
