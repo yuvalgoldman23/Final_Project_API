@@ -34,7 +34,7 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         tmdb_info = tmdb_info.json
         media_info['title'] = tmdb_info['original_title']
         media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
-        media_info['tmdb_id'] = watchlist_object['ID']
+        media_info['tmdb_id'] = watchlist_object['TMDB_ID']
         # TODO change poster size to be editable by client request?
         media_info['poster_path'] = "https://image.tmdb.org/t/p/w94_and_h141_bestv2/" + tmdb_info['poster_path']
         # TODO add here the logos of the streaming services for this media in the USA? do that using my streaming function
