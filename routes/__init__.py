@@ -6,3 +6,4 @@ from .streaming_providers_routes import streaming_providers_routes
 from .user_routes import user_routes
 from .tmdb_routes import tmdb_routes
 from .reviews_routes import reviews_routes
+from .ratings_routes import ratings_routes

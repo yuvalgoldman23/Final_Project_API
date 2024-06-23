@@ -541,6 +541,134 @@ Headers:
   }
   ```
 ---
+### 13. Add Rating
+**URL:** `/api/ratings`  
+**Method:** `POST`  
+**Description:** Adds a rating for a specific content item.  
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+```json
+{
+  "content_id": "string",
+  "rating": "number",
+  "is_movie": "boolean"
+}
+```
+
+**Success Response:**
+- **Status Code:** `201 Created`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "string"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `400 Bad Request`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "error": "Content ID and Rating must be provided"
+  }
+  ```
+
+- **Status Code:** Varies (e.g., `500 Internal Server Error`)
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "string"
+  }
+  ```
+
+### 14. Get Ratings by User
+**URL:** `/api/users/ratings`  
+**Method:** `GET`  
+**Description:** Retrieves all ratings given by a specific user. If no user_id is provided in the request, it returns the ratings for the logged-in user.  
+**Authorization:** Token-based authentication required.
+
+**Request Body (Optional):**
+```json
+{
+  "user_id": "string"
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "ratings": [
+      {
+        "rating_id": "string",
+        "content_id": "string",
+        "rating": "number",
+        "is_movie": "boolean",
+        "timestamp": "string"
+      },
+      ...
+    ]
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** Varies (e.g., `500 Internal Server Error`)
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "string"
+  }
+  ```
+
+### 15. Remove Rating
+**URL:** `/api/ratings`  
+**Method:** `DELETE`  
+**Description:** Deletes a specific rating given by the logged-in user.  
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+```json
+{
+  "rating_object_id": "string"
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "string"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `404 Not Found`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "Must provide content id to be deleted"
+  }
+  ```
+
+- **Status Code:** Varies (e.g., `500 Internal Server Error`)
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "string"
+  }
+  ```
+---
 ### 7. Create Post
 
 - **URL:** `/api/posts`

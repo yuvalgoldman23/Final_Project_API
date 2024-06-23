@@ -4,13 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added tmdb id to watchlist">
-      <change afterPath="$PROJECT_DIR$/routes/ratings_routes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/search_routes.py" afterDir="false" />
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated the content deletion from watchlist endpoint. changes reflected in README.md">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old_basic_server_user_api.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/watchlist_services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DataBase_Export/database_export.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/ratings_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/ratings_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/rating_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/rating_services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,7 +139,7 @@
       <workItem from="1719048715703" duration="334000" />
       <workItem from="1719077934672" duration="4211000" />
       <workItem from="1719149162190" duration="4787000" />
-      <workItem from="1719157183825" duration="201000" />
+      <workItem from="1719157183825" duration="2877000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -290,7 +290,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719153480669</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Updated the content deletion from watchlist endpoint. changes reflected in README.md">
+      <option name="closed" value="true" />
+      <created>1719157506993</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1719157506993</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -325,7 +333,8 @@
     <MESSAGE value="Created a concurrent basic, working version of the streaming service recommendation engine. Currently returns the top service covering the watchlist." />
     <MESSAGE value="Added review routes, updated the readme accordingly" />
     <MESSAGE value="Added tmdb id to watchlist" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added tmdb id to watchlist" />
+    <MESSAGE value="Updated the content deletion from watchlist endpoint. changes reflected in README.md" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the content deletion from watchlist endpoint. changes reflected in README.md" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -339,6 +348,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1719079748402" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1719159910349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
