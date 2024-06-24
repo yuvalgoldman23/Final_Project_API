@@ -166,7 +166,7 @@ Headers:
 **Request Body:**
 ```json
 {
-  "watchlist_id": "string",
+  "watchlist_id": "string" (Optional - if none received, remove from main watchlist),
   "content_id": "string"
 }
 ```
