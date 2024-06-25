@@ -14,7 +14,8 @@ def add_rating(token_info):
     content_id = data.get('content_id')
     rating = data.get('rating')
     is_movie = data.get('is_movie')
-    if not content_id or not content_id or not is_movie:
+    print("is_movie", is_movie)
+    if not content_id or not content_id or is_movie is None:
         return jsonify({'error': 'Content ID and Rating must be provided'}), 400
     else:
         return_val, status = service.Add_rating(user_id, content_id, rating, is_movie)

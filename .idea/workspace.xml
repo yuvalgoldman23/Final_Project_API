@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added ratings routes, updated README.md accordingly">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated the content deletion as per request - now watchlist id is optional">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/ratings_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/ratings_routes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +136,9 @@
       <workItem from="1719077934672" duration="4211000" />
       <workItem from="1719149162190" duration="4787000" />
       <workItem from="1719157183825" duration="3243000" />
-      <workItem from="1719222978757" duration="950000" />
+      <workItem from="1719222978757" duration="1216000" />
+      <workItem from="1719325291741" duration="203000" />
+      <workItem from="1719325642614" duration="1960000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -303,7 +305,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719160263925</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Updated the content deletion as per request - now watchlist id is optional">
+      <option name="closed" value="true" />
+      <created>1719251241702</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1719251241702</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -340,7 +350,8 @@
     <MESSAGE value="Added tmdb id to watchlist" />
     <MESSAGE value="Updated the content deletion from watchlist endpoint. changes reflected in README.md" />
     <MESSAGE value="Added ratings routes, updated README.md accordingly" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added ratings routes, updated README.md accordingly" />
+    <MESSAGE value="Updated the content deletion as per request - now watchlist id is optional" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the content deletion as per request - now watchlist id is optional" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -354,6 +365,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1719159910349" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1719326263524" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
