@@ -269,7 +269,7 @@ Headers:
 
 ### 8. Add Movie/Show to Watchlist
 **URL:** `/api/watchlists/content`  
-**Method:** `PUT`  
+**Method:** `POST`  
 **Description:** Adds a new movie/show to the logged-in user's watchlist.  
 **Authorization:** Token-based authentication required.  
 

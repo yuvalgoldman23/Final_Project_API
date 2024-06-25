@@ -129,7 +129,7 @@ def get_user_watchlists(token_info):
     # TODO here run the produce_client_ready_watchlist in a loop on all watchlists received here and return an object of watchlists, each being a return value from the produce function
 
 
-@watchlists_routes.route('/api/watchlists/content', methods=['PUT'])
+@watchlists_routes.route('/api/watchlists/content', methods=['POST'])
 @auth_required
 def add_movie_to_watchlist(token_info):
     data = request.json
