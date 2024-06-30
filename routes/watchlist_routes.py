@@ -20,13 +20,13 @@ def get_watchlist_owner(watchlist_id):
 def produce_client_ready_watchlist(watchlist_id, watchlist_items):
     watchlist_details = service.get_watchlist_details_only(watchlist_id)
     watchlist_name = watchlist_details['name']
-    print("watchlist deets" , watchlist_details)
+    #print("watchlist deets" , watchlist_details)
     finished_watchlist = []
-    print("watchlist items", watchlist_items)
+    #print("watchlist items", watchlist_items)
     for watchlist_object in watchlist_items:
         # Add the watchlist item's ID to the client ready object in order to allow deletion of items from watchlist
         media_info = {'watchlist_item_id': watchlist_object['ID']}
-        print("watchlist object" , watchlist_object)
+        #print("watchlist object" , watchlist_object)
         if watchlist_object['is_movie']:
             tmdb_info = (tmdb.get_movie_info(watchlist_object['TMDB_ID']))
         else:
@@ -43,7 +43,7 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
     if not watchlist_name:
         watchlist_name = "Watchlist #"+ watchlist_details['ID']
     watchlist = {'Content': finished_watchlist, 'Name': watchlist_name, 'ID': watchlist_details['ID']}
-    print("finished watchlist" , finished_watchlist)
+    #print("finished watchlist" , finished_watchlist)
     return watchlist
 
 
@@ -102,28 +102,28 @@ def get_watchlist_by_id(watchlist_id):
         return jsonify({'Error': db_response}), 404
     else:
         client_watchlist = produce_client_ready_watchlist(watchlist_id, watchlist_items=db_response)
-        print("client's watchlist is " , client_watchlist)
+        #print("client's watchlist is " , client_watchlist)
         return jsonify(client_watchlist), 200
 
 
 @watchlists_routes.route('/api/watchlists/all', methods=['GET'])
 @auth_required
 def get_user_watchlists(token_info):
-    print("in get all")
+    #print("in get all")
     user_id = token_info.get('sub')
     db_response = service.get_user_watchlists(user_id)
-    print("db response " , db_response)
+    #print("db response " , db_response)
     # Check whether the DB has returned watchlists or an error
     if utils.is_db_response_error(db_response):
         return jsonify({'Error': db_response}), 404
     else:
         all_watchlists = []
-        print("db response is " , db_response)
+        #print("db response is " , db_response)
         for watchlist in db_response:
             watchlist_id = watchlist.get('ID')
             watchlist, status = (get_watchlist_by_id(watchlist_id))
             all_watchlists.append(watchlist.json)
-        print(all_watchlists)
+        #print(all_watchlists)
         # Returns a list of json objects, each being a watchlist, including a content sub list and a Name attribute
         return jsonify({'watchlists' : all_watchlists}), 200
     # TODO here run the produce_client_ready_watchlist in a loop on all watchlists received here and return an object of watchlists, each being a return value from the produce function

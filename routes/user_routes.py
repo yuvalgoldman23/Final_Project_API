@@ -9,6 +9,7 @@ user_routes = Blueprint('user_routes', __name__)
 @user_routes.route('/api/login', methods=['POST'])
 @auth_required
 def login(token_info):
+    # TODO return the main watchlist for the user if already registered and also his rating and reviews lists???
     user_id = token_info.get('sub')
     user_email = token_info.get('email')
     '''if user_id not in users:

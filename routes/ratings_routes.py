@@ -19,7 +19,10 @@ def add_rating(token_info):
         return jsonify({'error': 'Content ID and Rating must be provided'}), 400
     else:
         return_val, status = service.Add_rating(user_id, content_id, rating, is_movie)
-        return jsonify({'status': return_val}), status
+        if status != 201:
+            return jsonify({'status': return_val}), status
+        else:
+            return jsonify({'rating_id': return_val}), status
 
 
 @ratings_routes.route('/api/users/ratings', methods=['GET'])

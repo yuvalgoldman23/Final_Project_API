@@ -5,11 +5,16 @@ from flask import jsonify
 
 
 def Add_rating(User_ID, Media_id, rating, is_movie):
+    # Query to get the last inserted id for the given user_id
+    rating_id_query = "SELECT ID FROM `final_project_db`.`rating` WHERE User_ID = %s ORDER BY ID DESC LIMIT 1"
     try:
         insert_query = f"INSERT INTO `final_project_db`.`rating`(`User_ID`,`Media_ID`,`rating`, `is_movie`) VALUES (%s,%s,%s,%s) "
         cursor.execute(insert_query, (User_ID, Media_id, rating, is_movie))
         connection.commit()
-        return f"success adding rating for {Media_id}", 200
+        cursor.execute(rating_id_query, (User_ID,))
+        rating_id = cursor.fetchone()[0]
+        print(f"success adding rating for {Media_id}")
+        return rating_id, 201
     except mysql.connector.Error as err:
 
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:

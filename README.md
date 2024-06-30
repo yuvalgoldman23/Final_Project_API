@@ -562,7 +562,7 @@ Headers:
 - **Response Body:**
   ```json
   {
-    "status": "string"
+    "rating_id": "string"
   }
   ```
 
