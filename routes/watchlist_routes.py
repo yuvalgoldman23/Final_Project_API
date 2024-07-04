@@ -5,6 +5,7 @@ from flask import Blueprint, request, jsonify, json
 import utils
 from auth import auth_required
 import services.watchlist_services as service
+import services.rating_services
 import routes.tmdb_routes as tmdb
 watchlists_routes = Blueprint('watchlists_routes', __name__)
 
@@ -85,6 +86,13 @@ def delete_content_from_watchlist(token_info):
         return jsonify({'Error': db_response}), 404
     else:
         return db_response
+
+@watchlists_routes.route('/api/stam', methods=['GET'])
+def stam():
+    a,b =services.rating_services.get_rating_of_user_of_movie('abc','123')
+    t=5
+    return jsonify(a)
+
 
 @watchlists_routes.route('/api/watchlists/<watchlist_id>', methods=['GET'])
 def get_watchlist_by_id(watchlist_id):
