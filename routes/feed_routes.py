@@ -1,39 +1,61 @@
 from flask import Blueprint, request, jsonify
 from auth import auth_required
 import datetime
-
+import services.feed_services as service
 feed_routes = Blueprint('feed_routes', __name__)
 
 
-def validate_user_post(post, token_id):
-    if post['user_id'] != token_id:
-        return jsonify({'error': f"the post does not belong to the currently logged-in user"}), 400
-    else:
-        return True
+# A Post could include either mentions (of other users) or hashtags (of media content)
+# Both mentions and hashtags are lists (we could mention multiple people or movies - or none) - would probably be smart to limit their sizes
+# A post belongs to a certain user
+# A post could have other posts linked above it and below it (a parent-child relationship) as comments to a post.
+# We want to be able to display all posts of a certain user (token not required)
+# We want to allow a user to only edit/remove posts by himself (token required)
+# We want to allow getting all posts mentioning a certain content (no token required) - later, delivery with content page?
+# Fields of a post in the server side: post_id, user_id (owner), parent_post_id, child_post_id, mentions_list, hashtags_list, creation_date
 
 
-@feed_routes.route('/api/posts', methods=['POST'])
+@feed_routes.route('/feed', methods=['POST'])
 @auth_required
-def create_post(token_info):
-    data = request.json
+def add_post(token_info):
     user_id = token_info.get('sub')
-    # Basic input validation
-    if 'text' not in data or 'mentioned_id' not in data:
-        return jsonify({"error": "Missing required fields"}), 400
-    # Create post object
-    new_post = {
-        "text": data['text'],
-        "mentioned_id": data['mentioned_id'],
-        "user_id": user_id,
-        "created_at": datetime.datetime.now(),
-        "post_id": len(posts) + 1
-    }
-    # Save post to database or perform further actions
-    # For demonstration, just append to posts list
-    posts.append(new_post)
-    # TODO should post IDs be added to a user's DB? if so then add it here, and make sure to update accordingly at removal too
-
-    return jsonify(new_post), 201
+    data = request.json
+    text_content = data.get('text_content')
+    if not text_content:
+        return jsonify({'error': 'No text content provided'}), 400
+    parent_id = data.get('parent_id', None)
+    is_child = data.get('is_child')
+    if not is_child:
+        return jsonify({'error': 'No is_child provided'}), 400
+    # TODO mentions and tags shall both be arrays filled with sub arrays of tag id, starting index and length
+    mentions = data.get('mentions')
+    tags = data.get('tags')
+    # First create the post-entry in the DB, then later add the tags and mentions, once we have a post id
+    db_response  = service.add_post(user_id, parent_id, is_child, text_content)
+    if len(db_response) == 2:
+        error, status = db_response
+        return jsonify({'error': error}), status
+    else:
+        # Only a single response value - thus success
+        post_id = db_response
+        # Now add the tags and mentions into the DB, linked to the newly created post id
+        mentions_id = []
+        tags_id = []
+        for mention in mentions:
+            new_mention = service.add_mention(post_id, mention.get('mentioned_user_id'), mention.get('start_position'), mention.get('length'))
+            if not new_mention:
+                #  Remove post, since it wasn't fully created
+                service.remove_post(post_id)
+                return jsonify({'error': 'Error adding mention to post, please try sending request again'}), 400
+            mentions_id.append((new_mention, mention.get('mentioned_user_id')))
+        for tag in tags:
+            new_tag = service.add_tag(post_id, tag.get('tagged_media_id'), tag.get('start_position'), tag.get('length'))
+            if not new_tag:
+                #  Remove post, since it wasn't fully created
+                service.remove_post(post_id)
+                return jsonify({'error': 'Error adding tag to post, please try sending request again'}), 400
+            tags_id.append((new_tag, tag.get('tagged_media_id')))
+        return jsonify({'post_id': post_id, 'mentions': mentions_id, 'tags': tags_id}), 200
 
 
 @feed_routes.route('/api/posts/<post_id>', methods=['DELETE'])

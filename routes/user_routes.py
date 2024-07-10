@@ -9,6 +9,7 @@ user_routes = Blueprint('user_routes', __name__)
 @user_routes.route('/api/login', methods=['POST'])
 @auth_required
 def login(token_info):
+    # TODO add user's name to DB upon registration and send to client
     # TODO return the main watchlist for the user if already registered and also his rating and reviews lists???
     user_id = token_info.get('sub')
     user_email = token_info.get('email')
@@ -19,6 +20,7 @@ def login(token_info):
     if status != 200:
         return jsonify({'Error' : return_val}), status
     elif status == 200:
+        # TODO add sending the username?
         return jsonify({'main_watchlist_id': return_val}), 200
 
 @user_routes.route('/api/user', methods=['GET'])

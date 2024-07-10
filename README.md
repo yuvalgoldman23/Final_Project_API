@@ -669,6 +669,98 @@ Headers:
   }
   ```
 ---
+
+### 16. Add Post
+**URL:** `/feed`  
+**Method:** `POST`  
+**Description:** Creates a new post in the feed with optional mentions and tags.  
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+```json
+{
+  "text_content": "string",        // The content of the post.
+  "parent_id": "string" (optional),// The ID of the parent post (if this is a reply).
+  "is_child": "boolean",           // Indicates if this post is a child post.
+  "mentions": [                    // Array of mentions, each containing:
+    {
+      "mentioned_user_id": "string", // ID of the mentioned user.
+      "start_position": "integer",   // Start index of the mention in the text.
+      "length": "integer"            // Length of the mention in the text.
+    }
+  ],
+  "tags": [                        // Array of tags, each containing:
+    {
+      "tagged_media_id": "string",  // ID of the tagged media.
+      "start_position": "integer",  // Start index of the tag in the text.
+      "length": "integer"           // Length of the tag in the text.
+    }
+  ]
+}
+```
+
+**Success Response:**
+
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "post_id": "string",        // The ID of the newly created post.
+    "mentions": [               // Array of mentions added, each containing:
+      {
+        "mention_id": "string",    // ID of the mention.
+        "mentioned_user_id": "string" // ID of the mentioned user.
+      }
+    ],
+    "tags": [                   // Array of tags added, each containing:
+      {
+        "tag_id": "string",     // ID of the tag.
+        "tagged_media_id": "string" // ID of the tagged media.
+      }
+    ]
+  }
+  ```
+
+**Failure Responses:**
+
+- **Status Code:** `400 Bad Request`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "No text content provided" // When 'text_content' is missing.
+    }
+    ```
+  - **Response Body:**
+    ```json
+    {
+      "error": "No is_child provided" // When 'is_child' is missing.
+    }
+    ```
+  - **Response Body:**
+    ```json
+    {
+      "error": "Error adding mention to post, please try sending request again" // When a mention cannot be added.
+    }
+    ```
+  - **Response Body:**
+    ```json
+    {
+      "error": "Error adding tag to post, please try sending request again" // When a tag cannot be added.
+    }
+    ```
+
+- **Status Code:** `500 Internal Server Error`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "string" // Error message describing the server issue.
+    }
+    ```
+
+---
 ### 7. Create Post
 
 - **URL:** `/api/posts`
