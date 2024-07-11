@@ -6,3 +6,9 @@ def is_db_response_error(response):
         return True
     else:
         return False
+
+def isNegative(num):
+    if num < 0:
+        return True
+    else:
+        return False

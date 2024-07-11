@@ -18,30 +18,159 @@ def add_post(user_id, parent_id, is_child, text_content):
         connection.commit()
 
         # Get the last inserted ID
-        last_inserted_id = cursor.lastrowid
+        post_id_query = "SELECT id FROM `final_project_db`.`posts` WHERE user_id = %s ORDER BY id DESC LIMIT 1"
+        cursor.execute(post_id_query, (user_id,))
+        last_inserted_id = cursor.fetchone()[0]
 
-        return last_inserted_id
+        return last_inserted_id,200
 
     except mysql.connector.Error as err:
+        print (err)
         return err, 404
 
-def remove_post(post_id):
+# Returns true if 'id' is an id of a post that exists in the DB
+def does_post_id_exist(id):
+    try:
+        query = f"SELECT * FROM `final_project_db`.`posts` WHERE id = %s "
+        cursor2.execute(query, (id,))
+        result = cursor2.fetchone()
+        print(result)
+        if result is None:
+            print("No post exists")
+            return False
+        return True
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return False
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return False
+
+
+        else:
+            print(err)
+            return err
+
+def get_posts_by_parentid(parentid, number_of_posts):
+    try:
+        if number_of_posts:
+            query = f"SELECT * FROM `final_project_db`.`posts` WHERE parent_id = %s ORDER BY created_at DESC LIMIT {number_of_posts}"
+        else:
+            query = f"SELECT * FROM `final_project_db`.`posts` WHERE parent_id = %s "
+        cursor2.execute(query, (parentid, ))
+        return cursor2.fetchall(), 200
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return "Something is wrong with your user name or password", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return "Database does not exist", 404
+
+
+        else:
+            print(err)
+            return err, 404
+
+
+def update_post_text(postid, newtext, user_id):
+    try:
+        sql_update_query = "UPDATE posts SET text_content = %s WHERE id = %s AND user_id = %s"
+
+        # Tuple to hold data
+        update_tuple = (newtext, postid, user_id)
+        # Execute the query
+        cursor.execute(sql_update_query, update_tuple)
+        connection.commit()
+
+        # Check the number of affected rows
+        if cursor.rowcount == 0:
+            return "Post ID does not exist or does not belong to the provided user ID", 404
+
+        return "success", 200
+    except mysql.connector.Error as err:
+        print(err)
+        return str(err), 500
+
+
+def get_posts_by_user(user_id, number_of_posts):
+    try:
+        if number_of_posts:
+            query = f"SELECT * FROM `final_project_db`.`posts` WHERE user_id = %s ORDER BY created_at DESC LIMIT {number_of_posts}"
+        else:
+            query = f"SELECT * FROM `final_project_db`.`posts` WHERE user_id = %s "
+        cursor2.execute(query, (user_id,))
+        return cursor2.fetchall(), 200
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return "Something is wrong with your user name or password", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return "Database does not exist", 404
+
+
+        else:
+            print(err)
+            return err, 404
+
+
+
+def get_last_n_posts(number_of_posts, timestamp=None):
+    try:
+        if timestamp:
+            query = f"""
+            SELECT * FROM `final_project_db`.`posts` 
+            WHERE created_at < %s 
+            ORDER BY created_at DESC 
+            LIMIT %s
+            """
+            cursor2.execute(query, (timestamp, number_of_posts))
+        else:
+            query = f"""
+            SELECT * FROM `final_project_db`.`posts` 
+            ORDER BY created_at DESC 
+            LIMIT %s
+            """
+            cursor2.execute(query, (number_of_posts,))
+
+        return cursor2.fetchall(), 200
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return "Something is wrong with your user name or password", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return "Database does not exist", 404
+        else:
+            print(err)
+            return str(err), 500
+
+
+
+def remove_post(post_id, user_id):
    try:
-    sql_delete_query = """DELETE FROM posts WHERE id = %s"""
+    sql_delete_query = "DELETE FROM `final_project_db`.`posts` WHERE `id` = %s AND `user_id` =%s;"
 
     # Execute the query
-    cursor.execute(sql_delete_query, (post_id,))
+    cursor.execute(sql_delete_query, (post_id, user_id))
     connection.commit()
 
     # Check if the row was deleted
     if cursor.rowcount > 0:
         print("Post deleted successfully")
+        return f"Successfully deleted post {post_id}", 201
     else:
-        print("Post not found")
+        return "Post ID does not exist or does not belong to the provided user ID", 404
 
    except mysql.connector.Error as err:
         print(err)
-        return 404
+        return err, 404
 
 def add_tag(post_id, tagged_media_id, start_position, length):
     try:
@@ -56,14 +185,91 @@ def add_tag(post_id, tagged_media_id, start_position, length):
         connection.commit()
 
         # Get the last inserted ID
-        last_inserted_id = cursor.lastrowid
+        tag_id_query = "SELECT id FROM `final_project_db`.`tags` WHERE post_id = %s ORDER BY post_id DESC LIMIT 1"
+        cursor.execute(tag_id_query, (post_id,))
+        last_inserted_id = cursor.fetchone()[0]
 
         return last_inserted_id
 
     except mysql.connector.Error as err:
         print(err)
-        return 404
+        return err,404
 
+def get_tags_of_post(postid):
+    try:
+
+        query = f"SELECT * FROM `final_project_db`.`tags` WHERE post_id = %s "
+        cursor2.execute(query, (postid))
+        return cursor2.fetchall(), 200
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return "Something is wrong with your user name or password", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return "Database does not exist", 404
+
+
+        else:
+            print(err)
+            return err, 404
+
+def get_tags_of_media(media_id):
+    try:
+
+        query = f"SELECT post_id FROM `final_project_db`.`tags` WHERE tagged_media_id = %s "
+        cursor2.execute(query, (media_id))
+        return cursor2.fetchall(), 200
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return "Something is wrong with your user name or password", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return "Database does not exist", 404
+
+
+        else:
+            print(err)
+            return err, 404
+def get_mentions_of_user(user_id):
+    try:
+
+        query = f"SELECT post_id FROM `final_project_db`.`mentions` WHERE mentioned_user_id= %s "
+        cursor2.execute(query, (user_id))
+        return cursor2.fetchall(), 200
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return "Something is wrong with your user name or password", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return "Database does not exist", 404
+        else:
+            print(err)
+            return err, 404
+def get_mentions_of_post(postid):
+    try:
+
+        query = f"SELECT * FROM `final_project_db`.`mentions` WHERE post_id = %s "
+        cursor2.execute(query, (postid))
+        return cursor2.fetchall(), 200
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return "Something is wrong with your user name or password", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return "Database does not exist", 404
+
+
+        else:
+            print(err)
+            return err, 404
 def remove_tag(tag_id):
 
     try:
@@ -77,14 +283,14 @@ def remove_tag(tag_id):
         # Check if the row was deleted
         if cursor.rowcount > 0:
             print("Tag deleted successfully")
-            return 200
+            return "success",200
         else:
             print("Tag not found")
-            return 404
+            return "error",404
 
     except mysql.connector.Error as err:
         print(err)
-        return 404
+        return err,404
 
 
 def add_mention(post_id, mentioned_user_id, start_position, length):
@@ -102,7 +308,10 @@ def add_mention(post_id, mentioned_user_id, start_position, length):
         connection.commit()
 
         # Get the last inserted ID
-        last_inserted_id = cursor.lastrowid
+        # Get the last inserted ID
+        tag_id_query = "SELECT id FROM `final_project_db`.`mentions` WHERE post_id = %s ORDER BY post_id DESC LIMIT 1"
+        cursor.execute(tag_id_query, (post_id,))
+        last_inserted_id = cursor.fetchone()[0]
 
         return last_inserted_id
 
@@ -123,11 +332,11 @@ def remove_mention(mention_id):
         # Check if the row was deleted
         if cursor.rowcount > 0:
             print("Mention deleted successfully")
-            return 200
+            return "success",200
         else:
             print("Mention not found")
-            return 404
+            return "error",404
 
     except mysql.connector.Error as err:
         print(err)
-        return 404
+        return err,404

@@ -10,7 +10,7 @@ CORS(app)
 
 # Register blueprints for each set of routes
 app.register_blueprint(watchlists_routes)
-#app.register_blueprint(feed_routes)
+app.register_blueprint(feed_routes)
 app.register_blueprint(streaming_providers_routes)
 app.register_blueprint(user_routes)
 app.register_blueprint(tmdb_routes)

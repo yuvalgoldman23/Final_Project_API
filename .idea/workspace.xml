@@ -4,12 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Fixed a slight error in ratings where tv shows rating could not be added, changd watchlist content addition to post">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Changed post_services to feed_services. Created 'add post' endpoint, documented in README.">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/feed_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/feed_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/post_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/feed_services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/user_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/feed_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/feed_services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/post_services.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,7 +158,7 @@
       <workItem from="1719939150002" duration="8000" />
       <workItem from="1720110377744" duration="656000" />
       <workItem from="1720173841739" duration="26000" />
-      <workItem from="1720629913212" duration="4458000" />
+      <workItem from="1720629913212" duration="15288000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -353,7 +357,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719775591610</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Changed post_services to feed_services. Created 'add post' endpoint, documented in README.">
+      <option name="closed" value="true" />
+      <created>1720634848616</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1720634848616</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -393,7 +405,8 @@
     <MESSAGE value="Updated the content deletion as per request - now watchlist id is optional" />
     <MESSAGE value="Fixed a slight error in ratings where tv shows rating could not be added" />
     <MESSAGE value="Fixed a slight error in ratings where tv shows rating could not be added, changd watchlist content addition to post" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed a slight error in ratings where tv shows rating could not be added, changd watchlist content addition to post" />
+    <MESSAGE value="Changed post_services to feed_services. Created 'add post' endpoint, documented in README." />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed post_services to feed_services. Created 'add post' endpoint, documented in README." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -407,6 +420,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1719326263524" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1720726774260" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

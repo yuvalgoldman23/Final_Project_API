@@ -671,7 +671,7 @@ Headers:
 ---
 
 ### 16. Add Post
-**URL:** `/feed`  
+**URL:** `/api/feed`  
 **Method:** `POST`  
 **Description:** Creates a new post in the feed with optional mentions and tags.  
 **Authorization:** Token-based authentication required.
@@ -718,7 +718,9 @@ Headers:
         "tag_id": "string",     // ID of the tag.
         "tagged_media_id": "string" // ID of the tagged media.
       }
-    ]
+    ],
+    "is_child": "boolean",      // Indicates if this post is a child post.
+    "parent_id": "string"       // The ID of the parent post (if this is a reply).
   }
   ```
 
@@ -736,6 +738,18 @@ Headers:
     ```json
     {
       "error": "No is_child provided" // When 'is_child' is missing.
+    }
+    ```
+  - **Response Body:**
+    ```json
+    {
+      "error": "This is a child post, but no parent_id was provided" // When 'is_child' is true but 'parent_id' is missing.
+    }
+    ```
+  - **Response Body:**
+    ```json
+    {
+      "error": "Invalid parent post id" // When 'parent_id' is invalid.
     }
     ```
   - **Response Body:**
@@ -760,6 +774,297 @@ Headers:
     }
     ```
 
+---
+### 17. Get Child Posts
+**URL:** `/api/feed/child_posts`  
+**Method:** `GET`  
+**Description:** Retrieves child posts for a given parent post.  
+**Authorization:** No authentication required.
+
+**Request Body:**
+```json
+{
+  "parent_id": "string",                     // The ID of the parent post.
+  "requested_num_of_posts": "integer" (optional) // Number of child posts to retrieve.
+}
+```
+
+**Success Response:**
+
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "posts": [                  // Array of child posts, each containing:
+      {
+        "post_id": "string",     // The ID of the child post.
+        "user_id": "string",     // The ID of the user who created the post.
+        "text_content": "string", // The content of the post.
+        "parent_id": "string",   // The ID of the parent post.
+        "is_child": "boolean",   // Indicates if this post is a child post.
+        "mentions": [            // Array of mentions, each containing:
+          {
+            "mention_id": "string",       // ID of the mention.
+            "mentioned_user_id": "string" // ID of the mentioned user.
+          }
+        ],
+        "tags": [                // Array of tags, each containing:
+          {
+            "tag_id": "string",     // ID of the tag.
+            "tagged_media_id": "string" // ID of the tagged media.
+          }
+        ]
+      }
+    ]
+  }
+  ```
+
+**Failure Responses:**
+
+- **Status Code:** `400 Bad Request`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "No parent_id was provided" // When 'parent_id' is missing.
+    }
+    ```
+  - **Response Body:**
+    ```json
+    {
+      "error": "Invalid parent post id" // When 'parent_id' is invalid.
+    }
+    ```
+
+- **Status Code:** `500 Internal Server Error`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "string" // Error message describing the server issue.
+    }
+    ```
+---
+### 19. Get Posts by User
+**URL:** `/api/feed/user`  
+**Method:** `GET`  
+**Description:** Retrieves posts created by a specific user.  
+**Authorization:** No authentication required.
+
+**Request Body:**
+```json
+{
+  "user_id": "string",                    // The ID of the user whose posts are being requested.
+  "requested_num_of_posts": "integer" (optional) // The number of posts to retrieve.
+}
+```
+
+**Success Response:**
+
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "user_posts": [           // Array of posts created by the user, each containing:
+      {
+        "post_id": "string",      // The ID of the post.
+        "text_content": "string", // The content of the post.
+        "parent_id": "string" (optional), // The ID of the parent post (if this is a reply).
+        "is_child": "boolean",    // Indicates if this post is a child post.
+        "mentions": [             // Array of mentions, each containing:
+          {
+            "mention_id": "string",       // ID of the mention.
+            "mentioned_user_id": "string" // ID of the mentioned user.
+          }
+        ],
+        "tags": [                 // Array of tags, each containing:
+          {
+            "tag_id": "string",      // ID of the tag.
+            "tagged_media_id": "string" // ID of the tagged media.
+          }
+        ]
+      }
+    ],
+    "user_id": "string"          // The ID of the user whose posts are returned.
+  }
+  ```
+
+**Failure Responses:**
+
+- **Status Code:** `400 Bad Request`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "Invalid number of posts requested" // When 'requested_num_of_posts' is negative.
+    }
+    ```
+
+- **Status Code:** `500 Internal Server Error`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "string" // Error message describing the server issue.
+    }
+    ```
+---
+### 20. Get Last N Posts
+**URL:** `/api/feed/`  
+**Method:** `GET`  
+**Description:** Retrieves the last N posts from the feed. Optionally, it can retrieve the last N posts created before a certain timestamp - usable for loading earlier feed posts.
+**Authorization:** No authentication required.
+
+**Request Body:**
+```json
+{
+  "number_of_posts": "integer",     // The number of posts to retrieve.
+  "earlier_than": "string" (optional) // Optional timestamp of the post to retrieve posts earlier than.
+}
+```
+
+**Success Response:**
+
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "posts": [                // Array of posts, each containing:
+      {
+        "post_id": "string",      // The ID of the post.
+        "user_id": "string",      // The ID of the user who created the post.
+        "text_content": "string", // The content of the post.
+        "parent_id": "string" (optional), // The ID of the parent post (if this is a reply).
+        "is_child": "boolean",    // Indicates if this post is a child post.
+        "mentions": [             // Array of mentions, each containing:
+          {
+            "mention_id": "string",       // ID of the mention.
+            "mentioned_user_id": "string" // ID of the mentioned user.
+          }
+        ],
+        "tags": [                 // Array of tags, each containing:
+          {
+            "tag_id": "string",      // ID of the tag.
+            "tagged_media_id": "string" // ID of the tagged media.
+          }
+        ]
+      }
+    ]
+  }
+  ```
+
+**Failure Responses:**
+
+- **Status Code:** `400 Bad Request`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "Invalid number of posts" // When 'number_of_posts' is missing or negative.
+    }
+    ```
+
+- **Status Code:** `500 Internal Server Error`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "string" // Error message describing the server issue.
+    }
+    ```
+---
+### 21. Delete Post
+**URL:** `/api/feed`  
+**Method:** `DELETE`  
+**Description:** Deletes a post identified by its ID.  
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+```json
+{
+  "post_id": "string"  // The ID of the post to delete.
+}
+```
+
+**Success Response:**
+
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "post_id": "string",       // The ID of the deleted post.
+    "success": "string"  // Success message indicating the post has been successfully deleted.
+  }
+  ```
+
+**Failure Responses:**
+
+- **Status Code:** `400 Bad Request`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "No post id provided" // When 'post_id' is missing.
+    }
+    ```
+
+- **Status Code:** `500 Internal Server Error`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "string" // Error message describing the server issue, for example: user doesn't own the post
+    }
+    ```
+---
+### 21. Delete Post
+**URL:** `/api/feed`  
+**Method:** `DELETE`  
+**Description:** Deletes a post identified by its ID.  
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+```json
+{
+  "post_id": "string"  // The ID of the post to delete.
+}
+```
+
+**Success Response:**
+
+- **Status Code:** `201 Created`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "post_id": "string",       // The ID of the deleted post.
+    "success": "string"  // Success message indicating the post has been successfully deleted.
+  }
+  ```
+
+**Failure Responses:**
+
+- **Status Code:** `400 Bad Request`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "No post id provided" // When 'post_id' is missing.
+    }
+    ```
+
+- **Status Code:** `500 Internal Server Error`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "string" // Error message describing the server issue.
+    }
+    ```
 ---
 ### 7. Create Post
 
