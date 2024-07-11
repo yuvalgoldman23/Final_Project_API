@@ -188,8 +188,8 @@ def add_tag(post_id, tagged_media_id, start_position, length):
         tag_id_query = "SELECT id FROM `final_project_db`.`tags` WHERE post_id = %s ORDER BY post_id DESC LIMIT 1"
         cursor.execute(tag_id_query, (post_id,))
         last_inserted_id = cursor.fetchone()[0]
-
-        return last_inserted_id
+        print("last inserted tag is " , last_inserted_id)
+        return last_inserted_id, 200
 
     except mysql.connector.Error as err:
         print(err)

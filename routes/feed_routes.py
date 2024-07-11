@@ -156,6 +156,12 @@ def delete_post(token_info):
 
 # TODO add a function to request the N posts earlier than the post created at sec:sec:min:min:hh:dd:mm:yy
 
+# TODO FOR TESTING PURPOSES ONLY - ID RETURNED IS INCORRECT IF MANY SUCCESSIVE DB ENTRIES ARE CREATED
+@feed_routes.route('/api/feed/tag', methods=['POST'])
+def create_tag():
+    db_res, status = service.add_tag('666', '666',  '66', '1')
+    return jsonify({'new_id': db_res}), 200
+
 
 @feed_routes.route('/api/posts/<post_id>', methods=['PUT'])
 @auth_required
