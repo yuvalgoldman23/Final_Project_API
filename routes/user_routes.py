@@ -9,6 +9,7 @@ user_routes = Blueprint('user_routes', __name__)
 @user_routes.route('/api/login', methods=['POST'])
 @auth_required
 def login(token_info):
+  try:
     # TODO add user's name to DB upon registration and send to client
     # TODO return the main watchlist for the user if already registered and also his rating and reviews lists???
     user_id = token_info.get('sub')
@@ -22,6 +23,8 @@ def login(token_info):
     elif status == 200:
         # TODO add sending the username?
         return jsonify({'main_watchlist_id': return_val}), 200
+  except IOError as e:
+      print(f"Error while connecting to MySQL: {e}")
 
 @user_routes.route('/api/user', methods=['GET'])
 @auth_required

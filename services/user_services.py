@@ -29,13 +29,13 @@ def login_google(id,email):
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
-                return jsonify({"Database does not exist"}), 404
+                return "Database does not exist", 404
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Database does not exist")
-                return jsonify({"type":"Error" ,"message":"Database does not exist"}), 404
+                return "error", 404
             else:
                 print(err)
-                return jsonify({"type":"Error" ,"message":"Database does not exist"}), 404
+                return err, 404
 
 
 def get_user_details(id):
@@ -46,17 +46,17 @@ def get_user_details(id):
         if exists:
          query = f"SELECT * FROM `final_project_db`.`users` WHERE id = %s"
          cursor2.execute(query, (id,))
-         return jsonify(cursor2.fetchall()[0])
+         return cursor2.fetchall()[0],200
         else:
-            return jsonify({"message": "Completed"})
+            return "user does not exist",404
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
-            return jsonify({"Database does not exist"}), 404
+            return "Database does not exist", 404
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
             print("Database does not exist")
-            return jsonify({"type":"Error" ,"message":"Database does not exist"}), 404
+            return "Database does not exist", 404
         else:
             print(err)
-            return jsonify({"type":"Error" ,"message":"Database does not exist"}), 404
+            return err, 404
 

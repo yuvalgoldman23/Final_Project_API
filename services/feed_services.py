@@ -19,8 +19,8 @@ def add_post(user_id, parent_id, is_child, text_content):
 
         # Get the last inserted ID
         post_id_query = "SELECT id FROM `final_project_db`.`posts` WHERE user_id = %s ORDER BY id DESC LIMIT 1"
-        cursor.execute(post_id_query, (user_id,))
-        last_inserted_id = cursor.fetchone()[0]
+        cursor2.execute(post_id_query, (user_id,))
+        last_inserted_id = cursor2.fetchall()
 
         return last_inserted_id,200
 
@@ -33,7 +33,7 @@ def does_post_id_exist(id):
     try:
         query = f"SELECT * FROM `final_project_db`.`posts` WHERE id = %s "
         cursor2.execute(query, (id,))
-        result = cursor2.fetchone()
+        result = cursor2.fetchall()
         print(result)
         if result is None:
             print("No post exists")
@@ -186,8 +186,8 @@ def add_tag(post_id, tagged_media_id, start_position, length):
 
         # Get the last inserted ID
         tag_id_query = "SELECT id FROM `final_project_db`.`tags` WHERE post_id = %s ORDER BY post_id DESC LIMIT 1"
-        cursor.execute(tag_id_query, (post_id,))
-        last_inserted_id = cursor.fetchone()[0]
+        cursor2.execute(tag_id_query, (post_id,))
+        last_inserted_id = cursor2.fetchall()
         print("last inserted tag is " , last_inserted_id)
         return last_inserted_id, 200
 
@@ -310,8 +310,8 @@ def add_mention(post_id, mentioned_user_id, start_position, length):
         # Get the last inserted ID
         # Get the last inserted ID
         tag_id_query = "SELECT id FROM `final_project_db`.`mentions` WHERE post_id = %s ORDER BY post_id DESC LIMIT 1"
-        cursor.execute(tag_id_query, (post_id,))
-        last_inserted_id = cursor.fetchone()[0]
+        cursor2.execute(tag_id_query, (post_id,))
+        last_inserted_id = cursor2.fetchall()
 
         return last_inserted_id
 
