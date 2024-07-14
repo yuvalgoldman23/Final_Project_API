@@ -12,8 +12,8 @@ def write_review(User_ID, Parent_ID, TEXT):
            insert_query = f"INSERT INTO `final_project_db`.`reviews`(`User_ID`,`Text`,`Parent_ID`) VALUES (%s,%s,%s) "
            cursor.execute(insert_query, (User_ID, TEXT, Parent_ID))
            connection.commit()
-           cursor.execute(review_id_query, (User_ID,))
-           return cursor.fetchall()[0]
+           cursor2.execute(review_id_query, (User_ID,))
+           return cursor2.fetchall(),200
        except mysql.connector.Error as err:
 
            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
