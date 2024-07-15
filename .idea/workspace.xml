@@ -44,6 +44,20 @@
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MarkupSafe-2.1.5.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MarkupSafe-2.1.5.dist-info/RECORD" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MarkupSafe-2.1.5.dist-info/WHEEL" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MarkupSafe-2.1.5.dist-info/WHEEL" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MarkupSafe-2.1.5.dist-info/top_level.txt" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MarkupSafe-2.1.5.dist-info/top_level.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/_exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/_exceptions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/_mysql.c" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/_mysql.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/connections.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/connections.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/CLIENT.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/CLIENT.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/CR.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/CR.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/ER.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/ER.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/FIELD_TYPE.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/FIELD_TYPE.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/FLAG.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/FLAG.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/constants/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/converters.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/converters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/cursors.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/cursors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/release.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/release.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/times.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/MySQLdb/times.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/PyJWT-2.3.0.dist-info/AUTHORS.rst" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/PyJWT-2.3.0.dist-info/AUTHORS.rst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/PyJWT-2.3.0.dist-info/INSTALLER" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/PyJWT-2.3.0.dist-info/INSTALLER" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/PyJWT-2.3.0.dist-info/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/PyJWT-2.3.0.dist-info/LICENSE" afterDir="false" />
@@ -229,6 +243,14 @@
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_native.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_native.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_speedups.c" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_speedups.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_speedups.pyi" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_speedups.pyi" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/mysql-0.0.3.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/mysql-0.0.3.dist-info/RECORD" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/mysql_connector-2.2.9.dist-info/METADATA" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/mysql_connector-2.2.9.dist-info/METADATA" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/mysql_connector-2.2.9.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/mysql_connector-2.2.9.dist-info/RECORD" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/mysql_connector_python-9.0.0.dist-info/METADATA" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/mysql_connector_python-9.0.0.dist-info/METADATA" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/mysql_connector_python-9.0.0.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/mysql_connector_python-9.0.0.dist-info/RECORD" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/mysqlclient-2.2.4.dist-info/LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/mysqlclient-2.2.4.dist-info/LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/mysqlclient-2.2.4.dist-info/METADATA" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/mysqlclient-2.2.4.dist-info/METADATA" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/mysqlclient-2.2.4.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/mysqlclient-2.2.4.dist-info/RECORD" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/pip-24.0.dist-info/AUTHORS.txt" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/pip-24.0.dist-info/AUTHORS.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/pip-24.0.dist-info/INSTALLER" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/pip-24.0.dist-info/INSTALLER" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/pip-24.0.dist-info/LICENSE.txt" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/pip-24.0.dist-info/LICENSE.txt" afterDir="false" />
