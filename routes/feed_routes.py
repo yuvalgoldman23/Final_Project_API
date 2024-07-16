@@ -216,3 +216,7 @@ def get_last_20_posts_mentioning_content_id(content_id):
         # Add more posts here if available
     ]
     return jsonify({"posts": last_20_posts_mentioning_content_id}), 200
+
+@feed_routes.route('/api/posts/stam', methods=['GET'])
+def feedstam():
+    return jsonify(service.add_mention("666","66",6,6))

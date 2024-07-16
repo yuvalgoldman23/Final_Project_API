@@ -7,7 +7,6 @@ from flask import jsonify
 def Add_rating(User_ID, Media_id, rating, is_movie):
 
 
-
     try:
         query = f"SELECT EXISTS(SELECT 1 FROM `final_project_db`.`rating` WHERE User_ID = %s AND Media_ID = %s )"
         cursor.execute(query, (User_ID,Media_id))

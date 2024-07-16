@@ -20,22 +20,22 @@ def login_google(id,email):
                 connection.commit()
                 print(f"ID {id} was added to the table .")
                 main_watchlist_id = service.create_watchlist(id, "Main", True)
-                return main_watchlist_id, 200
+                return main_watchlist_id
             else:
                 print(f"ID {id} already exists in the table .")
-                main_watchlist_id = service.get_main_watchlist(id)[0].get('ID')
-                return main_watchlist_id, 200
+
+                return  service.create_watchlist(id, "Main", True) ,200
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
-                return "Database does not exist", 404
+                return jsonify({"Database does not exist"}), 404
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Database does not exist")
-                return "error", 404
+                return jsonify({"type":"Error" ,"message":"Database does not exist"}), 404
             else:
                 print(err)
-                return err, 404
+                return jsonify({"type":"Error" ,"message":"Database does not exist"}), 404
 
 
 def get_user_details(id):
@@ -46,17 +46,17 @@ def get_user_details(id):
         if exists:
          query = f"SELECT * FROM `final_project_db`.`users` WHERE id = %s"
          cursor2.execute(query, (id,))
-         return cursor2.fetchall()[0],200
+         return jsonify(cursor2.fetchall()[0])
         else:
-            return "user does not exist",404
+            return jsonify({"message": "Completed"})
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
-            return "Database does not exist", 404
+            return jsonify({"Database does not exist"}), 404
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
             print("Database does not exist")
-            return "Database does not exist", 404
+            return jsonify({"type":"Error" ,"message":"Database does not exist"}), 404
         else:
             print(err)
-            return err, 404
+            return jsonify({"type":"Error" ,"message":"Database does not exist"}), 404
 
