@@ -54,6 +54,7 @@ def does_post_id_exist(id):
             return err
 
 def get_posts_by_parentid(parentid, number_of_posts):
+    # TODO for all such posts return their mentions and tags and not just post
     try:
         if number_of_posts:
             query = f"SELECT * FROM `final_project_db`.`posts` WHERE parent_id = %s ORDER BY created_at DESC LIMIT {number_of_posts}"
@@ -97,6 +98,7 @@ def update_post_text(postid, newtext, user_id):
 
 
 def get_posts_by_user(user_id, number_of_posts):
+    # TODO also return mentions and tags
     try:
         if number_of_posts:
             query = f"SELECT * FROM `final_project_db`.`posts` WHERE user_id = %s ORDER BY created_at DESC LIMIT {number_of_posts}"
@@ -121,6 +123,7 @@ def get_posts_by_user(user_id, number_of_posts):
 
 
 def get_last_n_posts(number_of_posts, timestamp=None):
+    # TODO also return mentions and tags for each post
     try:
         if timestamp:
             query = f"""
@@ -217,9 +220,11 @@ def get_tags_of_post(postid):
 
 def get_tags_of_media(media_id):
     try:
-
+        # TODO needs to return the posts not just their post ids
         query = f"SELECT post_id FROM `final_project_db`.`tags` WHERE tagged_media_id = %s"
         cursor2.execute(query, (media_id,))
+        post_ids = cursor2.fetchall()
+        print("post ids are " , post_ids)
         return cursor2.fetchall(), 200
 
     except mysql.connector.Error as err:
@@ -229,14 +234,14 @@ def get_tags_of_media(media_id):
         elif err.errno == errorcode.ER_BAD_DB_ERROR:
             print("Database does not exist")
             return "Database does not exist", 404
-
-
         else:
             print(err)
             return err, 404
-def get_mentions_of_user(user_id):
-    try:
 
+print(get_tags_of_media("123"))
+def get_mentions_of_user(user_id):
+    # TODO Needs to return the posts, not just the post ids
+    try:
         query = f"SELECT post_id FROM `final_project_db`.`mentions` WHERE mentioned_user_id= %s "
         cursor2.execute(query, (user_id))
         return cursor2.fetchall(), 200

@@ -171,6 +171,9 @@ def get_posts_tagging_media():
         else:
             # TODO change here to produce ready posts
             # TODO add an option to choose some number of posts, otherwise send 10 last in default?
+            posts = []
+            for id in db_response:
+                posts.append(service.get_post)
             return jsonify({'tags': db_response}), status
 
 @feed_routes.route('/api/feed/user_mentioned_posts', methods=['GET'])
