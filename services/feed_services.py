@@ -21,8 +21,8 @@ def add_post(user_id, parent_id, is_child, text_content):
         post_id_query = "SELECT id FROM `final_project_db`.`posts` WHERE user_id = %s ORDER BY id DESC LIMIT 1"
         cursor2.execute(post_id_query, (user_id,))
         last_inserted_id = cursor2.fetchall()
-
-        return last_inserted_id,200
+        last_post_id = last_inserted_id[0]
+        return last_post_id,200
 
     except mysql.connector.Error as err:
         print (err)
@@ -34,7 +34,7 @@ def does_post_id_exist(id):
         query = f"SELECT * FROM `final_project_db`.`posts` WHERE id = %s "
         cursor2.execute(query, (id,))
         result = cursor2.fetchall()
-        print(result)
+        print("result is " , result)
         if result is None:
             print("No post exists")
             return False
@@ -185,9 +185,9 @@ def add_tag(post_id, tagged_media_id, start_position, length):
         connection.commit()
 
         # Get the last inserted ID
-        tag_id_query = "SELECT id FROM `final_project_db`.`tags` WHERE post_id = %s ORDER BY post_id DESC LIMIT 1"
-        cursor2.execute(tag_id_query, (post_id,))
-        last_inserted_id = cursor2.fetchall()
+        tag_id_query = "SELECT id FROM `final_project_db`.`tags` WHERE post_id = %s AND tagged_media_id = %s AND start_position = %s AND `length` = %s ORDER BY post_id DESC LIMIT 1"
+        cursor2.execute(tag_id_query, (post_id,tagged_media_id, start_position, length))
+        last_inserted_id = cursor2.fetchall()[0]
         print("last inserted tag is " , last_inserted_id)
         return last_inserted_id, 200
 
@@ -218,8 +218,8 @@ def get_tags_of_post(postid):
 def get_tags_of_media(media_id):
     try:
 
-        query = f"SELECT post_id FROM `final_project_db`.`tags` WHERE tagged_media_id = %s "
-        cursor2.execute(query, (media_id))
+        query = f"SELECT post_id FROM `final_project_db`.`tags` WHERE tagged_media_id = %s"
+        cursor2.execute(query, (media_id,))
         return cursor2.fetchall(), 200
 
     except mysql.connector.Error as err:
@@ -309,11 +309,12 @@ def add_mention(post_id, mentioned_user_id, start_position, length):
 
         # Get the last inserted ID
         # Get the last inserted ID
+
         tag_id_query = "SELECT id FROM `final_project_db`.`mentions` WHERE post_id = %s ORDER BY post_id DESC LIMIT 1"
         cursor2.execute(tag_id_query, (post_id,))
         last_inserted_id = cursor2.fetchall()
-
-        return last_inserted_id
+        print("last id is ", last_inserted_id[0].get('id'))
+        return last_inserted_id[0].get('id')
 
     except mysql.connector.Error as err:
         print(err)

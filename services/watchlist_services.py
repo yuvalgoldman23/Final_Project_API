@@ -8,7 +8,7 @@ from flask import jsonify
 
 def add_watch_list_item(userID,Media_TMDB_ID,Parent_ID, is_movie):
     # Query to get the last inserted id for the given user_id
-    watchlist_id_query = "SELECT ID FROM `final_project_db`.`watch_lists_objects` WHERE User_ID = %s ORDER BY ID DESC LIMIT 1"
+    watchlist_id_query = "SELECT ID FROM `final_project_db`.`watch_lists_objects` WHERE User_ID = %s AND TMDB_ID = %s AND is_movie = %s ORDER BY ID DESC LIMIT 1"
     try:
         select_query = "SELECT COUNT(*) FROM `final_project_db`.`watch_lists_objects` WHERE `TMDB_ID` = %s AND `Parent_ID` = %s;"
         # Execute the SELECT query
@@ -18,7 +18,7 @@ def add_watch_list_item(userID,Media_TMDB_ID,Parent_ID, is_movie):
             insert_query = f"INSERT INTO `final_project_db`.`watch_lists_objects`(`User_ID`,`TMDB_ID`,`Parent_ID`, `is_movie`) VALUES (%s,%s,%s, %s) "
             cursor.execute(insert_query, (userID,Media_TMDB_ID ,Parent_ID, is_movie))
             connection.commit()
-            cursor.execute(watchlist_id_query, (userID,))
+            cursor.execute(watchlist_id_query, (userID, Media_TMDB_ID, Parent_ID, is_movie))
             main_watchlist_id = cursor.fetchone()[0]
             print("Added movie {} to watchlist {}".format(Media_TMDB_ID, Parent_ID))
             return main_watchlist_id, 201
@@ -76,7 +76,7 @@ def create_watchlist(user_id,name,Is_main):
              connection.commit()
              print(f"ID {user_id}  list was added to the table .")
              cursor2.execute(watchlist_id_query, (user_id,))
-             main_watchlist_id = cursor2.fetchall()
+             main_watchlist_id = cursor2.fetchall()[0]
              print (main_watchlist_id)
              return main_watchlist_id
          else:
@@ -88,7 +88,7 @@ def create_watchlist(user_id,name,Is_main):
          connection.commit()
          cursor2.execute(watchlist_id_query, (user_id,))
 
-         new_id = cursor2.fetchall()
+         new_id = cursor2.fetchall()[0]
          return new_id
     except mysql.connector.Error as err:
 

@@ -7,13 +7,13 @@ from flask import jsonify
 
 
 def write_review(User_ID, Parent_ID, TEXT):
-       review_id_query = "SELECT ID FROM `final_project_db`.`reviews` WHERE User_ID = %s ORDER BY ID DESC LIMIT 1"
+       review_id_query = "SELECT ID FROM `final_project_db`.`reviews` WHERE User_ID = %s AND Parent_ID = %s AND TText = %s ORDER BY ID DESC LIMIT 1"
        try:
-           insert_query = f"INSERT INTO `final_project_db`.`reviews`(`User_ID`,`Text`,`Parent_ID`) VALUES (%s,%s,%s) "
+           insert_query = f"INSERT INTO `final_project_db`.`reviews`(`User_ID`,`TText`,`Parent_ID`) VALUES (%s,%s,%s) "
            cursor.execute(insert_query, (User_ID, TEXT, Parent_ID))
            connection.commit()
-           cursor2.execute(review_id_query, (User_ID,))
-           return cursor2.fetchall(),200
+           cursor2.execute(review_id_query, (User_ID, Parent_ID, TEXT))
+           return cursor2.fetchall()[0].get('id'),200
        except mysql.connector.Error as err:
 
            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
