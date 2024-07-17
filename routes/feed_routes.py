@@ -192,8 +192,6 @@ def get_user_mentioned_posts():
 
 # TODO: add tag/remove tag/add mention/remove mention separately from new post? maybe for editing
 # TODO get_tags_of_post, get_mentions_of_post - think of usage - probably do something like produce post for client
-# TODO get (posts with) mentions of user
-#
 
 
 
@@ -208,7 +206,7 @@ def create_tag():
     tagged_media_id = data.get('tagged_media_id', None)
     start_position = data.get('start_position', None)
     length = data.get('length', None)
-    db_res, status = service.add_tag(post_id, tagged_media_id, start_position, length)
+    db_res, status = service.add_mention(post_id, tagged_media_id, start_position, length)
     return jsonify({'new_id': db_res}), 200
 
 
@@ -216,58 +214,3 @@ def create_tag():
 def create_mention():
     db_res, status = service.add_mention('666', '666', '66', '1')
     return jsonify({'new_mention_id': db_res}), 200
-
-
-@feed_routes.route('/api/posts/<post_id>', methods=['PUT'])
-@auth_required
-def edit_post(token_info, post_id):
-    data = request.json
-    user_id = token_info.get('sub')
-
-    # Find post in DB
-    for post in posts:
-        if post['post_id'] == post_id:
-            if not validate_user_post(post, user_id):
-                break
-            # Update post content if data contains a value for it
-            if 'text' in data:
-                post['text'] = data['text']
-            if 'content_id' in data:
-                post['content_id'] = data['content_id']
-            # TODO - ADD 'update_date' field to the post???
-            # TODO: Reload posts on the client side if needed
-            # Return the newly edited post
-            return jsonify({'post': post, 'success': f"post updated successfully"}), 201
-    # If reached here, post not found, thus return an error
-    return jsonify({'error': f"the post id provided doesn't exist"}), 400
-
-
-@feed_routes.route('/api/posts', methods=['GET'])
-def load_last_20_posts():
-    # Dummy implementation to return last 20 posts
-    # Replace this with actual implementation to fetch posts from database
-    return jsonify({"posts": posts[-20:]}), 200
-
-
-# TODO probably not needed, the client could just send the server that content id instead, in order to load its page
-@feed_routes.route('/api/posts/<post_id>/mention', methods=['GET'])
-def get_mentioned_content_id(post_id):
-    # Dummy implementation to return mentioned content ID from a post
-    # TODO Replace this with actual implementation to fetch mentioned content ID from database
-    # Assuming mentioned content ID is fetched based on post ID
-    mentioned_content_id = "movie_123"
-    return jsonify({"mentioned_content_id": mentioned_content_id}), 200
-
-
-# Return the 20 last posts mentioning a certain content id
-# To be used for content pages, displaying "their own feed" solely centred on the content
-@feed_routes.route('/api/posts/mentions/<content_id>', methods=['GET'])
-def get_last_20_posts_mentioning_content_id(content_id):
-    # Dummy implementation to return last 20 posts mentioning a specific content ID
-    # TODO Replace this with actual implementation to fetch posts from database
-    last_20_posts_mentioning_content_id = [
-        {"id": "789", "text": "Post mentioning content ID.", "user_id": "123"},
-        {"id": "790", "text": "Another post mentioning content ID.", "user_id": "456"}
-        # Add more posts here if available
-    ]
-    return jsonify({"posts": last_20_posts_mentioning_content_id}), 200

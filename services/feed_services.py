@@ -187,7 +187,7 @@ def add_tag(post_id, tagged_media_id, start_position, length):
         # Get the last inserted ID
         tag_id_query = "SELECT id FROM `final_project_db`.`tags` WHERE post_id = %s AND tagged_media_id = %s AND start_position = %s AND `length` = %s ORDER BY post_id DESC LIMIT 1"
         cursor2.execute(tag_id_query, (post_id,tagged_media_id, start_position, length))
-        last_inserted_id = cursor2.fetchall()[0]
+        last_inserted_id = cursor2.fetchall()[0].get('id')
         print("last inserted tag is " , last_inserted_id)
         return last_inserted_id, 200
 
@@ -314,11 +314,11 @@ def add_mention(post_id, mentioned_user_id, start_position, length):
         cursor2.execute(tag_id_query, (post_id,))
         last_inserted_id = cursor2.fetchall()
         print("last id is ", last_inserted_id[0].get('id'))
-        return last_inserted_id[0].get('id')
+        return last_inserted_id[0].get('id'), 200
 
     except mysql.connector.Error as err:
         print(err)
-        return None
+        return None, 400
 
 
 def remove_mention(mention_id):
