@@ -35,8 +35,9 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         media_info['title'] = tmdb_info['original_title']
         media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
         media_info['tmdb_id'] = watchlist_object['TMDB_ID']
-        # TODO change poster size to be editable by client request?
-        media_info['poster_path'] = "https://image.tmdb.org/t/p/w94_and_h141_bestv2/" + tmdb_info['poster_path']
+        # TODO probably could remove the poster image from media_info. Currently causes issues where some images do not get sent from TMDB's API
+        # TODO the poster path caused errors that lead to incorrect display of movies belonging to main watchlist
+        #media_info['poster_path'] = "https://image.tmdb.org/t/p/w94_and_h141_bestv2/" + tmdb_info['poster_path']
         # TODO add here the logos of the streaming services for this media in the USA? do that using my streaming function
         finished_watchlist.append(media_info)
     # If watchlist name wasn't set, give the watchlist a default name by its ID
@@ -50,14 +51,18 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
 @watchlists_routes.route('/api/watchlists', methods=['GET'])
 @auth_required
 def get_main_watchlist(token_info):
+    print("trying to get main watchlist")
     user_id = token_info.get('sub')
     db_response = service.get_main_watchlist(user_id)
     if utils.is_db_response_error(db_response):
+        print("DB Error: " + str(db_response))
         return jsonify({'Error': db_response}), 404
     else:
         watchlist_id = db_response[0].get('ID')
+        print("watchlist id is " + str(watchlist_id))
         watchlist_object = service.get_watchlist_by_id(watchlist_id)
-        return produce_client_ready_watchlist(watchlist_id, watchlist_object)
+        print("watchlist object is " + str(watchlist_object))
+        return jsonify(produce_client_ready_watchlist(watchlist_id, watchlist_object)), 200
 
 @watchlists_routes.route('/api/watchlists', methods=['POST'])
 @auth_required

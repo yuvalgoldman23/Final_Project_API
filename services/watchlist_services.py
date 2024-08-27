@@ -7,20 +7,25 @@ from flask import jsonify
 
 
 def add_watch_list_item(userID,Media_TMDB_ID,Parent_ID, is_movie):
+    print("in db-side add watchlist item")
     # Query to get the last inserted id for the given user_id
-    watchlist_id_query = "SELECT ID FROM `final_project_db`.`watch_lists_objects` WHERE User_ID = %s AND TMDB_ID = %s AND is_movie = %s ORDER BY ID DESC LIMIT 1"
+    watchlist_id_query = "SELECT ID FROM `final_project_db`.`watch_lists_objects` WHERE User_ID = %s AND TMDB_ID = %s AND `Parent_ID` = %s AND is_movie = %s ORDER BY ID DESC LIMIT 1"
     try:
         select_query = "SELECT COUNT(*) FROM `final_project_db`.`watch_lists_objects` WHERE `TMDB_ID` = %s AND `Parent_ID` = %s;"
         # Execute the SELECT query
         cursor.execute(select_query, (Media_TMDB_ID, Parent_ID))
         result = cursor.fetchone()
+        print("in result phase, result is " + str(result))
+        # Successfully added content to watchlist, now return its ID
         if result[0] == 0:
+            print("successfully added " + str(Media_TMDB_ID) + " to watchlist")
             insert_query = f"INSERT INTO `final_project_db`.`watch_lists_objects`(`User_ID`,`TMDB_ID`,`Parent_ID`, `is_movie`) VALUES (%s,%s,%s, %s) "
             cursor.execute(insert_query, (userID,Media_TMDB_ID ,Parent_ID, is_movie))
             connection.commit()
             cursor.execute(watchlist_id_query, (userID, Media_TMDB_ID, Parent_ID, is_movie))
             main_watchlist_id = cursor.fetchone()[0]
             print("Added movie {} to watchlist {}".format(Media_TMDB_ID, Parent_ID))
+            print("in successful addition phase with returned id of " , main_watchlist_id)
             return main_watchlist_id, 201
         else:
             print("Content already in watchlist")
@@ -33,7 +38,7 @@ def add_watch_list_item(userID,Media_TMDB_ID,Parent_ID, is_movie):
             print("Database does not exist")
             return jsonify({ "type":"Error" ,"message:": "Database does not exist"})
         else:
-            print(err)
+            print("DB Error:", err)
             return err
 
 

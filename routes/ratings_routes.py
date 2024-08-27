@@ -20,7 +20,7 @@ def add_rating(token_info):
     else:
         return_val, status = service.Add_rating(user_id, content_id, rating, is_movie)
         if status != 201:
-            return jsonify({'status': return_val}), status
+            return jsonify({'error': return_val}), status
         else:
             return jsonify({'rating_id': return_val}), status
 
