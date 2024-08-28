@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added about half of the required feed routes, updated in README with usage instructions">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated the watchlist API to handle the bug of adding some content for the first time, fixed an issue of inability to produce media_info correctly for watchlist-added content">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/ratings_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/ratings_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/watchlist_services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/rating_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/rating_services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -161,7 +159,8 @@
       <workItem from="1721242156529" duration="2835000" />
       <workItem from="1721318104037" duration="6000" />
       <workItem from="1724775416650" duration="811000" />
-      <workItem from="1724776479087" duration="1285000" />
+      <workItem from="1724776479087" duration="1361000" />
+      <workItem from="1724858637234" duration="760000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -408,7 +407,15 @@
       <option name="project" value="LOCAL" />
       <updated>1721245001347</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Updated the watchlist API to handle the bug of adding some content for the first time, fixed an issue of inability to produce media_info correctly for watchlist-added content">
+      <option name="closed" value="true" />
+      <created>1724777831963</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1724777831963</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -450,7 +457,8 @@
     <MESSAGE value="Fixed a slight error in ratings where tv shows rating could not be added, changd watchlist content addition to post" />
     <MESSAGE value="Changed post_services to feed_services. Created 'add post' endpoint, documented in README." />
     <MESSAGE value="Added about half of the required feed routes, updated in README with usage instructions" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added about half of the required feed routes, updated in README with usage instructions" />
+    <MESSAGE value="Updated the watchlist API to handle the bug of adding some content for the first time, fixed an issue of inability to produce media_info correctly for watchlist-added content" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the watchlist API to handle the bug of adding some content for the first time, fixed an issue of inability to produce media_info correctly for watchlist-added content" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

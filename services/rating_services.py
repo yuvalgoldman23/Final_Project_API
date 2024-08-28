@@ -14,7 +14,7 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
         cursor.execute(rating_id_query, (User_ID,))
         rating_id = cursor.fetchone()[0]
         print(f"success adding rating for {Media_id}")
-        return rating_id, 200
+        return rating_id, 201
     except mysql.connector.Error as err:
 
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
