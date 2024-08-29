@@ -32,13 +32,18 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
             return err,404
 
 
-def get_rating_of_user(user_id):
+def get_rating_of_user(user_id, content_id, is_movie):
 
     try:
-
-         query = f"SELECT * FROM `final_project_db`.`rating` WHERE User_ID = %s"
-         cursor2.execute(query, (user_id,))
-         return cursor2.fetchall(),200
+        # If provided a content id, then return only the rating for it, otherwise return for all content rated by user
+        if content_id:
+            query = f"SELECT * FROM `final_project_db`.`rating` WHERE User_ID = %s AND media_ID = %s AND is_movie = %s"
+            cursor2.execute(query, (user_id, content_id, is_movie))
+            return cursor2.fetchone(), 200
+        else:
+             query = f"SELECT * FROM `final_project_db`.`rating` WHERE User_ID = %s"
+             cursor2.execute(query, (user_id,))
+             return cursor2.fetchall(),200
 
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -54,13 +59,13 @@ def get_rating_of_user(user_id):
             return err,404
 
 
-def Remove_rating(rating_object_ID, User_ID):
+def Remove_rating(content_id, is_movie, User_ID):
     try:
-        delete_query = "DELETE FROM `final_project_db`.`rating` WHERE `ID`= %s AND `User_ID`= %s ;"
-        cursor.execute(delete_query, (rating_object_ID, User_ID))
+        delete_query = "DELETE FROM `final_project_db`.`rating` WHERE `media_ID`= %s AND is_movie = %s AND `User_ID`= %s ;"
+        cursor.execute(delete_query, (content_id,is_movie, User_ID))
         connection.commit()
         if cursor.rowcount > 0:
-            return f"successfully removed {rating_object_ID}", 200
+            return f"successfully removed {content_id}", 200
         else:
             return "no ratings found for such rating_id and user_id", 404
     except mysql.connector.Error as err:
@@ -78,3 +83,36 @@ def Remove_rating(rating_object_ID, User_ID):
         else:
             print(err)
             return err,404
+
+
+def update_rating(content_id, is_movie, User_ID, new_rating):
+    try:
+        # Step 1: Check the current rating
+        select_query = "SELECT `rating` FROM `final_project_db`.`rating` WHERE `media_ID`= %s AND is_movie = %s AND `User_ID`= %s;"
+        cursor.execute(select_query, (content_id, is_movie, User_ID))
+        current_rating = cursor.fetchone()
+
+        if current_rating is None:
+            return "No ratings found for the provided content_id and user_id", 404
+
+        # Step 2: Determine if the new rating is the same as the current rating
+        if current_rating[0] == new_rating:
+            return "The provided rating is the same as the current rating", 304  # 304 Not Modified
+
+        # Step 3: Proceed with the update
+        update_query = f"UPDATE `final_project_db`.`rating` SET `rating` = %s WHERE `media_ID`= %s AND is_movie = %s AND `User_ID`= %s;"
+        cursor.execute(update_query, (new_rating, content_id, is_movie, User_ID))
+        connection.commit()
+
+        if cursor.rowcount > 0:
+            return f"Successfully updated {content_id}", 200
+        else:
+            return "No ratings found for such content_id and user_id", 404
+
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            return "Something is wrong with your user name or password", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            return "Database does not exist", 404
+        else:
+            return str(err), 404

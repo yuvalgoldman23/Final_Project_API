@@ -32,12 +32,14 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         else:
             tmdb_info = tmdb.get_tv_show_info(watchlist_object.tmdb_id)
         tmdb_info = tmdb_info.json
+        #print(tmdb_info)
         media_info['title'] = tmdb_info['original_title']
         media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
         media_info['tmdb_id'] = watchlist_object['TMDB_ID']
-        # TODO probably could remove the poster image from media_info. Currently causes issues where some images do not get sent from TMDB's API
-        # TODO the poster path caused errors that lead to incorrect display of movies belonging to main watchlist
-        #media_info['poster_path'] = "https://image.tmdb.org/t/p/w94_and_h141_bestv2/" + tmdb_info['poster_path']
+        if tmdb_info['poster_path']:
+            media_info['poster_path'] = "https://image.tmdb.org/t/p/original/" + tmdb_info['poster_path']
+        else:
+            media_info['poster_path'] = None
         # TODO add here the logos of the streaming services for this media in the USA? do that using my streaming function
         finished_watchlist.append(media_info)
     # If watchlist name wasn't set, give the watchlist a default name by its ID

@@ -105,7 +105,7 @@ Headers:
         "watchlist_item_id": "string",
         "title": "string",
         "genres": ["string"],
-        "poster_path": "string",
+        "poster_path": "string" (or null in case of no image in TMDB's response)',
         "tmdb_id":  "string"
       }
     ],
@@ -208,7 +208,7 @@ Headers:
         "watchlist_item_id": "string",
         "title": "string",
         "genres": ["string"],
-        "poster_path": "string",
+        "poster_path": "string" (or null in case of no image in TMDB's response),
          "tmdb_id":  "string"
       }
     ],
@@ -246,7 +246,7 @@ Headers:
             "watchlist_item_id": "string",
             "title": "string",
             "genres": ["string"],
-            "poster_path": "string",
+            "poster_path": "string" (or null in case of no image in TMDB's response),
             "tmdb_id":  "string"
           }
         ],
@@ -588,13 +588,16 @@ Headers:
 ### 14. Get Ratings by User
 **URL:** `/api/users/ratings`  
 **Method:** `GET`  
-**Description:** Retrieves all ratings given by a specific user. If no user_id is provided in the request, it returns the ratings for the logged-in user.  
-**Authorization:** Token-based authentication required.
+**Description:** Retrieves ratings given by a specific user. If no user_id is provided in the request, it returns the ratings for the logged-in user.
+If no content id or "is_movie" value provided, returns all ratings by given user. Otherwise, returns rating for specificed content only.
+**Authorization:** Token-based authentication required if no user_id provided.
 
 **Request Body (Optional):**
 ```json
 {
-  "user_id": "string"
+  "user_id": "string",
+  "content_id":"string",
+  "is_movie": "boolean" (content_id AND is_movie are both requried - only one of them would result returning all ratings)
 }
 ```
 
@@ -636,7 +639,8 @@ Headers:
 **Request Body:**
 ```json
 {
-  "rating_object_id": "string"
+  "content_id": "string",
+  "is_movie": "boolean"
 }
 ```
 
@@ -659,6 +663,54 @@ Headers:
     "status": "Must provide content id to be deleted"
   }
   ```
+
+- **Status Code:** Varies (e.g., `500 Internal Server Error`)
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "string"
+  }
+  ```
+---
+
+
+### 16. Update Rating
+**URL:** `/api/ratings`  
+**Method:** `PUT`  
+**Description:** Updates a specific rating given by the logged-in user.  
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+```json
+{
+  "content_id": "string",
+  "is_movie": "boolean",
+  "new_rating": "number" (decimal number between 1 and 10)
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "string"
+  }
+  ```
+
+**Failure Response:**
+- **Status Code:** `404 Not Found`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "status": "Must provide content id, is_movie to be updated"
+  }
+  ```
+  
+-- **Status Code:** '304 Not Modified' (Happens when the new rating is same as existing)
 
 - **Status Code:** Varies (e.g., `500 Internal Server Error`)
 - **Content Type:** `application/json`

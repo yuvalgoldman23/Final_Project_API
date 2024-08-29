@@ -29,12 +29,17 @@ def add_rating(token_info):
 @auth_required
 def get_ratings_by_user(token_info):
     # If no user_id received in data,return ratings for logged in user
-    try:
-        data = request.json
-        user_id = data.get('user_id')
-    except:
+    if request.json and request.json.get('user_id'):
+        user_id = request.json.get('user_id')
+    else:
         user_id = token_info.get('sub')
-    db_response, status = service.get_rating_of_user(user_id)
+    if request.json and request.json.get('content_id') and request.json.get('is_movie'):
+        content_id = request.json.get('content_id')
+        is_movie = request.json.get('is_movie')
+    else:
+        content_id = None
+        is_movie = None
+    db_response, status = service.get_rating_of_user(user_id, content_id, is_movie)
     if status != 200:
         return jsonify({'status' : db_response}), status
     else:
@@ -43,14 +48,18 @@ def get_ratings_by_user(token_info):
 
 
 
-@ratings_routes.route('/api/ratings', methods = ['DELETE'])
+@ratings_routes.route('/api/ratings', methods = ['PUT','DELETE'])
 @auth_required
-def remove_review(token_info):
+def remove_update_rating(token_info):
     data = request.json
-    rating_object_id = data.get('rating_object_id')
+    content_id = data.get('content_id')
+    is_movie = data.get('is_movie')
     user_id = token_info.get('sub')
-    if not rating_object_id:
-        return jsonify({'status': "Must provide content id to be deleted"}), 404
+    if not content_id or is_movie is None:
+        return jsonify({'status': "Must provide content id and is_movie fields to be deleted/updated"}), 404
+    if not data.get("new_rating"):
+        db_response, status = service.Remove_rating(content_id,is_movie, user_id)
     else:
-        db_response, status = service.Remove_rating(rating_object_id, user_id)
-        return jsonify({'status': db_response}), status
+        new_rating = data.get('new_rating')
+        db_response, status = service.update_rating(content_id,is_movie, user_id, new_rating)
+    return jsonify({'status': db_response}), status
