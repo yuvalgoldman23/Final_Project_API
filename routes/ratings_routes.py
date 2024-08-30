@@ -28,24 +28,32 @@ def add_rating(token_info):
 @ratings_routes.route('/api/users/ratings', methods=['GET'])
 @auth_required
 def get_ratings_by_user(token_info):
-    # If no user_id received in data,return ratings for logged in user
-    if request.json and request.json.get('user_id'):
-        user_id = request.json.get('user_id')
+    # Safely parse JSON data from the request
+    data = request.get_json(silent=True)
+
+    # Determine user_id: from request if present, otherwise from token_info
+    if data and 'user_id' in data:
+        user_id = data['user_id']
     else:
         user_id = token_info.get('sub')
-    if request.json and request.json.get('content_id') and request.json.get('is_movie'):
-        content_id = request.json.get('content_id')
-        is_movie = request.json.get('is_movie')
+
+    # Determine content_id and is_movie: from request if present, otherwise None
+    if data and 'content_id' in data and 'is_movie' in data:
+        content_id = data['content_id']
+        is_movie = data['is_movie']
     else:
         content_id = None
         is_movie = None
-    db_response, status = service.get_rating_of_user(user_id, content_id, is_movie)
-    if status != 200:
-        return jsonify({'status' : db_response}), status
-    else:
-        print("db response" , db_response)
-        return jsonify({'ratings': db_response}), 200
 
+    # Call the service to get ratings
+    db_response, status = service.get_rating_of_user(user_id, content_id, is_movie)
+
+    # Return the appropriate response based on the status
+    if status != 200:
+        return jsonify({'status': db_response}), status
+    else:
+        print("db response", db_response)
+        return jsonify({'ratings': db_response}), 200
 
 
 @ratings_routes.route('/api/ratings', methods = ['PUT','DELETE'])

@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Fixed rating_id return error">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated &quot;get rating by user&quot; to also include a possibility of getting a specific content's rating, instead of all of the user's ratings.&#10;&#10;Updated and tested remove/update rating. Updated readme to reflect changes. As requested by Omer, instead of requiring &quot;Rating id&quot;, we now require &quot;content_id&quot; and &quot;is_movie&quot; for update/removal of rating.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/ratings_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/ratings_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/rating_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/rating_services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +161,8 @@
       <workItem from="1724775416650" duration="811000" />
       <workItem from="1724776479087" duration="1361000" />
       <workItem from="1724858637234" duration="876000" />
-      <workItem from="1724954223499" duration="5029000" />
+      <workItem from="1724954223499" duration="5128000" />
+      <workItem from="1725044222741" duration="641000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -427,7 +425,15 @@
       <option name="project" value="LOCAL" />
       <updated>1724860695408</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="Updated &quot;get rating by user&quot; to also include a possibility of getting a specific content's rating, instead of all of the user's ratings.&#10;&#10;Updated and tested remove/update rating. Updated readme to reflect changes. As requested by Omer, instead of requiring &quot;Rating id&quot;, we now require &quot;content_id&quot; and &quot;is_movie&quot; for update/removal of rating.">
+      <option name="closed" value="true" />
+      <created>1724959371234</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1724959371234</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -445,7 +451,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updated and (re-) added some watchlist routes. Updated Some services naming, fixed some indentation issues in 'services', updated README with new routes for watchlists" />
     <MESSAGE value="Started preparing watchlists for web display, started working on the streaming recommendation algorithm" />
     <MESSAGE value="Fixed naming issues" />
     <MESSAGE value="Got the watchlists to work and produce a client-ready watchlist object" />
@@ -470,7 +475,8 @@
     <MESSAGE value="Added about half of the required feed routes, updated in README with usage instructions" />
     <MESSAGE value="Updated the watchlist API to handle the bug of adding some content for the first time, fixed an issue of inability to produce media_info correctly for watchlist-added content" />
     <MESSAGE value="Fixed rating_id return error" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed rating_id return error" />
+    <MESSAGE value="Updated &quot;get rating by user&quot; to also include a possibility of getting a specific content's rating, instead of all of the user's ratings.&#10;&#10;Updated and tested remove/update rating. Updated readme to reflect changes. As requested by Omer, instead of requiring &quot;Rating id&quot;, we now require &quot;content_id&quot; and &quot;is_movie&quot; for update/removal of rating." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated &quot;get rating by user&quot; to also include a possibility of getting a specific content's rating, instead of all of the user's ratings.&#10;&#10;Updated and tested remove/update rating. Updated readme to reflect changes. As requested by Omer, instead of requiring &quot;Rating id&quot;, we now require &quot;content_id&quot; and &quot;is_movie&quot; for update/removal of rating." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -484,6 +490,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1724958909878" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1725044270973" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
