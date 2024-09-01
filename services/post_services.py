@@ -107,30 +107,21 @@ def remove_post(post_id):
 
 def add_tag(post_id, tagged_media_id, start_position, length):
     try:
-        sql_check_query = "SELECT id FROM tags    WHERE post_id = %s AND tagged_media_id = %s AND start_position = %s AND length = %s"
-        check_tuple = (post_id, tagged_media_id, start_position, length)
-        cursor2.execute(sql_check_query, check_tuple)
-        result = cursor2.fetchall()
-
-        if result:
-            # Tag already exists, return its ID
-            return result[0], 200
-        else:
-         sql_insert_query = """INSERT INTO tags (post_id, tagged_media_id, start_position, length)
+        sql_insert_query = """INSERT INTO tags (post_id, tagged_media_id, start_position, length)
                                           VALUES (%s, %s, %s, %s)"""
 
-         # Tuple to hold data
-         insert_tuple = (post_id, tagged_media_id, start_position, length)
+        # Tuple to hold data
+        insert_tuple = (post_id, tagged_media_id, start_position, length)
 
-         # Execute the query
-         cursor.execute(sql_insert_query, insert_tuple)
-         connection.commit()
+        # Execute the query
+        cursor.execute(sql_insert_query, insert_tuple)
+        connection.commit()
 
-         # Get the last inserted ID
-         sql_select_query="SELECT id FROM taqs where post_id= %s and tagged_media_id= %s and start_position= %s and length= %s"
-         cursor2.execute(sql_select_query,  insert_tuple)
+        # Get the last inserted ID
+        sql_select_query="SELECT id FROM taqs where post_id= %s and tagged_media_id= %s and start_position= %s and length= %s"
+        cursor2.execute(sql_select_query,  insert_tuple)
 
-         return cursor2.fetchall(),200
+        return cursor2.fetchall(),200
 
     except mysql.connector.Error as err:
         print(err)
@@ -236,33 +227,24 @@ def remove_tag(tag_id):
 
 def add_mention(post_id, mentioned_user_id, start_position, length):
     try:
-        sql_check_query = """SELECT id FROM mentions 
-                                     WHERE post_id = %s AND mentioned_user_id = %s AND start_position = %s AND length = %s"""
-        check_tuple = (post_id, mentioned_user_id, start_position, length)
-        cursor2.execute(sql_check_query, check_tuple)
-        result = cursor2.fetchall()
 
-        if result:
-            # Mention already exists, return its ID
-            return result[0], 200
         # SQL Insert Query
-        else:
-         sql_insert_query = """INSERT INTO mentions (post_id, mentioned_user_id, start_position, length)
+        sql_insert_query = """INSERT INTO mentions (post_id, mentioned_user_id, start_position, length)
                                          VALUES (%s, %s, %s, %s)"""
 
-         # Tuple to hold data
-         insert_tuple = (post_id, mentioned_user_id, start_position, length)
+        # Tuple to hold data
+        insert_tuple = (post_id, mentioned_user_id, start_position, length)
 
-         # Execute the query
-         cursor.execute(sql_insert_query, insert_tuple)
-         connection.commit()
+        # Execute the query
+        cursor.execute(sql_insert_query, insert_tuple)
+        connection.commit()
 
-         # Get the last inserted ID
+        # Get the last inserted ID
 
-         sql_select_query = "SELECT id FROM mentions where post_id= %s and mentioned_user_id= %s and start_position= %s and length= %s"
-         cursor2.execute(sql_select_query, insert_tuple)
+        sql_select_query = "SELECT id FROM mentions where post_id= %s and mentioned_user_id= %s and start_position= %s and length= %s"
+        cursor2.execute(sql_select_query, insert_tuple)
 
-         return cursor2.fetchall(), 200
+        return cursor2.fetchall(), 200
 
     except mysql.connector.Error as err:
         print(err)
@@ -289,35 +271,3 @@ def remove_mention(mention_id):
     except mysql.connector.Error as err:
         print(err)
         return err,404
-
-
-def get_last_n_posts(number_of_posts, timestamp=None):
-    try:
-        if timestamp:
-            query = f"""
-            SELECT * FROM `final_project_db`.`posts` 
-            WHERE created_at < %s 
-            ORDER BY created_at DESC 
-            LIMIT %s
-            """
-            cursor2.execute(query, (timestamp, number_of_posts))
-        else:
-            query = f"""
-            SELECT * FROM `final_project_db`.`posts` 
-            ORDER BY created_at DESC 
-            LIMIT %s
-            """
-            cursor2.execute(query, (number_of_posts,))
-
-        return cursor2.fetchall(), 200
-
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Something is wrong with your user name or password")
-            return "Something is wrong with your user name or password", 404
-        elif err.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database does not exist")
-            return "Database does not exist", 404
-        else:
-            print(err)
-            return str(err), 500
