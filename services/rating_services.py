@@ -39,7 +39,7 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
             print(err)
             return err,404
 
-def get_rating_of_user_of_movie(user_id,media_id):
+def get_rating_of_movie(user_id,media_id):
     try:
 
          query = f"SELECT * FROM `final_project_db`.`rating` WHERE User_ID = %s AND  Media_ID = %s"
