@@ -18,10 +18,11 @@ def add_post(user_id, parent_id, is_child, text_content):
         connection.commit()
 
         # Get the last inserted ID
-        post_id_query = "SELECT id FROM `final_project_db`.`posts` WHERE user_id = %s ORDER BY id DESC LIMIT 1"
-        cursor2.execute(post_id_query, (user_id,))
+        post_id_query = "SELECT id FROM `final_project_db`.`posts` WHERE user_id = %s AND parent_id = %s ORDER BY id DESC LIMIT 1"
+        cursor2.execute(post_id_query, (user_id, parent_id))
         last_inserted_id = cursor2.fetchall()
         last_post_id = last_inserted_id[0]
+        # TODO - return the whole post inserted for best practice?
         return last_post_id,200
 
     except mysql.connector.Error as err:
@@ -177,6 +178,15 @@ def remove_post(post_id, user_id):
 
 def add_tag(post_id, tagged_media_id, start_position, length):
     try:
+        sql_check_query = "SELECT id FROM tags    WHERE post_id = %s AND tagged_media_id = %s AND start_position = %s AND length = %s"
+        check_tuple = (post_id, tagged_media_id, start_position, length)
+        cursor2.execute(sql_check_query, check_tuple)
+        result = cursor2.fetchall()
+
+        if result:
+            # Tag already exists, return its ID
+            return result[0], 200
+
         sql_insert_query = """INSERT INTO tags (post_id, tagged_media_id, start_position, length)
                                           VALUES (%s, %s, %s, %s)"""
 
@@ -202,7 +212,7 @@ def get_tags_of_post(postid):
     try:
 
         query = f"SELECT * FROM `final_project_db`.`tags` WHERE post_id = %s "
-        cursor2.execute(query, (postid))
+        cursor2.execute(query, (postid,))
         return cursor2.fetchall(), 200
 
     except mysql.connector.Error as err:
@@ -243,7 +253,7 @@ def get_mentions_of_user(user_id):
     # TODO Needs to return the posts, not just the post ids
     try:
         query = f"SELECT post_id FROM `final_project_db`.`mentions` WHERE mentioned_user_id= %s "
-        cursor2.execute(query, (user_id))
+        cursor2.execute(query, (user_id,))
         return cursor2.fetchall(), 200
 
     except mysql.connector.Error as err:
@@ -260,7 +270,7 @@ def get_mentions_of_post(postid):
     try:
 
         query = f"SELECT * FROM `final_project_db`.`mentions` WHERE post_id = %s "
-        cursor2.execute(query, (postid))
+        cursor2.execute(query, (postid,))
         return cursor2.fetchall(), 200
 
     except mysql.connector.Error as err:
@@ -300,6 +310,15 @@ def remove_tag(tag_id):
 
 def add_mention(post_id, mentioned_user_id, start_position, length):
     try:
+        sql_check_query = """SELECT id FROM mentions 
+                                     WHERE post_id = %s AND mentioned_user_id = %s AND start_position = %s AND length = %s"""
+        check_tuple = (post_id, mentioned_user_id, start_position, length)
+        cursor2.execute(sql_check_query, check_tuple)
+        result = cursor2.fetchall()
+
+        if result:
+            # Mention already exists, return its ID
+            return result[0], 200
 
         # SQL Insert Query
         sql_insert_query = """INSERT INTO mentions (post_id, mentioned_user_id, start_position, length)
@@ -313,10 +332,9 @@ def add_mention(post_id, mentioned_user_id, start_position, length):
         connection.commit()
 
         # Get the last inserted ID
-        # Get the last inserted ID
 
-        tag_id_query = "SELECT id FROM `final_project_db`.`mentions` WHERE post_id = %s ORDER BY post_id DESC LIMIT 1"
-        cursor2.execute(tag_id_query, (post_id,))
+        tag_id_query = "SELECT id FROM mentions where post_id= %s and mentioned_user_id= %s and start_position= %s and length= %s"
+        cursor2.execute(tag_id_query, insert_tuple)
         last_inserted_id = cursor2.fetchall()
         print("last id is ", last_inserted_id[0].get('id'))
         return last_inserted_id[0].get('id'), 200

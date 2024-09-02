@@ -5,32 +5,35 @@ from flask import jsonify
 
 
 def Add_rating(User_ID, Media_id, rating, is_movie):
-    # Query to check if a rating already exists for the given user and media
-    check_existing_query = "SELECT ID FROM `final_project_db`.`rating` WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s LIMIT 1"
-
     try:
+        # Check if a rating already exists for the given user and media
+        check_existing_query = "SELECT EXISTS(SELECT 1 FROM `final_project_db`.`rating` WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s)"
         cursor.execute(check_existing_query, (User_ID, Media_id, is_movie))
-        existing_rating = cursor.fetchall()
+        exists_result = cursor.fetchall()
+        exists = exists_result[0][0] if exists_result else 0
 
-        if existing_rating:
-            print(update_rating(Media_id, is_movie, User_ID, rating))
-            return "success updated rating", 201
-
-        # If no rating exists, proceed to insert the new rating
-        insert_query = "INSERT INTO `final_project_db`.`rating`(`User_ID`,`Media_ID`,`rating`, `is_movie`) VALUES (%s,%s,%s,%s)"
-        cursor.execute(insert_query, (User_ID, Media_id, rating, is_movie))
-        connection.commit()
-
-        # Get the ID of the newly inserted rating
-        rating_id_query = "SELECT ID FROM `final_project_db`.`rating` WHERE User_ID = %s ORDER BY ID DESC LIMIT 1"
-        cursor.execute(rating_id_query, (User_ID,))
-        rating_id = cursor.fetchall()
-
-        if rating_id:
-            print(f"Successfully added rating for {Media_id}")
-            return rating_id[0][0], 201  # 201 Created; Extract first element from tuple
+        if exists:
+            # Update the existing rating
+            update_query = "UPDATE `final_project_db`.`rating` SET rating = %s WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s"
+            cursor.execute(update_query, (rating, User_ID, Media_id, is_movie))
+            connection.commit()
+            return f"Success updating rating for {Media_id}", 200
         else:
-            return "Failed to retrieve the rating ID", 500
+            # Insert a new rating
+            insert_query = "INSERT INTO `final_project_db`.`rating`(`User_ID`,`Media_ID`,`rating`, `is_movie`) VALUES (%s,%s,%s,%s)"
+            cursor.execute(insert_query, (User_ID, Media_id, rating, is_movie))
+            connection.commit()
+
+            # Retrieve and return the ID of the newly inserted rating
+            rating_id_query = "SELECT ID FROM `final_project_db`.`rating` WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s ORDER BY ID DESC LIMIT 1"
+            cursor.execute(rating_id_query, (User_ID, Media_id, is_movie))
+            rating_id_result = cursor.fetchall()
+            rating_id = rating_id_result[0][0] if rating_id_result else None
+
+            if rating_id:
+                return rating_id, 201  # 201 Created
+            else:
+                return "Failed to retrieve the rating ID", 500
 
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -50,9 +53,12 @@ def get_rating_of_user(user_id, content_id, is_movie):
             query = "SELECT * FROM `final_project_db`.`rating` WHERE User_ID = %s AND media_ID = %s AND is_movie = %s"
             cursor2.execute(query, (user_id, content_id, is_movie))
             result = cursor2.fetchall()
-            if result:
-                return result[0], 200  # Return the first result
-            else:
+            try:
+                if result:
+                    return result[0], 200  # Return the first result
+                else:
+                    return "No rating found for the provided content_id and user_id", 404
+            except IndexError:
                 return "No rating found for the provided content_id and user_id", 404
         else:
             query = "SELECT * FROM `final_project_db`.`rating` WHERE User_ID = %s"

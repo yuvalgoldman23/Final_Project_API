@@ -11,9 +11,10 @@ def add_watch_list_item(userID,Media_TMDB_ID,Parent_ID, is_movie):
     # Query to get the last inserted id for the given user_id
     watchlist_id_query = "SELECT ID FROM `final_project_db`.`watch_lists_objects` WHERE User_ID = %s AND TMDB_ID = %s AND `Parent_ID` = %s AND is_movie = %s ORDER BY ID DESC LIMIT 1"
     try:
-        select_query = "SELECT COUNT(*) FROM `final_project_db`.`watch_lists_objects` WHERE `TMDB_ID` = %s AND `Parent_ID` = %s;"
+        # TODO changed on 02/09, remove 2 last arguments if causing problems
+        select_query = "SELECT COUNT(*) FROM `final_project_db`.`watch_lists_objects` WHERE `TMDB_ID` = %s AND `Parent_ID` = %s AND User_ID = %s AND `is_movie` = %s"
         # Execute the SELECT query
-        cursor.execute(select_query, (Media_TMDB_ID, Parent_ID))
+        cursor.execute(select_query, (Media_TMDB_ID, Parent_ID, userID, is_movie))
         result = cursor.fetchone()
         print("in result phase, result is " + str(result))
         # Successfully added content to watchlist, now return its ID

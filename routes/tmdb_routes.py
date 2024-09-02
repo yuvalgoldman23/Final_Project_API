@@ -7,18 +7,18 @@ tmdb_routes = Blueprint('tmdb_routes', __name__)
 api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
 
 @tmdb_routes.route('/api/Media_search', methods=['GET'])
-def combine_serch():
+def combine_search():
     query= request.args.get("query")
     movieurl=f"https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={query}"
     tvurl=f"https://api.themoviedb.org/3/search/tv?api_key={api_key}&query={query}"
-    responce_movie=requests.get(movieurl)
-    responce_tv = requests.get(tvurl)
-    if  responce_movie.status_code == 200:
-        movie_result= responce_movie.json().get('results', [])
-    if  responce_movie.status_code == 200:
-        tv_result= responce_tv.json().get('results', [])
-    totalserch=  movie_result+ tv_result
-    return  jsonify(sorted(totalserch,key= lambda  x: x["popularity"],reverse=True))
+    response_movie=requests.get(movieurl)
+    response_tv = requests.get(tvurl)
+    if  response_movie.status_code == 200:
+        movie_result= response_movie.json().get('results', [])
+    if  response_movie.status_code == 200:
+        tv_result= response_tv.json().get('results', [])
+    totalsearch=  movie_result+ tv_result
+    return  jsonify(sorted(totalsearch,key= lambda  x: x["popularity"],reverse=True))
 
 
 @tmdb_routes.route('/api/tv/trending', methods=['GET'])
