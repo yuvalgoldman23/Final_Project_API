@@ -77,12 +77,11 @@ def create_watchlist(user_id,name,Is_main):
              # Insert the ID if it does not exist
              insert_query = "INSERT INTO `final_project_db`.`watch_lists_names` (User_ID, name, Main) VALUES (%s, %s, %s)"
              cursor.execute(insert_query, (user_id,'Main',True ))
-             print(type(user_id))
              connection.commit()
              print(f"ID {user_id}  list was added to the table .")
              cursor2.execute(watchlist_id_query, (user_id,))
              main_watchlist_id = cursor2.fetchall()[0]
-             print (main_watchlist_id)
+             print ("new main watchlist id is" , main_watchlist_id)
              return main_watchlist_id
          else:
              print(f"ID {user_id}  list main watchlist already exists in the table .")
@@ -181,7 +180,7 @@ def get_watchlist_details_only(watchlist_ID):
         query = f"SELECT * FROM `final_project_db`.`watch_lists_names` WHERE ID = %s"
         cursor2.execute(query, (watchlist_ID,))
         results = cursor2.fetchall()
-        print("watchlist deets " , results, "watchlist id " , watchlist_ID)
+        #print("watchlist deets " , results, "watchlist id " , watchlist_ID)
         return results[0]
 
     except mysql.connector.Error as err:

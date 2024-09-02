@@ -6,6 +6,7 @@ import utils
 from auth import auth_required
 import services.watchlist_services as service
 import routes.tmdb_routes as tmdb
+import services.rating_services as rating_service
 watchlists_routes = Blueprint('watchlists_routes', __name__)
 
 # Get the watchlist's owner's ID
@@ -40,6 +41,24 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
             media_info['poster_path'] = "https://image.tmdb.org/t/p/original/" + tmdb_info['poster_path']
         else:
             media_info['poster_path'] = None
+        if tmdb_info['overview']:
+            media_info['overview'] = tmdb_info['overview']
+        else:
+            media_info['overview'] = None
+        if tmdb_info['release_date']:
+            media_info['release_date'] = tmdb_info['release_date']
+        else:
+            media_info['release_date'] = None
+        if tmdb_info['vote_average']:
+            media_info['tmdb_rating'] = tmdb_info['vote_average']
+        else:
+            media_info['tmdb_rating'] = None
+        user_id = watchlist_details['User_ID']
+        user_rating, status_code = rating_service.get_rating_of_user(user_id, media_info['tmdb_id'],  watchlist_object['is_movie'])
+        if status_code == 200:
+            media_info['user_rating'] = user_rating['rating']
+        else:
+            media_info['user_rating'] = None
         # TODO add here the logos of the streaming services for this media in the USA? do that using my streaming function
         finished_watchlist.append(media_info)
     # If watchlist name wasn't set, give the watchlist a default name by its ID
@@ -63,7 +82,7 @@ def get_main_watchlist(token_info):
         watchlist_id = db_response[0].get('ID')
         print("watchlist id is " + str(watchlist_id))
         watchlist_object = service.get_watchlist_by_id(watchlist_id)
-        print("watchlist object is " + str(watchlist_object))
+        #print("watchlist object is " + str(watchlist_object))
         return jsonify(produce_client_ready_watchlist(watchlist_id, watchlist_object)), 200
 
 @watchlists_routes.route('/api/watchlists', methods=['POST'])

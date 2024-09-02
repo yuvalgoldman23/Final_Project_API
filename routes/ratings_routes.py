@@ -20,7 +20,7 @@ def add_rating(token_info):
     else:
         return_val, status = service.Add_rating(user_id, content_id, rating, is_movie)
         if status != 201:
-            return jsonify({'error': return_val}), status
+            return jsonify({'db_response': return_val}), status
         else:
             return jsonify({'rating_id': return_val}), status
 
@@ -30,7 +30,6 @@ def add_rating(token_info):
 def get_ratings_by_user(token_info):
     # Safely parse JSON data from the request
     data = request.get_json(silent=True)
-
     # Determine user_id: from request if present, otherwise from token_info
     if data and 'user_id' in data:
         user_id = data['user_id']
@@ -38,19 +37,21 @@ def get_ratings_by_user(token_info):
         user_id = token_info.get('sub')
 
     # Determine content_id and is_movie: from request if present, otherwise None
-    if data and 'content_id' in data and 'is_movie' in data:
-        content_id = data['content_id']
-        is_movie = data['is_movie']
+    if data and 'content_id' in data:
+        if 'is_movie' in data:
+            content_id = data['content_id']
+            is_movie = data['is_movie']
+        else:
+            return jsonify({'error': 'Content ID and is_movie must be provided together'}), 400
     else:
         content_id = None
         is_movie = None
 
     # Call the service to get ratings
     db_response, status = service.get_rating_of_user(user_id, content_id, is_movie)
-
     # Return the appropriate response based on the status
     if status != 200:
-        return jsonify({'status': db_response}), status
+        return jsonify({'db_response': db_response}), status
     else:
         print("db response", db_response)
         return jsonify({'ratings': db_response}), 200
@@ -70,4 +71,4 @@ def remove_update_rating(token_info):
     else:
         new_rating = data.get('new_rating')
         db_response, status = service.update_rating(content_id,is_movie, user_id, new_rating)
-    return jsonify({'status': db_response}), status
+    return jsonify({'db_response': db_response}), status
