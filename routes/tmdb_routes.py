@@ -15,6 +15,8 @@ def combine_search():
     response_tv = requests.get(tvurl)
     if  response_movie.status_code == 200:
         movie_result= response_movie.json().get('results', [])
+        t=5
+
     if  response_movie.status_code == 200:
         tv_result= response_tv.json().get('results', [])
     totalsearch=  movie_result+ tv_result
