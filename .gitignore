@@ -1,9 +1,4 @@
-# Ignore virtual environment folder
 env/
-
-# Ignore pycache and compiled Python files
 __pycache__/
-*.pyc
-
-# Ignore .idea folder (used by JetBrains IDEs like PyCharm)
 .idea/
+*.pyc
