@@ -1,1 +1,12 @@
 /routes/.env
+
+
+env/
+__pycache__/
+.idea/
+*.pyc
+
+env/
+_pycache_/
+.idea/
+*.pyc
