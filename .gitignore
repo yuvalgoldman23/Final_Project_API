@@ -1,12 +1,9 @@
-/routes/.env
+# Ignore .idea folder (for JetBrains IDEs like PyCharm)
+.idea/
 
-
-env/
+# Ignore Python bytecode files
+*.pyc
 __pycache__/
-.idea/
-*.pyc
 
+# Ignore virtual environments (if applicable)
 env/
-_pycache_/
-.idea/
-*.pyc
