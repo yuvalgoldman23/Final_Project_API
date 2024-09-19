@@ -15,8 +15,12 @@ def combine_search():
     response_tv = requests.get(tvurl)
     if  response_movie.status_code == 200:
         movie_result= response_movie.json().get('results', [])
+        for m in movie_result:
+            m['media_kind']='movie'
     if  response_movie.status_code == 200:
         tv_result= response_tv.json().get('results', [])
+        for m in tv_result:
+            m['media_kind'] = 'tv'
     totalsearch=  movie_result+ tv_result
     return  jsonify(sorted(totalsearch,key= lambda  x: x["popularity"],reverse=True))
 
