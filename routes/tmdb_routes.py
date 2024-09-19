@@ -15,8 +15,12 @@ def combine_search():
     response_tv = requests.get(tvurl)
     if  response_movie.status_code == 200:
         movie_result= response_movie.json().get('results', [])
+        for m in movie_result:
+            m['media_kind']='movie'
     if  response_movie.status_code == 200:
         tv_result= response_tv.json().get('results', [])
+        for m in tv_result:
+            m['media_kind'] = 'tv'
     totalsearch=  movie_result+ tv_result
     return  jsonify(sorted(totalsearch,key= lambda  x: x["popularity"],reverse=True))
 
@@ -149,15 +153,24 @@ def get_actor_combine_credits(actor_id):
     tv_credit_cast=[]
 
     tv_credit_cast =data.get('cast',[])
+    for t in tv_credit_cast:
+        t['media_kind'] = 'tv'
     movie_credit_cast = []
 
     movie_credit_cast = data2.get('cast', [])
+    for t in  movie_credit_cast:
+        t['media_kind'] = 'movie'
     tv_credit_craw = []
 
     tv_credit_craw  = data.get('craw', [])
+    for t in tv_credit_craw :
+        t['media_kind'] = 'tv'
     movie_credit_craw = []
 
     movie_credit_craw = data2.get('crew', [])
+    for t in movie_credit_craw:
+        t['media_kind'] = 'movie'
+
     combined_cast_credits= movie_credit_cast+tv_credit_cast
     combined_craw_credits = movie_credit_craw + tv_credit_craw
 
