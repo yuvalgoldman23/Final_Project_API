@@ -1391,7 +1391,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
       "adult": false, 
       "character": "Himself", 
       "first_air_date": "2003-01-26", 
-      "id": 1489, 
+      "id": 1489,
+      "media_kind": "tv",           ,
       "name": "Jimmy Kimmel Live!", 
       "original_name": "Jimmy Kimmel Live!", 
       "popularity": 494.357, 
@@ -1402,7 +1403,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
     {
       "adult": false, 
       "department": "Writing", 
-      "id": 9428, 
+      "id": 9428,
+      "media_kind": "tv",           
       "job": "Writer", 
       "original_title": "The Royal Tenenbaums", 
       "popularity": 26.071, 
@@ -1450,7 +1452,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
       878, 
       27, 
       28
-    ], 
+    ],
+    "media_kind": "tv", 
     "id": 940721, 
     "original_language": "ja", 
     "original_title": "\u30b4\u30b8\u30e9-1.0", 
@@ -1471,7 +1474,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
       10766, 
       35, 
       18
-    ], 
+    ],
+    "media_kind": "tv",     
     "id": 16286, 
     "name": "I am Betty, the Ugly one", 
     "origin_country": [
