@@ -153,15 +153,24 @@ def get_actor_combine_credits(actor_id):
     tv_credit_cast=[]
 
     tv_credit_cast =data.get('cast',[])
+    for t in tv_credit_cast:
+        t['media_kind'] = 'tv'
     movie_credit_cast = []
 
     movie_credit_cast = data2.get('cast', [])
+    for t in  movie_credit_cast:
+        t['media_kind'] = 'movie'
     tv_credit_craw = []
 
     tv_credit_craw  = data.get('craw', [])
+    for t in tv_credit_craw :
+        t['media_kind'] = 'tv'
     movie_credit_craw = []
 
     movie_credit_craw = data2.get('crew', [])
+    for t in movie_credit_craw:
+        t['media_kind'] = 'movie'
+
     combined_cast_credits= movie_credit_cast+tv_credit_cast
     combined_craw_credits = movie_credit_craw + tv_credit_craw
 
