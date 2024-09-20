@@ -25,16 +25,19 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
     finished_watchlist = []
     #print("watchlist items", watchlist_items)
     for watchlist_object in watchlist_items:
+        #print("watchlist object", watchlist_object)
         # Add the watchlist item's ID to the client ready object in order to allow deletion of items from watchlist
         media_info = {'watchlist_item_id': watchlist_object['ID']}
         #print("watchlist object" , watchlist_object)
-        if watchlist_object['is_movie']:
-            tmdb_info = (tmdb.get_movie_info(watchlist_object['TMDB_ID']))
+        is_movie = watchlist_object['is_movie']
+        if is_movie:
+            tmdb_info = (tmdb.get_movie_info(watchlist_object.get('TMDB_ID')))
         else:
-            tmdb_info = tmdb.get_tv_show_info(watchlist_object.tmdb_id)
+            tmdb_info = tmdb.get_tv_show_info(watchlist_object.get('TMDB_ID'))
+        if is_movie:
+            tmdb_info = jsonify(tmdb_info)
         tmdb_info = tmdb_info.json
-        #print(tmdb_info)
-        media_info['title'] = tmdb_info['original_title']
+        media_info['title'] = tmdb_info['original_title'] if is_movie else tmdb_info['original_name']
         media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
         media_info['tmdb_id'] = watchlist_object['TMDB_ID']
         if tmdb_info['poster_path']:
@@ -45,9 +48,12 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
             media_info['overview'] = tmdb_info['overview']
         else:
             media_info['overview'] = None
-        if tmdb_info['release_date']:
-            media_info['release_date'] = tmdb_info['release_date']
+        if is_movie:
+            media_info['release_date'] = tmdb_info.get('release_date')
         else:
+            media_info['release_date'] = tmdb_info.get('first_air_date')
+
+        if not media_info['release_date']:
             media_info['release_date'] = None
         if tmdb_info['vote_average']:
             media_info['tmdb_rating'] = tmdb_info['vote_average']
@@ -109,7 +115,7 @@ def delete_content_from_watchlist(token_info):
     content_id = data['content_id']
     user_id = token_info.get('sub')
     if not watchlist_id:
-        watchlist_id = service.get_main_watchlist(user_id)
+        watchlist_id = service.get_main_watchlist(user_id)[0].get('id')
     db_response = service.remove_watch_list_item(user_id, watchlist_id, content_id)
     if utils.is_db_response_error(db_response):
         return jsonify({'Error': db_response}), 404
