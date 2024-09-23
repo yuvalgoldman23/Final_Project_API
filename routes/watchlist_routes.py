@@ -41,7 +41,7 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
         media_info['tmdb_id'] = watchlist_object['TMDB_ID']
         if tmdb_info['poster_path']:
-            media_info['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + tmdb_info['poster_path']
+            media_info['large_poster_path'] = "https://image.tmdb.org/t/p/original/" + tmdb_info['poster_path']
             media_info['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + tmdb_info['poster_path']
         else:
             media_info['large_poster_path'] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"

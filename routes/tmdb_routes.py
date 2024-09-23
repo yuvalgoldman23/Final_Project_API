@@ -27,7 +27,7 @@ def combine_search():
             result["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
             result["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
         else:
-            result['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + result['poster_path']
+            result['large_poster_path'] = "https://image.tmdb.org/t/p/original/" + result['poster_path']
             result['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + result['poster_path']
     return  jsonify(sorted(totalsearch,key= lambda  x: x["popularity"],reverse=True))
 
@@ -43,7 +43,7 @@ def get_trending_tv_shows():
                 tvshow["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
                 tvshow["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
             else:
-                tvshow['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + tvshow['poster_path']
+                tvshow['large_poster_path'] = "https://image.tmdb.org/t/p/original/" + tvshow['poster_path']
                 tvshow['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + tvshow['poster_path']
         return jsonify(trending_tv_shows)
     else:
@@ -62,7 +62,7 @@ def get_trending_movies():
                 movie["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
                 movie["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
             else:
-                movie['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + movie['poster_path']
+                movie['large_poster_path'] = "https://image.tmdb.org/t/p/original/" + movie['poster_path']
                 movie['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + movie['poster_path']
         return jsonify(trending_movies)
     else:
@@ -83,7 +83,7 @@ def get_tv_show_info(tv_show_id):
         data["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
         data["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
     else:
-        data['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + data['poster_path']
+        data['large_poster_path'] = "https://image.tmdb.org/t/p/original/" + data['poster_path']
         data['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + data['poster_path']
     return jsonify(data)
 
@@ -126,7 +126,7 @@ def get_movie_info(movie_id):
         data["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
         data["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
     else:
-        data['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + data['poster_path']
+        data['large_poster_path'] = "https://image.tmdb.org/t/p/original/" + data['poster_path']
         data['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + data['poster_path']
     return data
 
@@ -155,7 +155,7 @@ def get_actor_movie_credits(actor_id):
             credit["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
             credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
         else:
-            credit['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + credit['poster_path']
+            credit['large_poster_path'] = "https://image.tmdb.org/t/p/original/" + credit['poster_path']
             credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + credit['poster_path']
     return jsonify(data)
 
@@ -173,7 +173,7 @@ def get_actor_tv_credits(actor_id):
             credit["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
             credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
         else:
-            credit['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + credit['poster_path']
+            credit['large_poster_path'] = "https://image.tmdb.org/t/p/original/" + credit['poster_path']
             credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + credit['poster_path']
     return jsonify(data)
 
@@ -226,14 +226,14 @@ def get_actor_combine_credits(actor_id):
             credit["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
             credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
         else:
-            credit['large_poster_path'] = "https://image.tmdb.org/t/p/w500" + credit['poster_path']
+            credit['large_poster_path'] = "https://image.tmdb.org/t/p/original" + credit['poster_path']
             credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + credit['poster_path']
     for credit in combined_craw_credits:
         if not credit["poster_path"]:
             credit["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
             credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
         else:
-            credit['large_poster_path'] = "https://image.tmdb.org/t/p/w500" + credit['poster_path']
+            credit['large_poster_path'] = "https://image.tmdb.org/t/p/original" + credit['poster_path']
             credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + credit['poster_path']
 
     new_combined_cast_credits=[]
