@@ -22,6 +22,13 @@ def combine_search():
         for m in tv_result:
             m['media_kind'] = 'tv'
     totalsearch=  movie_result+ tv_result
+    for result  in totalsearch:
+        if not result["poster_path"]:
+            result["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+            result["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+        else:
+            result['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + result['poster_path']
+            result['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + result['poster_path']
     return  jsonify(sorted(totalsearch,key= lambda  x: x["popularity"],reverse=True))
 
 
@@ -31,6 +38,13 @@ def get_trending_tv_shows():
     response = requests.get(url)
     if response.status_code == 200:
         trending_tv_shows = response.json().get('results', [])
+        for tvshow in trending_tv_shows:
+            if not tvshow["poster_path"]:
+                tvshow["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+                tvshow["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+            else:
+                tvshow['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + tvshow['poster_path']
+                tvshow['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + tvshow['poster_path']
         return jsonify(trending_tv_shows)
     else:
         print("Failed to fetch trending TV shows:", response.status_code)
@@ -42,10 +56,17 @@ def get_trending_movies():
     url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={api_key}"
     response = requests.get(url)
     if response.status_code == 200:
-        trending_tv_shows = response.json().get('results', [])
-        return jsonify(trending_tv_shows)
+        trending_movies = response.json().get('results', [])
+        for movie in trending_movies:
+            if not movie["poster_path"]:
+                movie["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+                movie["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+            else:
+                movie['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + movie['poster_path']
+                movie['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + movie['poster_path']
+        return jsonify(trending_movies)
     else:
-        print("Failed to fetch trending TV shows:", response.status_code)
+        print("Failed to fetch trending Movies:", response.status_code)
         return []
 
 
@@ -58,6 +79,12 @@ def get_tv_show_info(tv_show_id):
 
     response = requests.get(url, params=params)
     data = response.json()
+    if not data["poster_path"]:
+        data["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+        data["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+    else:
+        data['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + data['poster_path']
+        data['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + data['poster_path']
     return jsonify(data)
 
 
@@ -95,7 +122,12 @@ def get_movie_info(movie_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-    print("data", data)
+    if not data["poster_path"]:
+        data["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+        data["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+    else:
+        data['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + data['poster_path']
+        data['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + data['poster_path']
     return data
 
 @tmdb_routes.route('/api/actor/<string:actor_id>', methods=['GET'])
@@ -116,9 +148,15 @@ def get_actor_movie_credits(actor_id):
     params = {
         "api_key": api_key
     }
-
     response = requests.get(url, params=params)
     data = response.json()
+    for credit in data["cast"]:
+        if not credit["poster_path"]:
+            credit["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+            credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+        else:
+            credit['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + credit['poster_path']
+            credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + credit['poster_path']
     return jsonify(data)
 
 @tmdb_routes.route('/api/actor/tv_credits/<string:actor_id>', methods=['GET'])
@@ -130,6 +168,13 @@ def get_actor_tv_credits(actor_id):
 
     response = requests.get(url, params=params)
     data = response.json()
+    for credit in data["cast"]:
+        if not credit["poster_path"]:
+            credit["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+            credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+        else:
+            credit['large_poster_path'] = "https://image.tmdb.org/t/p/w500/" + credit['poster_path']
+            credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + credit['poster_path']
     return jsonify(data)
 
 
@@ -175,6 +220,21 @@ def get_actor_combine_credits(actor_id):
 
     combined_cast_credits= movie_credit_cast+tv_credit_cast
     combined_craw_credits = movie_credit_craw + tv_credit_craw
+
+    for credit in combined_cast_credits:
+        if not credit["poster_path"]:
+            credit["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+            credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+        else:
+            credit['large_poster_path'] = "https://image.tmdb.org/t/p/w500" + credit['poster_path']
+            credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + credit['poster_path']
+    for credit in combined_craw_credits:
+        if not credit["poster_path"]:
+            credit["large_poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+            credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+        else:
+            credit['large_poster_path'] = "https://image.tmdb.org/t/p/w500" + credit['poster_path']
+            credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + credit['poster_path']
 
     new_combined_cast_credits=[]
     for x in  combined_cast_credits:

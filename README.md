@@ -105,7 +105,8 @@ Headers:
         "watchlist_item_id": "string",
         "title": "string",
         "genres": ["string"],
-        "poster_path": "string" (or null in case of no image in TMDB's response)',
+        "large_poster_path":
+  "small_poster_path":, "string" (or null in case of no image in TMDB's response)',
         "tmdb_id":  "string",
         "overview": "string",
         "release_date": "string" (yyyy-mm-dd format)
@@ -126,7 +127,8 @@ Headers:
                 "Music"
             ],
             "overview": "Propagandhi play a benefit show for the Grassy Narrows First Nation Blockade and the International Solidarity Movement at the Zoo (the venue, not the animal prison numb-nuts) in Winnipeg, Canada in 2003.  Set features songs from all their full-length records in addition to some rare cover tunes along with early incarnations of tracks from Potemkin City Limits, which was released 2 years later. Show is video-taped by crowd-members and recorded and mixed by the band 100% DIY-like.",
-            "poster_path": null,
+            "large_poster_path":
+                       "small_poster_path": null,
             "release_date": "2007-04-24",
             "title": "Propagandhi: Live from Occupied Territory",
             "tmdb_id": "114924",
@@ -140,7 +142,8 @@ Headers:
                 "History"
             ],
             "overview": "The Americans are swiftly closing on Okinawa, an island just south of the Japanese mainland. The Imperial command sends top generals and several army divisions to defend it at all costs. The mission quickly degenerates as vital resources and troops are diverted to other islands. After a civilian evacuation ends in tragedy most of non-combatants are forced to remain on the island. Many convert to soldier status. Tokyo sends mixed messages that squander time and resources, as when they order the defenders to build an airstrip for aircraft that never come. The truth soon becomes obvious: the high command decides that the island cannot be held and effectively abandons the Okinawan defenders. When the Americans land many troops are deployed in the wrong places. As the slaughter mounts, a suicidal attitude takes hold. Okinawa becomes a death trap, for civilian volunteers and non-combatants as well.",
-            "poster_path": "https://image.tmdb.org/t/p/original//dq2g8cBDH8i5vNOZ7xJbIrmO5Y5.jpg",
+            "large_poster_path":
+                       "small_poster_path": "https://image.tmdb.org/t/p/original//dq2g8cBDH8i5vNOZ7xJbIrmO5Y5.jpg",
             "release_date": "1971-08-14",
             "title": "激動の昭和史　沖縄決戦",
             "tmdb_id": "130853",
@@ -248,7 +251,8 @@ Headers:
         "watchlist_item_id": "string",
         "title": "string",
         "genres": ["string"],
-        "poster_path": "string" (or null in case of no image in TMDB's response)',
+        "large_poster_path":
+  "small_poster_path":, "string" (or null in case of no image in TMDB's response)',
         "tmdb_id":  "string",
         "overview": "string",
         "release_date": "string" (yyyy-mm-dd format)
@@ -290,7 +294,8 @@ Headers:
         "watchlist_item_id": "string",
         "title": "string",
         "genres": ["string"],
-        "poster_path": "string" (or null in case of no image in TMDB's response)',
+        "large_poster_path":
+  "small_poster_path":, "string" (or null in case of no image in TMDB's response)',
         "tmdb_id":  "string",
         "overview": "string",
         "release_date": "string" (yyyy-mm-dd format)
@@ -1385,7 +1390,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
       "name": "The Daily Show", 
       "original_name": "The Daily Show", 
       "popularity": 2067.696, 
-      "poster_path": "/ixcfyK7it6FjRM36Te4OdblAq4X.jpg"
+      "large_poster_path":
+      "small_poster_path":,"/ixcfyK7it6FjRM36Te4OdblAq4X.jpg"
     }, 
     {
       "adult": false, 
@@ -1396,7 +1402,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
       "name": "Jimmy Kimmel Live!", 
       "original_name": "Jimmy Kimmel Live!", 
       "popularity": 494.357, 
-      "poster_path": "/6uKEYejjR88GwHgNq6NAQ30glTx.jpg"
+      "large_poster_path":
+      "small_poster_path":,"/6uKEYejjR88GwHgNq6NAQ30glTx.jpg"
     }
         ],
     "crew": [
@@ -1408,7 +1415,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
       "job": "Writer", 
       "original_title": "The Royal Tenenbaums", 
       "popularity": 26.071, 
-      "poster_path": "/hwklEwhBhLVI6v3ISlquFTeQIml.jpg", 
+      "large_poster_path":
+      "small_poster_path":,"/hwklEwhBhLVI6v3ISlquFTeQIml.jpg", 
       "release_date": "2001-10-05", 
       "title": "The Royal Tenenbaums", 
       "video": false
@@ -1420,7 +1428,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
       "job": "Executive Producer", 
       "original_title": "The Royal Tenenbaums", 
       "popularity": 26.071, 
-      "poster_path": "/hwklEwhBhLVI6v3ISlquFTeQIml.jpg", 
+      "large_poster_path":
+      "small_poster_path":,"/hwklEwhBhLVI6v3ISlquFTeQIml.jpg", 
       "release_date": "2001-10-05", 
       "title": "The Royal Tenenbaums", 
       "video": false
@@ -1459,7 +1468,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
     "original_title": "\u30b4\u30b8\u30e9-1.0", 
     "overview": "In postwar Japan, Godzilla brings new devastation to an already scorched landscape. With no military intervention or government help in sight, the survivors must join together in the face of despair and fight back against an unrelenting horror.", 
     "popularity": 487.791, 
-    "poster_path": "/hkxxMIGaiCTmrEArK7J56JTKUlB.jpg", 
+    "large_poster_path":
+    "small_poster_path":,"/hkxxMIGaiCTmrEArK7J56JTKUlB.jpg", 
     "release_date": "2023-11-03", 
     "title": "Godzilla Minus One", 
     "video": false, 
@@ -1485,7 +1495,8 @@ If no content id or "is_movie" value provided, returns all ratings by given user
     "original_name": "Yo soy Betty, la fea", 
     "overview": "Taking place mainly in Bogot\u00e1, Colombia, Betty La Fea is essentially a Cinderella comedy about the rise of poor, ugly 'Betty' Pinz\u00f3n and the fall of rich, handsome Armando Mendoza. Armando is a very incompetent playboy with a scheme to turn a huge profit as the new President of Eco Moda, a famous clothing manufacturing company, but his scheme is doomed because of his faulty mathematics. Because Betty, his secretary (and economics wizard), is in love with him, she helps Armando deceive the Board of Directors as he loses money and brings the company to ruin.\n\nBetty, la Fea is arguably the most successful telenovela of all time and one of the most popular television shows in the world. It is the first telenovela to have been remade worldwide and has been regarded as bringing the telenovela to new levels of success.", 
     "popularity": 234.021, 
-    "poster_path": "/iEBOiXiDGaxVR6w8aKgG5MEusuO.jpg", 
+    "large_poster_path": string,
+    "small_poster_path": string,
     "vote_average": 8.35, 
     "vote_count": 3283
   }
