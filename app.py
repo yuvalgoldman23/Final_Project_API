@@ -7,6 +7,7 @@ import database_connector
 
 app = Flask(__name__)
 CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # Register blueprints for each set of routes
 app.register_blueprint(watchlists_routes)
