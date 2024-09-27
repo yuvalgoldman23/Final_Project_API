@@ -19,8 +19,13 @@ def get_watchlist_owner(watchlist_id):
 # TODO  - finish after understanding the movies API
 # TODO after finishing the Movies API, add a method to convert a watchlist's movie id's to a list of movie details?
 def produce_client_ready_watchlist(watchlist_id, watchlist_items):
+    if utils.is_db_response_error(watchlist_items):
+        return "Database Error", 400
     watchlist_details = service.get_watchlist_details_only(watchlist_id)
-    watchlist_name = watchlist_details['name']
+    try:
+        watchlist_name = watchlist_details['name']
+    except TypeError:
+        return 'Watchlist not found', 404
     #print("watchlist deets" , watchlist_details)
     finished_watchlist = []
     #print("watchlist items", watchlist_items)
@@ -75,7 +80,7 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         watchlist_name = "Watchlist #"+ watchlist_details['ID']
     watchlist = {'Content': finished_watchlist, 'Name': watchlist_name, 'ID': watchlist_details['ID']}
     #print("finished watchlist" , finished_watchlist)
-    return watchlist
+    return watchlist, 200
 
 
 @watchlists_routes.route('/api/watchlists', methods=['GET'])
@@ -86,13 +91,17 @@ def get_main_watchlist(token_info):
     db_response = service.get_main_watchlist(user_id)
     if utils.is_db_response_error(db_response):
         print("DB Error: " + str(db_response))
-        return jsonify({'Error': db_response}), 404
+        return jsonify({'Error': str(db_response)}), 404
     else:
+        print("in get main watchlist route, db response is" + str(db_response))
         watchlist_id = db_response[0].get('ID')
         print("watchlist id is " + str(watchlist_id))
         watchlist_object = service.get_watchlist_by_id(watchlist_id)
         #print("watchlist object is " + str(watchlist_object))
-        return jsonify(produce_client_ready_watchlist(watchlist_id, watchlist_object)), 200
+        client_ready_watchlist, status = produce_client_ready_watchlist(watchlist_id, watchlist_object)
+        if status != 200:
+            return jsonify({'Error': client_ready_watchlist}), status
+        return jsonify(client_ready_watchlist), 200
 
 @watchlists_routes.route('/api/watchlists', methods=['POST'])
 @auth_required
@@ -102,7 +111,7 @@ def create_watchlist(token_info):
     watchlist_name = data.get('watchlist_name')
     db_response = service.create_watchlist(user_id, watchlist_name, False)
     if utils.is_db_response_error(db_response):
-        return db_response, 404
+        return jsonify({"Error": str(db_response)}), 404
     else:
         new_watchlist_id = db_response
         return jsonify({'watchlist_id' : new_watchlist_id}), 201
@@ -121,7 +130,7 @@ def delete_content_from_watchlist(token_info):
         watchlist_id = service.get_main_watchlist(user_id)[0].get('id')
     db_response = service.remove_watch_list_item(user_id, watchlist_id, content_id)
     if utils.is_db_response_error(db_response):
-        return jsonify({'Error': db_response}), 404
+        return jsonify({'Error': str(db_response)}), 404
     else:
         return db_response
 
@@ -134,10 +143,12 @@ def get_watchlist_by_id(watchlist_id):
     db_response = service.get_watchlist_by_id(watchlist_id)
     if utils.is_db_response_error(db_response):
         print("error")
-        return jsonify({'Error': db_response}), 404
+        return jsonify({'Error': str(db_response)}), 404
     else:
-        client_watchlist = produce_client_ready_watchlist(watchlist_id, watchlist_items=db_response)
-        #print("client's watchlist is " , client_watchlist)
+        client_watchlist, status = produce_client_ready_watchlist(watchlist_id, watchlist_items=db_response)
+        if status != 200:
+            return jsonify({"Error": client_watchlist}), status
+        print("client's watchlist is " , client_watchlist)
         return jsonify(client_watchlist), 200
 
 
@@ -150,11 +161,13 @@ def get_user_watchlists(token_info):
     #print("db response " , db_response)
     # Check whether the DB has returned watchlists or an error
     if utils.is_db_response_error(db_response):
-        return jsonify({'Error': db_response}), 404
+        return jsonify({'Error': str(db_response)}), 404
     else:
         all_watchlists = []
         #print("db response is " , db_response)
         for watchlist in db_response:
+            if utils.is_db_response_error(db_response):
+                continue
             watchlist_id = watchlist.get('ID')
             watchlist, status = (get_watchlist_by_id(watchlist_id))
             all_watchlists.append(watchlist.json)
@@ -182,7 +195,7 @@ def add_movie_to_watchlist(token_info):
     # TODO is the user_id necessary here? where is the validation that the watchlist belongs to the user adding the content?
     db_response, status = service.add_watch_list_item(user_id, content_id, watchlist_id, is_movie)
     if utils.is_db_response_error(db_response):
-        return jsonify({'Error': db_response}), 404
+        return jsonify({'Error': str(db_response)}), 404
     else:
         if status == 200:
             return jsonify({'Success': f'Added {content_id} to watchlist', 'watchlist_object_id': db_response}), 200
@@ -200,6 +213,6 @@ def delete_user_watchlist(token_info):
     db_response = service.remove_watch_list(user_id, watchlist_id)
     # Check whether the DB has returned success or an error
     if utils.is_db_response_error(db_response):
-        return jsonify({'Error': db_response}), 404
+        return jsonify({'Error': str(db_response)}), 404
     else:
         return db_response

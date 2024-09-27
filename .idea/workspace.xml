@@ -4,7 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated &quot;large poster path&quot; to include the original poster as is" />
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added specific CORS handling">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database_connector.py" beforeDir="false" afterPath="$PROJECT_DIR$/database_connector.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/user_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/user_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/user_services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/watchlist_services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/watchlist_services.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,6 +44,12 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;yuvalgoldman23&quot;
+  }
+}</component>
   <component name="GitSEFilterConfiguration">
     <file-type-list>
       <filtered-out-file-type name="LOCAL_BRANCH" />
@@ -51,6 +65,12 @@
       </list>
     </option>
   </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/yuvalgoldman23/Final_Project_API.git&quot;,
+    &quot;accountId&quot;: &quot;aeabf4fa-63a1-4012-828e-d04f7d9b4fa8&quot;
+  }
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -180,6 +200,9 @@
       <workItem from="1726867984794" duration="2185000" />
       <workItem from="1727092682892" duration="2222000" />
       <workItem from="1727105213220" duration="291000" />
+      <workItem from="1727266662787" duration="6398000" />
+      <workItem from="1727350513219" duration="618000" />
+      <workItem from="1727449794391" duration="4234000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -498,7 +521,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727105449319</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="Added specific CORS handling">
+      <option name="closed" value="true" />
+      <created>1727266873911</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1727266873911</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -516,7 +547,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Changed the 'get all watchlists' endpoint's url" />
     <MESSAGE value="Added watchlist id to the watchlist object returned for client" />
     <MESSAGE value="Added protection from adding same content more than once to the watchlist" />
     <MESSAGE value="Updated the readme file to fit the new watchlist routes, update login readme" />
@@ -541,7 +571,8 @@
     <MESSAGE value="Fixed a bug happening causing errors in watchlists containing both movies and tv-shows" />
     <MESSAGE value="Added server handling of movie/tv shows posters. Still not added for cast" />
     <MESSAGE value="Updated &quot;large poster path&quot; to include the original poster as is" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated &quot;large poster path&quot; to include the original poster as is" />
+    <MESSAGE value="Added specific CORS handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added specific CORS handling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -555,6 +586,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1727093923303" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1727452347668" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

@@ -6,12 +6,11 @@ from services import  watchlist_services as service
 
 
 def login_google(id,email):
-
         try:
             # Check if the ID exists
             query = f"SELECT EXISTS(SELECT 1 FROM `final_project_db`.`users` WHERE id = %s)"
             cursor.execute(query, (id,))
-            exists = cursor.fetchone()[0]
+            exists = cursor.fetchall()[0][0]
 
             if not exists:
                 # Registration: Insert the ID if it does not exist
@@ -23,26 +22,29 @@ def login_google(id,email):
                 return main_watchlist_id, 200
             else:
                 print(f"ID {id} already exists in the table .")
-                main_watchlist_id = service.get_main_watchlist(id)[0].get('ID')
-                return main_watchlist_id, 200
+                try:
+                    main_watchlist_id = service.get_main_watchlist(id)[0].get('ID')
+                    return main_watchlist_id, 200
+                except TypeError:
+                    return "Couldn't find main watchlist due to a DB error", 400
 
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
-                return "Database does not exist", 404
+                return "Wrong credentials", 404
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Database does not exist")
-                return "error", 404
+                return "Database does not exist", 404
             else:
-                print(err)
-                return err, 404
+                print("unknown error", err)
+                return str(err), 404
 
 
 def get_user_details(id):
     try:
         query = f"SELECT EXISTS(SELECT 1 FROM `final_project_db`.`users` WHERE id = %s)"
         cursor.execute(query, (id,))
-        exists = cursor.fetchone()[0]
+        exists = cursor.fetchall[0][0]
         if exists:
          query = f"SELECT * FROM `final_project_db`.`users` WHERE id = %s"
          cursor2.execute(query, (id,))
