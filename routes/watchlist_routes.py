@@ -93,10 +93,13 @@ def get_main_watchlist(token_info):
         print("DB Error: " + str(db_response))
         return jsonify({'Error': str(db_response)}), 404
     else:
-        print("in get main watchlist route, db response is" + str(db_response))
+        #print("in get main watchlist route, db response is" + str(db_response))
         watchlist_id = db_response[0].get('ID')
         print("watchlist id is " + str(watchlist_id))
         watchlist_object = service.get_watchlist_by_id(watchlist_id)
+        if utils.is_db_response_error(watchlist_object):
+            json_response = jsonify({'Error': str(watchlist_object)})
+            return json_response, 404
         #print("watchlist object is " + str(watchlist_object))
         client_ready_watchlist, status = produce_client_ready_watchlist(watchlist_id, watchlist_object)
         if status != 200:
@@ -148,8 +151,12 @@ def get_watchlist_by_id(watchlist_id):
         client_watchlist, status = produce_client_ready_watchlist(watchlist_id, watchlist_items=db_response)
         if status != 200:
             return jsonify({"Error": client_watchlist}), status
-        print("client's watchlist is " , client_watchlist)
+        #print("client's watchlist is " , client_watchlist)
         return jsonify(client_watchlist), 200
+
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from flask import jsonify
 
 
 @watchlists_routes.route('/api/watchlists/all', methods=['GET'])
@@ -170,11 +177,12 @@ def get_user_watchlists(token_info):
                 continue
             watchlist_id = watchlist.get('ID')
             watchlist, status = (get_watchlist_by_id(watchlist_id))
-            all_watchlists.append(watchlist.json)
+            # Only add to watchlists list if no error has occurred during the DB transaction
+            if status == 200:
+                all_watchlists.append(watchlist.json)
         #print(all_watchlists)
         # Returns a list of json objects, each being a watchlist, including a content sub list and a Name attribute
         return jsonify({'watchlists' : all_watchlists}), 200
-    # TODO here run the produce_client_ready_watchlist in a loop on all watchlists received here and return an object of watchlists, each being a return value from the produce function
 
 
 @watchlists_routes.route('/api/watchlists/content', methods=['POST'])
