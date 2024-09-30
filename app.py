@@ -1,12 +1,24 @@
 # app.py
 
 from flask import Flask
+from flask_session import Session
 from routes import watchlists_routes, feed_routes, streaming_providers_routes, user_routes, tmdb_routes, reviews_routes, ratings_routes
 from flask_cors import CORS
+from datetime import timedelta
 import database_connector
 
 app = Flask(__name__)
-CORS(app)
+app.config['SECRET_KEY'] = 'your_secret_key'
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+# Erase the session after 60 minutes
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
+
+# Initialize the session
+Session(app)
+
+CORS(app, supports_credentials=True)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # Register blueprints for each set of routes

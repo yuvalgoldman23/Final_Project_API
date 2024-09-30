@@ -5,6 +5,7 @@ from flask import jsonify
 
 
 def Add_rating(User_ID, Media_id, rating, is_movie):
+    print("starting add rating process")
     try:
         # Check if a rating already exists for the given user and media
         check_existing_query = "SELECT EXISTS(SELECT 1 FROM `final_project_db`.`rating` WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s)"
@@ -28,6 +29,7 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
             rating_id_query = "SELECT ID FROM `final_project_db`.`rating` WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s ORDER BY ID DESC LIMIT 1"
             cursor.execute(rating_id_query, (User_ID, Media_id, is_movie))
             rating_id_result = cursor.fetchall()
+            print("inserting new rating, result is", rating_id_result)
             rating_id = rating_id_result[0][0] if rating_id_result else None
 
             if rating_id:

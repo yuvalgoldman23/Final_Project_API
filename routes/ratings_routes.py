@@ -61,6 +61,7 @@ def get_ratings_by_user(token_info):
 @auth_required
 def remove_update_rating(token_info):
     data = request.json
+    print("delete rating request content", data)
     content_id = data.get('content_id')
     is_movie = data.get('is_movie')
     user_id = token_info.get('sub')

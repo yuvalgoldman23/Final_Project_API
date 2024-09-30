@@ -5,4 +5,5 @@ PyJWT
 Flask-CORS
 Werkzeug
 mysql-connector-python
+flask-session
 

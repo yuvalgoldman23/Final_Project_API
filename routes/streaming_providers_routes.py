@@ -1,11 +1,13 @@
 import time
 
 from flask import Blueprint, request, jsonify
+
+import utils
 from auth import auth_required
 from dotenv import load_dotenv
 import os
 import requests
-from services.watchlist_services import get_watchlist_by_id
+from services.watchlist_services import get_watchlist_by_id, get_main_watchlist
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import OrderedDict
 
@@ -95,17 +97,28 @@ def produce_streaming_providers_list_for_content(content_id, territory, content_
         print("TMDB Error", error)
         return []
 
-
+@auth_required
 @streaming_providers_routes.route('/api/watchlists/streaming_recommendation', methods=['GET'])
-def streaming_recommendation():
+def streaming_recommendation(token_info):
     data = request.json
+    # If no watchlist id provided in the data, we'll recommend based on the user's main watchlist
     if "watchlist_id" not in data:
-        return jsonify({"Error": "watchlist_id is required to proceed"}), 404
-
-    watchlist_id = data['watchlist_id']
+        user_id = token_info.get('sub')
+        db_response = get_main_watchlist(user_id)
+        if utils.is_db_response_error(db_response):
+            print("DB Error: " + str(db_response))
+            return jsonify({'Error': str(db_response)}), 404
+        else:
+            # print("in get main watchlist route, db response is" + str(db_response))
+            watchlist_id = db_response[0].get('ID')
+    # If we were provided with a watchlist id, produce the results for it
+    else:
+        watchlist_id = data['watchlist_id']
+    # By default, return results for streaming in the US
     territory = data.get('territory', 'US')
+    # Get the watchlist's content
     watchlist = get_watchlist_by_id(watchlist_id)
-
+    #  Process the watchlist item-by-item
     def process_watchlist_item(watchlist_object):
         is_movie = 'movie' if watchlist_object.get("is_movie") else 'tv'
         tmdb_id = watchlist_object["TMDB_ID"]
@@ -117,11 +130,12 @@ def streaming_recommendation():
         # Count occurrences and store TMDB IDs
         for provider in current_providers:
             provider_name = provider["name"]
+            tmdb_id_object = [{"tmdb_id": tmdb_id, "is_movie": watchlist_object.get("is_movie")}]
             if provider_name not in provider_counts:
-                provider_counts[provider_name] = {"count": 1, "tmdb_ids": [tmdb_id]}
+                provider_counts[provider_name] = {"count": 1, "tmdb_ids": tmdb_id_object}
             else:
                 provider_counts[provider_name]["count"] += 1
-                provider_counts[provider_name]["tmdb_ids"].append(tmdb_id)
+                provider_counts[provider_name]["tmdb_ids"].append(tmdb_id_object[0])
 
         return provider_counts
 
@@ -145,7 +159,7 @@ def streaming_recommendation():
     sorted_providers = sorted(providers.items(), key=lambda item: item[1]["count"], reverse=True)
     sorted_providers = OrderedDict(sorted_providers)
 
-    print("Providers sorted best to worst", sorted_providers)
+    #print("Providers sorted best to worst", sorted_providers)
 
     if len(sorted_providers) == 0:
         return jsonify({"Error": "No streaming providers found"}), 404
@@ -156,6 +170,7 @@ def streaming_recommendation():
     best_providers = {provider: data for provider, data in sorted_providers.items() if data["count"] == top_value}
 
     # Return as JSON with both count and tmdb_ids
-    return jsonify({"best_providers": best_providers}), 200
+    return jsonify({"providers": sorted_providers, "best_providers": best_providers}), 200
 
     # TODO return max. value in the providers list? limit the list to only well known providers such as hulu, netflix, amazon, hbo , etc?
+# TODO remove 'similar' named streaming services - e.g. with and without ads?

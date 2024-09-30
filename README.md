@@ -45,7 +45,9 @@ Headers:
 ## 1. Login
 **URL:** `/api/login`  
 **Method:** `POST`  
-**Description:** Logs the user in using Google authentication, creating a new user if necessary, and returns the ID of the main watchlist.  
+**Description:** Logs the user in using Google authentication, creating a new user if necessary, and returns the ID of the main watchlist.
+A session cookie will also be provided to the client for future usage.
+
 **Authorization:** Token-based authentication required.
 
 **Request Body:**
@@ -73,6 +75,45 @@ Headers:
   {
     "Message": "string"
   }
+  ```
+## 2. Logout
+**URL:** `/api/logout`  
+**Method:** `POST`  
+**Description:** Logs-out the user whose session cookie was provided, while deleting the session.
+
+**Authorization:** Session Cookie, handled by the browser.
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "message": Logged out successfully
+  }
+  ```
+## 3. Is User Logged In?
+**URL:** `/api/is_logged_in`  
+**Method:** `GET`  
+**Description:** Checks whether the user whose session cookie has been provided is logged in or not.
+
+**Request Body:**
+```json
+{
+  // No request body parameters required.
+}
+```
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "logged_in: "boolean"
+  }
+
   ```
   ### 2. Get User Details (Inactive as of now!)
 
@@ -1125,6 +1166,218 @@ If no content id or "is_movie" value provided, returns all ratings by given user
       "error": "string" // Error message describing the server issue.
     }
     ```
+---
+### 24. Get Streaming Services Recommendation
+**URL:** `/api/watchlists/streaming_recommendation`  
+**Method:** `GET`  
+**Description:** Returns a streaming service recommendation based on the service with the most content available from the watchlist. 
+
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+```json
+{
+  "watchlist_id": "string"  // Optional - when no id is provided, the recommendation will be based on the main watchlist.
+  "territory": "string"     // Optional - "US" by default. The country codes are based on TMDB's codes.
+}
+```
+
+**Success Response:**
+
+- **Status Code:** `200 Success`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "providers": {
+        "Amazon Prime Video": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 0,
+                    "tmdb_id": "62017"
+                }
+            ]
+        },
+        "Amazon Prime Video with Ads": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 0,
+                    "tmdb_id": "62017"
+                }
+            ]
+        },
+        "Apple TV Plus": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 0,
+                    "tmdb_id": "95396"
+                }
+            ]
+        },
+        "Disney Plus": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "1022789"
+                }
+            ]
+        },
+        "Hulu": {
+            "count": 2,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "550"
+                },
+                {
+                    "is_movie": 0,
+                    "tmdb_id": "111800"
+                }
+            ]
+        },
+        "Max": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "473033"
+                }
+            ]
+        },
+        "Max Amazon Channel": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "473033"
+                }
+            ]
+        },
+        "Netflix": {
+            "count": 3,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "704239"
+                },
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "646097"
+                },
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "569547"
+                }
+            ]
+        },
+        "Netflix basic with Ads": {
+            "count": 3,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "704239"
+                },
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "646097"
+                },
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "569547"
+                }
+            ]
+        },
+        "Paramount Plus": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "762441"
+                }
+            ]
+        },
+        "Paramount Plus Apple TV Channel ": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "762441"
+                }
+            ]
+        },
+        "Paramount+ Amazon Channel": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "762441"
+                }
+            ]
+        },
+        "Paramount+ Roku Premium Channel": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 1,
+                    "tmdb_id": "762441"
+                }
+            ]
+        },
+        "fuboTV": {
+            "count": 1,
+            "tmdb_ids": [
+                {
+                    "is_movie": 0,
+                    "tmdb_id": "111800"
+                }
+            ]
+        }
+    }
+}
+
+**Failure Responses:**
+
+- **Status Code:** `400 Bad Request`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "No watchlist id or user token provided" // When 'watchlist_id' and token info are missing.
+    }
+    ```
+
+- **Status Code:** `404 Not Found`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "Watchlist not found" // When the watchlist cannot be retrieved from the database.
+    }
+    ```
+
+- **Status Code:** `404 Not Found`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "No streaming providers found" // When no streaming providers are found for the watchlist.
+    }
+    ```
+
+- **Status Code:** `500 Internal Server Error`
+  - **Content Type:** `application/json`
+  - **Response Body:**
+    ```json
+    {
+      "error": "Database error" // When there's an issue fetching the main watchlist or other database errors occur.
+    }
+    ```
+
+
 ---
 ### 7. Create Post
 

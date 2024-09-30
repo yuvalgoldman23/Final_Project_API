@@ -1,10 +1,8 @@
 from functools import wraps
-from flask import request, jsonify, Flask
+from flask import request, jsonify, Flask, session
 import requests
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
-
 
 # Function to verify Google OAuth2 token
 def verify_google_token(token):
@@ -18,12 +16,25 @@ def verify_google_token(token):
     return None
 
 
-# Decorator to protect API endpoints
+# Decorator to protect API endpoints and check login
 def auth_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
+        # Check if user is already logged in by checking session
+        if 'user_id' in session:
+            # Optionally, re-validate token to ensure it hasn't expired
+            token = session.get('token')
+            if token:
+                token_info = verify_google_token(token)
+                if not token_info or not token_info.get('sub'):
+                    # Token is invalid or expired, clear the session
+                    session.clear()
+                    return jsonify({'message': 'Session expired. Please log in again.'}), 401
+                # Token is still valid, proceed
+                return f(token_info, *args, **kwargs)
+
+        # If not logged in, check token in Authorization header
         token = None
-        # Check if the request contains an access token in the Authorization header
         if 'Authorization' in request.headers:
             token = request.headers['Authorization']
         if not token:
@@ -33,7 +44,15 @@ def auth_required(f):
         token_info = verify_google_token(token)
         if not token_info or not token_info.get('sub'):
             return jsonify({'message': 'Token is invalid or verification failed'}), 401
-        # Pass the token info to the protected endpoint
+
+        # Store user ID (sub) and token in session
+        session['user_id'] = token_info['sub']
+        session['token'] = token  # Store token for further checks
+
+        # Pass the user ID to the protected endpoint
         return f(token_info, *args, **kwargs)
 
     return decorated
+
+if __name__ == '__main__':
+    app.run(debug=True)
