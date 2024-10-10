@@ -2,7 +2,8 @@
 
 from flask import Blueprint, request, jsonify
 from auth import auth_required
-
+import routes.tmdb_routes as tmdb
+import services.rating_services as rating_service
 lists_routes = Blueprint('lists_routes', __name__)
 
 # TODO currently, this consists of the old watchlists routes, where  we let a user create multiple watchlists

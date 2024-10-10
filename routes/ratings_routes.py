@@ -4,6 +4,28 @@ import utils
 from auth import auth_required
 import services.rating_services as service
 import routes.tmdb_routes as tmdb
+from List import ListItem, List
+
+class RatingList(List):
+    def __init__(self, user_id):
+        # As of now, our ratings list doesn't have a list_id - it's one of a kind
+        super().__init__(user_id, None)
+    def populate_raw_objects(self):
+        # Use 'get user ratings' to get all the raw rating objects
+        # Call the service to get ratings
+        db_response, status = service.get_rating_of_user(self.user_id, None, None)
+        # Return the appropriate response based on the status
+        if status != 200:
+            # TODO Think about how to handle an error here, since the init handles this function and the next one
+            print("there was an error populating the ratings list raw objects")
+            return db_response, status
+        else:
+            self.raw_objects = db_response
+            for raw_object in self.raw_objects:
+                new_item = ListItem(raw_object['is_movie'], raw_object['media_ID'], raw_object['User_ID'],
+                                    raw_object['ID'], self.list_id)
+                self.content.append(new_item)
+            return "success", 200
 ratings_routes = Blueprint('ratings_routes', __name__)
 
 @ratings_routes.route('/api/ratings', methods=['POST'])
@@ -24,10 +46,21 @@ def add_rating(token_info):
         else:
             return jsonify({'rating_id': return_val}), status
 
+@ratings_routes.route('/api/users/ratings_list', methods=['GET'])
+@auth_required
+def get_user_ratings_list(token_info):
+    print("got api request for ratings_list")
+    user_id = token_info.get('sub')
+    # Get the ratings list for the currently logged in user
+    # TODO think about handling errors here....
+    ratings_list = RatingList(user_id)
+    return jsonify(ratings_list.to_dict()), 200
+
+
 
 @ratings_routes.route('/api/users/ratings', methods=['GET'])
 @auth_required
-def get_ratings_by_user(token_info):
+def old_get_ratings_by_user(token_info):
     # Safely parse JSON data from the request
     data = request.get_json(silent=True)
     # Determine user_id: from request if present, otherwise from token_info

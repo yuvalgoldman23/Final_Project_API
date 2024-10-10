@@ -4,18 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added handling of poster images, fixed some error handling issues in watchlist routes">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added session support, updated the README file with the related endpoints, added the streaming recommendations endpoint to the README, updated requirements.txt">
+      <change afterPath="$PROJECT_DIR$/List.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/lists_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/lists_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/ratings_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/ratings_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/streaming_providers_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/streaming_providers_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/tmdb_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/tmdb_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/user_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/rating_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/rating_services.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/watchlist_services.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -210,7 +209,13 @@
       <workItem from="1727454610972" duration="74000" />
       <workItem from="1727515537649" duration="7049000" />
       <workItem from="1727682804811" duration="3552000" />
-      <workItem from="1727690734045" duration="7108000" />
+      <workItem from="1727690734045" duration="7483000" />
+      <workItem from="1727717611711" duration="170000" />
+      <workItem from="1728226059300" duration="2667000" />
+      <workItem from="1728237051396" duration="2943000" />
+      <workItem from="1728252510901" duration="42000" />
+      <workItem from="1728481071092" duration="935000" />
+      <workItem from="1728552838972" duration="13737000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -545,7 +550,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727454676420</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Added session support, updated the README file with the related endpoints, added the streaming recommendations endpoint to the README, updated requirements.txt">
+      <option name="closed" value="true" />
+      <created>1727705560401</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1727705560401</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -563,7 +576,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added protection from adding same content more than once to the watchlist" />
     <MESSAGE value="Updated the readme file to fit the new watchlist routes, update login readme" />
     <MESSAGE value="Updated add watch  list item readme to include duplicate content addition protection" />
     <MESSAGE value="Created a basic, working version of the streaming service recommendation engine. Currently returns the top service covering the watchlist" />
@@ -588,7 +600,8 @@
     <MESSAGE value="Updated &quot;large poster path&quot; to include the original poster as is" />
     <MESSAGE value="Added specific CORS handling" />
     <MESSAGE value="added better error handling to watchlist and user routes" />
-    <option name="LAST_COMMIT_MESSAGE" value="added better error handling to watchlist and user routes" />
+    <MESSAGE value="Added session support, updated the README file with the related endpoints, added the streaming recommendations endpoint to the README, updated requirements.txt" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added session support, updated the README file with the related endpoints, added the streaming recommendations endpoint to the README, updated requirements.txt" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -602,6 +615,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1727702832656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1728567911611" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

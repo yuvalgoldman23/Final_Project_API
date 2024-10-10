@@ -18,8 +18,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 # Initialize the session
 Session(app)
 
-CORS(app, supports_credentials=True)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, supports_credentials=True ,resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # Register blueprints for each set of routes
 app.register_blueprint(watchlists_routes)

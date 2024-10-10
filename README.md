@@ -147,7 +147,7 @@ A session cookie will also be provided to the client for future usage.
         "title": "string",
         "genres": ["string"],
         "large_poster_path": string (original sized poster)
-  "small_poster_path":, "strin (w200 image)g" (or null in case of no image in TMDB's response)',
+  "small_poster_path":, "string (w200 image)g" (or null in case of no image in TMDB's response)',
         "tmdb_id":  "string",
         "overview": "string",
         "release_date": "string" (yyyy-mm-dd format)
@@ -815,6 +815,309 @@ If no content id or "is_movie" value provided, returns all ratings by given user
   }
   ```
 ---
+### 17. Get User's Rating List
+**URL:** `/api/users/ratings_list`
+**Method:** `GET`
+**Description:** Returns the user's list of rated content, including all relevant details.
+**Authorization:** Token-based authentication required.
+
+**Request Body:**
+Empty
+
+**Success Response:**:
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+```json
+
+{
+    "content": [
+        {
+            "genres": [
+                "Action & Adventure",
+                "Comedy",
+                "Animation"
+            ],
+            "is_movie": 0,
+            "item_id": "460102f4cc57",
+            "list_id": null,
+            "overview": "Years ago, the fearsome Pirate King, Gol D. Roger was executed leaving a huge pile of treasure and the famous \"One Piece\" behind. Whoever claims the \"One Piece\" will be named the new King of the Pirates.\n\nMonkey D. Luffy, a boy who consumed a \"Devil Fruit,\" decides to follow in the footsteps of his idol, the pirate Shanks, and find the One Piece. It helps, of course, that his body has the properties of rubber and that he's surrounded by a bevy of skilled fighters and thieves to help him along the way.\n\nLuffy will do anything to get the One Piece and become King of the Pirates!",
+            "poster_path": "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original/cMD9Ygz11zjJzAovURpO75Qg7rT.jpg",
+            "release_date": "1999-10-20",
+            "small_poster_path": "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original/cMD9Ygz11zjJzAovURpO75Qg7rT.jpg",
+            "streaming_services": null,
+            "title": "One Piece",
+            "tmdb_id": "37854",
+            "tmdb_rating": 8.7,
+            "user_id": "113749586527602021810",
+            "user_rating": 9,
+            "video_links": [
+                {
+                    "id": "65e7a4a542f19f01878c703f",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "LrCmsOAgvxk",
+                    "name": "Opening 25 | The Peak - SEKAI NO OWARI [Subtitled]",
+                    "official": true,
+                    "published_at": "2023-09-11T22:24:28.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65f3d0d93852020186e2723f",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "u59DSmF20Dg",
+                    "name": "Opening 15 | We Go! - Hiroshi Kitadani [Subtitled]",
+                    "official": false,
+                    "published_at": "2020-05-13T10:40:46.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65eca1438cfcc7016461fd1a",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "PwVT67T5Xt4",
+                    "name": "Opening 22 | OVER THE TOP - Hiroshi Kitadani",
+                    "official": true,
+                    "published_at": "2019-08-01T14:30:00.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65eca1b978570e0187fab7fc",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "t7xHamn5inQ",
+                    "name": "Opening 21 | Super Powers - V6",
+                    "official": true,
+                    "published_at": "2018-10-16T02:00:02.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65eca189a9b9a4017dd49041",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "Oo52vQyAR6w",
+                    "name": "Opening 20 | Hope - Namie Amuro [Subtitled]",
+                    "official": true,
+                    "published_at": "2018-02-26T02:00:01.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65f8b34f85b10501866335ad",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "yAtUSvVayM0",
+                    "name": "Opening 1 (Special Edition) | We Are! - Hiroshi Kitadani [Subtitled]",
+                    "official": false,
+                    "published_at": "2016-09-27T11:21:50.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65f8b3e3160e730183f955b0",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "CFM_zypYFHM",
+                    "name": "Opening 10 | We Are! - TVXQ [Creditless]",
+                    "official": false,
+                    "published_at": "2013-07-28T22:25:16.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65c495050c4c16016402d214",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "LzC0HSOOauI",
+                    "name": "Opening 11 | Share the World - TVXQ [Subtitled]",
+                    "official": false,
+                    "published_at": "2012-07-24T10:06:47.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65f8b4ce4d0e8d017c321c29",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "dmtK7RiIz1A",
+                    "name": "English Opening 1 | We Are! - Vic Mignogna",
+                    "official": false,
+                    "published_at": "2011-10-06T11:36:23.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65f3d201293835018728aecb",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "NZv-BKl4qEo",
+                    "name": "Opening 5 | Map of the Heart - BOYSTYLE [Subtitled]",
+                    "official": false,
+                    "published_at": "2010-11-04T17:58:25.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                },
+                {
+                    "id": "65f3d24224f2ce018516c4bc",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "FZ26zR5EGEA",
+                    "name": "Opening 6 | BRAND NEW WORLD - D-51 [Subtitled]",
+                    "official": false,
+                    "published_at": "2006-07-21T07:22:09.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Opening Credits"
+                }
+            ]
+        },
+        {
+            "genres": [],
+            "is_movie": 1,
+            "item_id": "694aa97847dc",
+            "list_id": null,
+            "overview": "",
+            "poster_path": "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original/6upxSiukqIvPhHQ8FoOlN4bZciY.jpg",
+            "release_date": "",
+            "small_poster_path": "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original/6upxSiukqIvPhHQ8FoOlN4bZciY.jpg",
+            "streaming_services": null,
+            "title": "אותיות מצחיקות",
+            "tmdb_id": "992127",
+            "tmdb_rating": 0.0,
+            "user_id": "113749586527602021810",
+            "user_rating": 4,
+            "video_links": []
+        },
+        {
+            "genres": [],
+            "is_movie": 0,
+            "item_id": "8e9e43733379",
+            "list_id": null,
+            "overview": "System Crash was a television show on YTV about a group of students in a media club telling the events of their fictional school, Lambton High, in the past week.\n\nThe show was of the sketch comedy genre, with many short segments. Each episode usually had a theme, i.e. parents. Many of the recurring sketches had familiar titles such as Fly on the Wall, Sports Update, Burnbaum Helps, and Lambton Home Shopping.",
+            "poster_path": "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original/oEMskC0OFilELHGsDfRFM84gU8C.jpg",
+            "release_date": "1999-02-04",
+            "small_poster_path": "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original/oEMskC0OFilELHGsDfRFM84gU8C.jpg",
+            "streaming_services": null,
+            "title": "System Crash",
+            "tmdb_id": "99",
+            "tmdb_rating": 0.0,
+            "user_id": "113749586527602021810",
+            "user_rating": 4,
+            "video_links": []
+        },
+        {
+            "genres": [
+                "Action",
+                "Comedy"
+            ],
+            "is_movie": 1,
+            "item_id": "ff6b8d5ee6f2",
+            "list_id": null,
+            "overview": "A New Jersey construction worker goes from regular guy to aspiring spy when his long-lost high school sweetheart recruits him for an espionage mission.",
+            "poster_path": "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original/d9CTnTHip1RbVi2OQbA2LJJQAGI.jpg",
+            "release_date": "2024-08-15",
+            "small_poster_path": "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original/d9CTnTHip1RbVi2OQbA2LJJQAGI.jpg",
+            "streaming_services": null,
+            "title": "The Union",
+            "tmdb_id": "704239",
+            "tmdb_rating": 6.271,
+            "user_id": "113749586527602021810",
+            "user_rating": 7,
+            "video_links": [
+                {
+                    "id": "66cd835e16d5538e68c420e5",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "PnX0e2CJUhQ",
+                    "name": "Car Chase Finale",
+                    "official": true,
+                    "published_at": "2024-08-24T15:00:00.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Clip"
+                },
+                {
+                    "id": "66c43c1f2185dcbce75d18b7",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "tjlLyJUGPEM",
+                    "name": "Halle Berry and Mark Wahlberg Take You Behind The Scenes",
+                    "official": true,
+                    "published_at": "2024-08-17T16:00:00.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Behind the Scenes"
+                },
+                {
+                    "id": "66bd41749a3172dc508003bd",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "T3t4NzfxZfI",
+                    "name": "Kitchen Fight Scene - Sneak Peek",
+                    "official": true,
+                    "published_at": "2024-08-14T15:00:00.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Clip"
+                },
+                {
+                    "id": "66b4411a3139e04832888441",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "far_Oqw4a4M",
+                    "name": "Halle Berry and Mark Wahlberg Compare Action Movie Injuries",
+                    "official": true,
+                    "published_at": "2024-08-07T13:00:00.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Featurette"
+                },
+                {
+                    "id": "66ad699e78e48634d5cd86c7",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "Xk9RlH0g37I",
+                    "name": "Roxanne and Mike Reunite",
+                    "official": true,
+                    "published_at": "2024-08-02T16:30:00.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Clip"
+                },
+                {
+                    "id": "667c391e2bb283e831478f23",
+                    "iso_3166_1": "US",
+                    "iso_639_1": "en",
+                    "key": "vea9SdnRMyg",
+                    "name": "Official Trailer",
+                    "official": true,
+                    "published_at": "2024-06-26T15:30:01.000Z",
+                    "site": "YouTube",
+                    "size": 1080,
+                    "type": "Trailer"
+                }
+            ]
+        }
+    ],
+    "list_id": null,
+    "user_id": "113749586527602021810"
+}
+```
 
 ### 16. Add Post
 **URL:** `/api/feed`  

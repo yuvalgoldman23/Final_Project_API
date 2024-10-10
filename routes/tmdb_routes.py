@@ -72,7 +72,7 @@ def get_trending_movies():
 
 @tmdb_routes.route('/api/tv/<string:tv_show_id>', methods=['GET'])
 def get_tv_show_info(tv_show_id):
-    url = f"https://api.themoviedb.org/3/tv/{tv_show_id}"
+    url = f"https://api.themoviedb.org/3/tv/{tv_show_id}?language=en&append_to_response=similar,videos"
     params = {
         "api_key": api_key
     }
@@ -115,13 +115,14 @@ def get_movie_cast(movie_id):
 @tmdb_routes.route('/api/movie/<string:movie_id>', methods=['GET'])
 def get_movie_info(movie_id):
     # TODO remove or leave the append to response here? use this to understand https://developer.themoviedb.org/reference/movie-similar
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}?append_to_response=similar, videos"
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?append_to_response=similar,videos"
     params = {
         "api_key": api_key
     }
 
     response = requests.get(url, params=params)
     data = response.json()
+    print("movie info data",  data)
     if not data["poster_path"]:
         data["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
         data["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"

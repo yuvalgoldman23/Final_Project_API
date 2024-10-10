@@ -45,6 +45,7 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         media_info['title'] = tmdb_info['original_title'] if is_movie else tmdb_info['original_name']
         media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
         media_info['tmdb_id'] = watchlist_object['TMDB_ID']
+        media_info['is_movie'] = is_movie
         if tmdb_info['poster_path']:
             media_info['poster_path'] = "https://image.tmdb.org/t/p/original/" + tmdb_info['poster_path']
             media_info['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + tmdb_info['poster_path']
@@ -67,6 +68,10 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
             media_info['tmdb_rating'] = tmdb_info['vote_average']
         else:
             media_info['tmdb_rating'] = None
+        if tmdb_info.get('videos'):
+            media_info['video_links'] = tmdb_info['videos']['results']
+        else:
+            media_info['video_links'] = None
         user_id = watchlist_details['User_ID']
         user_rating, status_code = rating_service.get_rating_of_user(user_id, media_info['tmdb_id'],  watchlist_object['is_movie'])
         if status_code == 200:

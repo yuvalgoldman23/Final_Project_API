@@ -16,6 +16,7 @@ def login(token_info):
     elif status == 200:
         # Store user_id in session upon successful login
         session['user_id'] = user_id
+        print("session id is", session.get('user_id'))
         return jsonify({'main_watchlist_id': return_val}), 200
 
 @user_routes.route('/api/user', methods=['GET'])
@@ -36,4 +37,5 @@ def is_logged_in():
 def logout():
     # Remove the 'user_id' from the session to log out the user
     session.pop('user_id', None)
+    print("session after logging out", session.get('user_id'))
     return jsonify({'message': 'Logged out successfully'}), 200

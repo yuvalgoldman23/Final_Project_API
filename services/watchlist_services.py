@@ -115,14 +115,18 @@ def get_user_watchlists(user_id):
     except mysql.connector.Error as err:
         return handle_mysql_error(err)
 
-
 def get_watchlist_by_id(watchlist_ID):
+    """
+
+    :param watchlist_ID:
+    :return: Returns the content objects (tmdb_id's and is_movie) of the provided watchlist id
+    """
     try:
         query = "SELECT * FROM final_project_db.watch_lists_objects WHERE Parent_ID = %s"
         with connection.cursor(dictionary=True) as cursor2:
             cursor2.execute(query, (watchlist_ID,))
-            results = cursor2.fetchall()  # Using fetchall() to maintain return type
-            return results  # Return type remains a list of dictionaries
+            results = cursor2.fetchall()
+            return results
     except mysql.connector.Error as err:
         return handle_mysql_error(err)
 
