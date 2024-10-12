@@ -164,3 +164,27 @@ def handle_mysql_error(err):
     else:
         print(err)
         return err
+
+
+def check_content_in_watchlist(watchlist_ID, content_id, is_movie):
+    """
+    Check if a specific content ID and is_movie flag exist in the given watchlist.
+
+    :param watchlist_ID: The ID of the watchlist to check.
+    :param content_id: The content ID to search for.
+    :param is_movie: Boolean flag indicating if the content is a movie.
+    :return: True if the content exists in the watchlist, otherwise False.
+    """
+    try:
+        query = """
+        SELECT COUNT(*) AS count 
+        FROM final_project_db.watch_lists_objects 
+        WHERE Parent_ID = %s AND TMDB_ID = %s AND is_movie = %s
+        """
+        with connection.cursor(dictionary=True) as cursor2:
+            cursor2.execute(query, (watchlist_ID, content_id, is_movie))
+            result = cursor2.fetchone()
+            return result['count'] > 0, 200  # Return True if count is greater than 0, otherwise False
+    except mysql.connector.Error as err:
+        return handle_mysql_error(err), 400
+

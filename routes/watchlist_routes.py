@@ -1,7 +1,8 @@
 # routes/watchlist_routes.py
 
 from flask import Blueprint, request, jsonify, json
-
+import aiohttp
+import asyncio
 import utils
 from auth import auth_required
 import services.watchlist_services as service
@@ -69,7 +70,9 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         else:
             media_info['tmdb_rating'] = None
         if tmdb_info.get('videos'):
-            media_info['video_links'] = tmdb_info['videos']['results']
+            # TODO choose the right video to be here! e.g. trailer, youtube, official etc
+            media_info['video_links'] = tmdb_info['videos']['results'][0]["key"]
+            #print("provided the following video link",  media_info['video_links'])
         else:
             media_info['video_links'] = None
         user_id = watchlist_details['User_ID']
@@ -110,6 +113,119 @@ def get_main_watchlist(token_info):
         if status != 200:
             return jsonify({'Error': client_ready_watchlist}), status
         return jsonify(client_ready_watchlist), 200
+
+'''Async get main watchlist'''
+# TODO much faster, talk to Omer to understand how we can implement in the client
+# TODO use the same strategy to fetch the ratings list
+async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist_id, item_id):
+    movie_url = f"https://api.themoviedb.org/3/movie/{content_id}?api_key={api_key}&append_to_response=videos"
+    tv_url = f"https://api.themoviedb.org/3/tv/{content_id}?api_key={api_key}&append_to_response=videos"
+    async with session.get(movie_url if is_movie else tv_url) as response:
+        if response.status == 200:
+            data = await response.json()
+
+            # Initialize media_info
+            media_info = {}
+
+            # Constructing the media_info object based on whether it's a movie or a series
+            media_info['title'] = data['original_title'] if is_movie else data['original_name']
+            media_info['genres'] = [genre['name'] for genre in data['genres']]
+            media_info['tmdb_id'] = content_id
+            media_info['is_movie'] = is_movie
+
+            # Poster paths
+            if data['poster_path']:
+                media_info['poster_path'] = "https://image.tmdb.org/t/p/original/" + data['poster_path']
+                media_info['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + data['poster_path']
+            else:
+                media_info['poster_path'] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+                media_info['small_poster_path'] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+
+            # Overview
+            media_info['overview'] = data['overview'] if data['overview'] else None
+
+            # Release date
+            media_info['release_date'] = data.get('release_date') if is_movie else data.get('first_air_date')
+            if not media_info['release_date']:
+                media_info['release_date'] = None
+
+            # TMDB rating
+            media_info['tmdb_rating'] = data['vote_average'] if data['vote_average'] else None
+
+            # Video links
+            media_info['video_links'] = data['videos']['results'][0]["key"] if data.get('videos') and data['videos'][
+                'results'] else None
+            # User Rating
+            user_rating, status_code = rating_service.get_rating_of_user(user_id, content_id,
+                                                                         is_movie)
+            if status_code == 200:
+                media_info['user_rating'] = user_rating['rating']
+            else:
+                media_info['user_rating'] = None
+
+            media_info['watchlist_item_id'] = item_id
+
+            return media_info
+        else:
+            return None  # Handle errors appropriately
+
+
+async def fetch_movies(content_info, api_key, user_id, watchlist_id):
+    async with aiohttp.ClientSession() as session:
+        tasks = [
+            asyncio.create_task(fetch_movie(session, item['TMDB_ID'], item['is_movie'], api_key, user_id, watchlist_id, item['ID']))
+            for item in content_info
+        ]
+        return await asyncio.gather(*tasks)
+
+
+def run_async(func, *args):
+    return asyncio.run(func(*args))
+
+
+@watchlists_routes.route('/api/watchlists/async', methods=['GET'])
+@auth_required
+def async_get_main_watchlist(token_info):
+    print("trying to get main watchlist")
+    user_id = token_info.get('sub')
+    db_response = service.get_main_watchlist(user_id)
+
+    if utils.is_db_response_error(db_response):
+        print("DB Error: " + str(db_response))
+        return jsonify({'Error': str(db_response)}), 404
+
+    watchlist_id = db_response[0].get('ID')
+    print("watchlist id is " + str(watchlist_id))
+
+    watchlist_object = service.get_watchlist_by_id(watchlist_id)
+    if utils.is_db_response_error(watchlist_object):
+        json_response = jsonify({'Error': str(watchlist_object)})
+        return json_response, 404
+
+    # Extract TMDB IDs and is_movie from the watchlist object
+    extracted_watchlist = [
+        {
+            'TMDB_ID': item.get('TMDB_ID'),
+            'is_movie': item.get('is_movie'),
+            'ID': item.get('ID')
+        }
+        for item in watchlist_object
+        if item.get('TMDB_ID') is not None
+    ]
+
+    api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'  # Replace with your actual TMDB API key
+
+    # Fetch movies asynchronously, passing both TMDB_ID and is_movie
+    movie_data_list = run_async(fetch_movies, extracted_watchlist, api_key, user_id, watchlist_id)
+
+    # Filter out None values and construct the result
+    result = [
+        movie_data for movie_data in movie_data_list if movie_data is not None
+    ]
+
+    # Returning the movie data as a JSON response
+    return jsonify({"Content": result, "ID": watchlist_id}), 200
+
 
 @watchlists_routes.route('/api/watchlists', methods=['POST'])
 @auth_required
@@ -229,3 +345,24 @@ def delete_user_watchlist(token_info):
         return jsonify({'Error': str(db_response)}), 404
     else:
         return db_response
+
+@watchlists_routes.route('/api/watchlists/is_in_watchlist', methods=['GET', 'POST'])
+@auth_required
+def is_in_watchlist(token_info):
+    user_id = token_info.get('sub')
+    db_response = service.get_main_watchlist(user_id)
+    if utils.is_db_response_error(db_response):
+        print("DB Error: " + str(db_response))
+        return jsonify({'Error': str(db_response)}), 404
+    data = request.json
+    if 'content_id' not in data or 'is_movie' not in data:
+        return jsonify({"error": "No content id/is_movie provided in the request"}), 400
+    else:
+        #print("in get main watchlist route, db response is" + str(db_response))
+        watchlist_id = db_response[0].get('ID')
+        db_response, status = service.check_content_in_watchlist(watchlist_id, data['content_id'], data['is_movie'])
+        if status != 200:
+            return jsonify({"error": "DB error"}), status
+        else:
+            return jsonify({"is_in_watchlist": db_response}), 200
+

@@ -20,6 +20,7 @@ Session(app)
 
 CORS(app, supports_credentials=True ,resources={r"/*": {"origins": "http://localhost:3000"}})
 
+
 # Register blueprints for each set of routes
 app.register_blueprint(watchlists_routes)
 app.register_blueprint(feed_routes)

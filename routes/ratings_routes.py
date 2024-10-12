@@ -86,7 +86,7 @@ def old_get_ratings_by_user(token_info):
     if status != 200:
         return jsonify({'db_response': db_response}), status
     else:
-        print("db response", db_response)
+        #print("db response", db_response)
         return jsonify({'ratings': db_response}), 200
 
 

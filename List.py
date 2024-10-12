@@ -30,13 +30,11 @@ class ListItem:
             tmdb_info = get_movie_info(self.tmdb_id)
         else:
             tmdb_info = get_tv_show_info(self.tmdb_id)
-
         if self.is_movie:
             tmdb_info = jsonify(tmdb_info)
         tmdb_info = tmdb_info.json
         self.title = tmdb_info['title'] if self.is_movie else tmdb_info['name']
         self.genres = [genre['name'] for genre in tmdb_info['genres']]
-
         if tmdb_info['poster_path']:
             self.poster_path = "https://image.tmdb.org/t/p/original/" + tmdb_info['poster_path']
             self.small_poster_path = "https://image.tmdb.org/t/p/w200/" + tmdb_info['poster_path']
@@ -44,9 +42,9 @@ class ListItem:
         self.overview = tmdb_info.get('overview')
         self.release_date = tmdb_info.get('release_date') if self.is_movie else tmdb_info.get('first_air_date')
         self.tmdb_rating = tmdb_info.get('vote_average')
-
-        if tmdb_info.get('videos'):
-            self.video_links = tmdb_info['videos']['results']
+        if "videos" in tmdb_info and len(tmdb_info['videos']['results']) > 0:
+            #print("the video selected is", tmdb_info.get('videos')['results'][0]['key'])
+            self.video_links = [tmdb_info['videos']['results'][0]['key']]
 
         user_rating, status_code = rating_service.get_rating_of_user(self.user_id, self.tmdb_id, self.is_movie)
         if status_code == 200:
