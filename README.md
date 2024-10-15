@@ -2061,5 +2061,90 @@ Empty
   - **500 Internal Server Error** - The server encountered an unexpected condition which prevented it from fulfilling the request.
     - Content: Empty object.
 
+### 24. Get media recomandation:
 
+- **URL:** `/api/Media_recomandation?usr_id={user_id}`
+- **Method:** `GET`
+- **Description:** Get recomandation for a user
+- **Parameters:** 
+  - `usr_id` : The id of the user that wants recomandation
+- **Authorization:** Not required.
+- **Response:** 
+  - **200 OK** - Successfully retrieved serch results.
+    - Content: example
+```Json
+[
+  {
+    "Is_movie": 1,
+    "Recomended_by": "Algorithem1",
+    "id": 10537,
+    "overview": "The story of the famous and influential 1960s rock band and its lead singer and composer, Jim Morrison.",
+    "poster_path": "/x1LM3dzGuG6xOz0aT2e71o11vhu.jpg",
+    "release_date": "1991-03-01",
+    "title": "The Doors",
+    "trailer": "qJu9nfVCQmk",
+    "vote_average": 7.128
+  },
+  {
+    "Is_movie": 1,
+    "Recomended_by": "Algorithem1",
+    "id": 678512,
+    "overview": "The story of Tim Ballard, a former US government agent, who quits his job in order to devote his life to rescuing children from global sex traffickers.",
+    "poster_path": "/kSf9svfL2WrKeuK8W08xeR5lTn8.jpg",
+    "release_date": "2023-07-03",
+    "title": "Sound of Freedom",
+    "trailer": "Rt0kp4VW1cI",
+    "vote_average": 8.003
+  },
+  {
+    "Is_movie": 1,
+    "Recomended_by": "Algorithem1",
+    "id": 2897,
+    "overview": "Based on the famous book by Jules Verne the movie follows Phileas Fogg on his journey around the world. Which has to be completed within 80 days, a very short period for those days.",
+    "poster_path": "/kk6Rrwh0toMz9tjuUHdS4O3v2Rk.jpg",
+    "release_date": "1956-10-17",
+    "title": "Around the World in Eighty Days",
+    "trailer": "vjiCO8k6Jhg",
+    "vote_average": 6.6
+  },
+  {
+    "Is_movie": 1,
+    "Recomended_by": "Algorithem1",
+    "id": 330459,
+    "overview": "A rogue band of resistance fighters unite for a mission to steal the Death Star plans and bring a new hope to the galaxy.",
+    "poster_path": "/i0yw1mFbB7sNGHCs7EXZPzFkdA1.jpg",
+    "release_date": "2016-12-14",
+    "title": "Rogue One: A Star Wars Story",
+    "trailer": "sC9abcLLQpI",
+    "vote_average": 7.492
+  },
+  {
+    "Is_movie": 0,
+    "Recomended_by": "Algorithem1",
+    "id": 96129,
+    "name": "Don't F**k with Cats: Hunting an Internet Killer",
+    "overview": "A group of online justice seekers track down a guy who posted a video of him killing kittens.",
+    "poster_path": "/Crc4XkhLddMTNJfj1iLca0w1Bb.jpg",
+    "trailer": "tgkXpowex-g",
+    "vote_average": 7.6
+  }
+]
 
+```
+### 25. FeedBack for recomandation:
+
+- **URL:** `/api/recomandation_feedback?usr_id={user_id}&media_id={media_id}&is_movie={1 or 0}&is_liked={1 or 0}&algo={algorithem}`
+- **Method:** `GET`
+- **Description:** Get recomandation for a user
+- **Parameters:** 
+  - `usr_id` : The id of the user that wants recomandation
+  -  `media_id` : The media id of the media in tmdb
+  -   `is_movie` : if the media is movie
+  -   `is_liked` : If the media is liked or disliked
+  -   `algo` : The algo that recomanded this media
+- **Authorization:** Not required.
+- **Response:** 
+  - **200 OK** - Successfully retrieved serch results.
+      return "1"
+      "0" other wise
+    
