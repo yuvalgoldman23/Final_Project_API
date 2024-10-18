@@ -1,3 +1,6 @@
+import asyncio
+
+import aiohttp
 from flask import request, jsonify
 from auth import auth_required
 from routes.tmdb_routes import get_movie_info, get_tv_show_info
@@ -94,3 +97,6 @@ class List:
             'list_id': self.list_id,
             'content': [item.to_dict() for item in self.content]
         }
+
+
+

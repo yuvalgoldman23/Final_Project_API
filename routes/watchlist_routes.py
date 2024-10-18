@@ -91,7 +91,7 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
     return watchlist, 200
 
 
-@watchlists_routes.route('/api/watchlists', methods=['GET'])
+@watchlists_routes.route('/api/watchlists/test', methods=['GET'])
 @auth_required
 def get_main_watchlist(token_info):
     print("trying to get main watchlist")
@@ -183,7 +183,7 @@ def run_async(func, *args):
     return asyncio.run(func(*args))
 
 
-@watchlists_routes.route('/api/watchlists/async', methods=['GET'])
+@watchlists_routes.route('/api/watchlists', methods=['GET'])
 @auth_required
 def async_get_main_watchlist(token_info):
     print("trying to get main watchlist")
@@ -213,7 +213,7 @@ def async_get_main_watchlist(token_info):
         if item.get('TMDB_ID') is not None
     ]
 
-    api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'  # Replace with your actual TMDB API key
+    api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
 
     # Fetch movies asynchronously, passing both TMDB_ID and is_movie
     movie_data_list = run_async(fetch_movies, extracted_watchlist, api_key, user_id, watchlist_id)

@@ -1,3 +1,6 @@
+import asyncio
+
+import aiohttp
 from flask import Blueprint, request, jsonify, json
 
 import utils
@@ -12,7 +15,7 @@ class RatingList(List):
         super().__init__(user_id, None)
     def populate_raw_objects(self):
         # Use 'get user ratings' to get all the raw rating objects
-        # Call the service to get ratings
+        # Call the service to get all ratings by the logged in user
         db_response, status = service.get_rating_of_user(self.user_id, None, None)
         # Return the appropriate response based on the status
         if status != 200:
@@ -106,3 +109,107 @@ def remove_update_rating(token_info):
         new_rating = data.get('new_rating')
         db_response, status = service.update_rating(content_id,is_movie, user_id, new_rating)
     return jsonify({'db_response': db_response}), status
+
+
+
+# Async ratings list endpoint
+# TODO change the endpoint naming eventually
+
+
+async def fetch_movie(session, content_id, is_movie, api_key,  item_id, rating, user_id):
+    movie_url = f"https://api.themoviedb.org/3/movie/{content_id}?api_key={api_key}&append_to_response=videos"
+    tv_url = f"https://api.themoviedb.org/3/tv/{content_id}?api_key={api_key}&append_to_response=videos"
+    async with session.get(movie_url if is_movie else tv_url) as response:
+        if response.status == 200:
+            data = await response.json()
+
+            # Initialize media_info
+            media_info = {}
+
+            # Constructing the media_info object based on whether it's a movie or a series
+            media_info['title'] = data['original_title'] if is_movie else data['original_name']
+            media_info['genres'] = [genre['name'] for genre in data['genres']]
+            media_info['tmdb_id'] = content_id
+            media_info['is_movie'] = is_movie
+
+            # Poster paths
+            if data['poster_path']:
+                media_info['poster_path'] = "https://image.tmdb.org/t/p/original/" + data['poster_path']
+                media_info['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + data['poster_path']
+            else:
+                media_info['poster_path'] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+                media_info['small_poster_path'] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+
+            # Overview
+            media_info['overview'] = data['overview'] if data['overview'] else None
+
+            # Release date
+            media_info['release_date'] = data.get('release_date') if is_movie else data.get('first_air_date')
+            if not media_info['release_date']:
+                media_info['release_date'] = None
+
+            # TMDB rating
+            media_info['tmdb_rating'] = data['vote_average'] if data['vote_average'] else None
+
+            # Video links
+            media_info['video_links'] = data['videos']['results'][0]["key"] if data.get('videos') and data['videos'][
+                'results'] else None
+
+            media_info['list_item_id'] = item_id
+            media_info['user_rating'] = rating
+            media_info['user_id'] = user_id
+
+            return media_info
+        else:
+            return None  # Handle errors appropriately
+
+
+async def fetch_movies(content_info, api_key, user_id):
+    async with aiohttp.ClientSession() as session:
+        tasks = [
+            asyncio.create_task(fetch_movie(session, item['TMDB_ID'], item['is_movie'], api_key, item['ID'], item['user_rating'], user_id))
+            for item in content_info
+        ]
+        return await asyncio.gather(*tasks)
+
+
+def run_async(func, *args):
+    return asyncio.run(func(*args))
+
+
+@ratings_routes.route('/api/ratings/async', methods=['GET'])
+@auth_required
+def async_get_ratings_list(token_info):
+    # TODO add ratings list id?
+    user_id = token_info.get('sub')
+
+    rating_list_object = service.get_rating_of_user(user_id, None, None)
+    if utils.is_db_response_error(rating_list_object):
+        json_response = jsonify({'Error': str(rating_list_object)})
+        return json_response, 404
+    rating_list_object = rating_list_object[0]
+    # Extract TMDB IDs and is_movie from the watchlist object
+    extracted_ratings_list = [
+        {
+            'TMDB_ID': item.get('media_ID'),
+            'is_movie': item.get('is_movie'),
+            'ID': item.get('ID'),
+            'user_rating': item.get('rating')
+        }
+        for item in rating_list_object
+        if item.get('media_ID') is not None
+    ]
+
+    api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
+
+    # Fetch movies asynchronously, passing both TMDB_ID and is_movie
+    movie_data_list = run_async(fetch_movies, extracted_ratings_list, api_key, user_id)
+
+    # Filter out None values and construct the result
+    result = [
+        movie_data for movie_data in movie_data_list if movie_data is not None
+    ]
+
+    # Returning the movie data as a JSON response
+    # TODO - if adding a ratings list id, add it in this response
+    return jsonify({"Content": result}), 200

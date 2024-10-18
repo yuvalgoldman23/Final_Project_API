@@ -94,8 +94,8 @@ def get_tv_show_info(tv_show_id):
             if link["type"] == "official" and link["site"] == "YouTube" and link["site"] == "Trailer":
                 data["video_links"] = link["key"]
                 break
-        data["video_links"] = [data["videos"]["results"][0]["key"]]
         '''
+        data["video_links"] = [data["videos"]["results"][0]["key"]]
     return jsonify(data)
 
 
