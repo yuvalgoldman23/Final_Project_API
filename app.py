@@ -2,12 +2,13 @@
 
 from flask import Flask
 from flask_session import Session
-from routes import watchlists_routes, feed_routes, streaming_providers_routes, user_routes, tmdb_routes, reviews_routes, ratings_routes
+from routes import watchlists_routes, feed_routes, streaming_providers_routes, user_routes, tmdb_routes, reviews_routes, ratings_routes, recomandation_routes
 from flask_cors import CORS
 from datetime import timedelta
 import database_connector
 
 app = Flask(__name__)
+'''
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
@@ -17,12 +18,14 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
 # Initialize the session
 Session(app)
-
-CORS(app, supports_credentials=True ,resources={r"/*": {"origins": "http://localhost:3000"}})
+'''
+#CORS(app, supports_credentials=True ,resources={r"/*": {"origins": "http://localhost:3000"}})
 
 
 # Register blueprints for each set of routes
 app.register_blueprint(watchlists_routes)
+app.register_blueprint(recomandation_routes)
+
 app.register_blueprint(feed_routes)
 app.register_blueprint(streaming_providers_routes)
 app.register_blueprint(user_routes)
