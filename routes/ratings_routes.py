@@ -177,18 +177,16 @@ def run_async(func, *args):
     return asyncio.run(func(*args))
 
 
-@ratings_routes.route('/api/ratings/async', methods=['GET'])
-@auth_required
-def async_get_ratings_list(token_info):
-    # TODO add ratings list id?
-    user_id = token_info.get('sub')
+def get_ratings_list_data(user_id):
+    """
+    This helper function handles fetching the user's ratings and movie data.
+    It returns the result as a Python dictionary, ready to be used internally or by the endpoint.
+    """
+    rating_list_object, status = service.get_rating_of_user(user_id, None, None)
+    if utils.is_db_response_error(rating_list_object) or status != 200:
+        return {'Error': str(rating_list_object)}, 404
 
-    rating_list_object = service.get_rating_of_user(user_id, None, None)
-    if utils.is_db_response_error(rating_list_object):
-        json_response = jsonify({'Error': str(rating_list_object)})
-        return json_response, 404
-    rating_list_object = rating_list_object[0]
-    # Extract TMDB IDs and is_movie from the watchlist object
+    # Extract TMDB IDs, is_movie, and user_rating from the rating list object
     extracted_ratings_list = [
         {
             'TMDB_ID': item.get('media_ID'),
@@ -206,10 +204,24 @@ def async_get_ratings_list(token_info):
     movie_data_list = run_async(fetch_movies, extracted_ratings_list, api_key, user_id)
 
     # Filter out None values and construct the result
-    result = [
-        movie_data for movie_data in movie_data_list if movie_data is not None
-    ]
+    result = [movie_data for movie_data in movie_data_list if movie_data is not None]
 
-    # Returning the movie data as a JSON response
-    # TODO - if adding a ratings list id, add it in this response
-    return jsonify({"Content": result}), 200
+    # Return the result as a dictionary
+    return {"Content": result}, 200
+
+
+@ratings_routes.route('/api/ratings/async', methods=['GET'])
+@auth_required
+def async_get_ratings_list(token_info):
+    """
+    Endpoint for fetching the user's ratings list. It uses the helper function
+    and returns the result as a JSON response.
+    """
+    user_id = token_info.get('sub')
+
+    # Call the helper function and get the result
+    result, status_code = get_ratings_list_data(user_id)
+
+    # Return the result using jsonify for the API response
+    return jsonify(result), status_code
+

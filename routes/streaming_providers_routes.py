@@ -71,22 +71,11 @@ def merge_provider_counts(main_providers, new_providers):
                 main_providers[provider_name]["tmdb_ids"].extend(data["tmdb_ids"])
 
 
-@streaming_providers_routes.route('/api/watchlists/streaming_recommendation', methods=['GET', 'POST'])
-@auth_required
-def streaming_recommendation(token_info):
-    data = request.json
-
-    if "watchlist_id" not in data:
-        user_id = token_info.get('sub')
-        db_response = get_main_watchlist(user_id)
-        if utils.is_db_response_error(db_response):
-            return jsonify({'Error': str(db_response)}), 404
-        else:
-            watchlist_id = db_response[0].get('ID')
-    else:
-        watchlist_id = data['watchlist_id']
-
-    territory = data.get('territory', 'US')
+async def get_streaming_recommendation_data(watchlist_id, territory='US'):
+    """
+    This helper function processes the watchlist and gathers streaming provider data.
+    It returns the result as a dictionary with sorted providers and the best providers.
+    """
     watchlist = get_watchlist_by_id(watchlist_id)
 
     providers = {}
@@ -112,15 +101,42 @@ def streaming_recommendation(token_info):
         for new_providers in results:
             merge_provider_counts(providers, new_providers)
 
-    asyncio.run(gather_provider_data())
+    await gather_provider_data()
 
     sorted_providers = sorted(providers.items(), key=lambda item: item[1]["count"], reverse=True)
     sorted_providers = OrderedDict(sorted_providers)
 
     if len(sorted_providers) == 0:
-        return jsonify({"Error": "No streaming providers found"}), 404
+        return {"Error": "No streaming providers found"}, 404
 
     top_value = next(iter(sorted_providers.values()))["count"]
     best_providers = {provider: data for provider, data in sorted_providers.items() if data["count"] == top_value}
+    return {"providers": sorted_providers, "best_providers": best_providers}, 200
 
-    return jsonify({"providers": sorted_providers, "best_providers": best_providers}), 200
+
+@streaming_providers_routes.route('/api/watchlists/streaming_recommendation', methods=['GET', 'POST'])
+@auth_required
+def streaming_recommendation(token_info):
+    """
+    Endpoint for fetching streaming provider recommendations. It uses the helper function
+    and returns the result as a JSON response.
+    """
+    data = request.json
+
+    if "watchlist_id" not in data:
+        user_id = token_info.get('sub')
+        db_response = get_main_watchlist(user_id)
+        if utils.is_db_response_error(db_response):
+            return jsonify({'Error': str(db_response)}), 404
+        watchlist_id = db_response[0].get('ID')
+    else:
+        watchlist_id = data['watchlist_id']
+
+    territory = data.get('territory', 'US')
+
+    # Call the helper function and get the result asynchronously
+    result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id, territory))
+
+    # Return the result using jsonify for the API response
+    return jsonify(result), status_code
+

@@ -183,24 +183,21 @@ def run_async(func, *args):
     return asyncio.run(func(*args))
 
 
-@watchlists_routes.route('/api/watchlists', methods=['GET'])
-@auth_required
-def async_get_main_watchlist(token_info):
-    print("trying to get main watchlist")
-    user_id = token_info.get('sub')
+def get_main_watchlist_data(user_id):
+    """
+    This helper function handles fetching the main watchlist and movie data.
+    It returns the result as a Python dictionary, ready to be used internally or by the endpoint.
+    """
     db_response = service.get_main_watchlist(user_id)
 
     if utils.is_db_response_error(db_response):
-        print("DB Error: " + str(db_response))
-        return jsonify({'Error': str(db_response)}), 404
+        return {'Error': str(db_response)}, 404
 
     watchlist_id = db_response[0].get('ID')
-    print("watchlist id is " + str(watchlist_id))
 
     watchlist_object = service.get_watchlist_by_id(watchlist_id)
     if utils.is_db_response_error(watchlist_object):
-        json_response = jsonify({'Error': str(watchlist_object)})
-        return json_response, 404
+        return {'Error': str(watchlist_object)}, 404
 
     # Extract TMDB IDs and is_movie from the watchlist object
     extracted_watchlist = [
@@ -219,12 +216,28 @@ def async_get_main_watchlist(token_info):
     movie_data_list = run_async(fetch_movies, extracted_watchlist, api_key, user_id, watchlist_id)
 
     # Filter out None values and construct the result
-    result = [
-        movie_data for movie_data in movie_data_list if movie_data is not None
-    ]
+    result = [movie_data for movie_data in movie_data_list if movie_data is not None]
 
-    # Returning the movie data as a JSON response
-    return jsonify({"Content": result, "ID": watchlist_id}), 200
+    # Return the result as a dictionary
+    return {"Content": result, "ID": watchlist_id}, 200
+
+
+@watchlists_routes.route('/api/watchlists', methods=['GET'])
+@auth_required
+def async_get_main_watchlist(token_info):
+    """
+    Endpoint for fetching the main watchlist. It uses the helper function
+    and returns the result as a JSON response.
+    """
+    print("trying to get main watchlist")
+    user_id = token_info.get('sub')
+
+    # Call the helper function and get the result
+    result, status_code = get_main_watchlist_data(user_id)
+
+    # Return the result using jsonify for the API response
+    return jsonify(result), status_code
+
 
 
 @watchlists_routes.route('/api/watchlists', methods=['POST'])

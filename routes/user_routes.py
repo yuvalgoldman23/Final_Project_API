@@ -1,6 +1,11 @@
+import asyncio
+
 from flask import Blueprint, jsonify, session
 from auth import auth_required
 from services.user_services import login_google, get_user_details
+from routes.ratings_routes import get_ratings_list_data
+from routes.watchlist_routes import get_main_watchlist_data
+from routes.streaming_providers_routes import get_streaming_recommendation_data
 
 user_routes = Blueprint('user_routes', __name__)
 
@@ -16,8 +21,14 @@ def login(token_info):
     elif status == 200:
         # Store user_id in session upon successful login
         session['user_id'] = user_id
-        print("session id is", session.get('user_id'))
-        return jsonify({'main_watchlist_id': return_val}), 200
+        ratings_list, status = get_ratings_list_data(user_id)
+        if status != 200:
+            ratings_list = []
+        main_watchlist_data, status = get_main_watchlist_data(user_id)
+        if status != 200:
+            main_watchlist_data = None
+        streaming_data = asyncio.run(get_streaming_recommendation_data(watchlist_id=return_val))
+        return jsonify({'main_watchlist_id': return_val, "main_watchlist": {"Content": main_watchlist_data, "ID":  return_val}, "ratings_list": ratings_list, "streaming_data": streaming_data}), 200
 
 @user_routes.route('/api/user', methods=['GET'])
 @auth_required
