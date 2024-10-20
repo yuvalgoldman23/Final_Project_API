@@ -8,6 +8,7 @@ from datetime import timedelta
 import database_connector
 
 app = Flask(__name__)
+'''
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config['SESSION_PERMANENT'] = False
@@ -16,7 +17,7 @@ app.config['SESSION_USE_SIGNER'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 
 # Initialize the session
-Session(app)
+Session(app)'''
 
 CORS(app, supports_credentials=True ,resources={r"/*": {"origins": "http://localhost:3000"}})
 

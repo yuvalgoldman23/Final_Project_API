@@ -45,9 +45,9 @@ def auth_required(f):
         if not token_info or not token_info.get('sub'):
             return jsonify({'message': 'Token is invalid or verification failed'}), 401
 
-        # Store user ID (sub) and token in session
+        '''# Store user ID (sub) and token in session
         session['user_id'] = token_info['sub']
-        session['token'] = token  # Store token for further checks
+        session['token'] = token  # Store token for further checks'''
 
         # Pass the user ID to the protected endpoint
         return f(token_info, *args, **kwargs)
