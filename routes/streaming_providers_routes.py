@@ -107,7 +107,7 @@ async def get_streaming_recommendation_data(watchlist_id, territory='US'):
     sorted_providers = OrderedDict(sorted_providers)
 
     if len(sorted_providers) == 0:
-        return {"Error": "No streaming providers found"}, 404
+        return jsonify({"providers": {}, "best_providers": {}}), 404
 
     top_value = next(iter(sorted_providers.values()))["count"]
     best_providers = {provider: data for provider, data in sorted_providers.items() if data["count"] == top_value}
@@ -138,5 +138,7 @@ def streaming_recommendation(token_info):
     result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id, territory))
 
     # Return the result using jsonify for the API response
+    if status_code != 200:
+        return jsonify({"providers": {}, "best_providers": {}}), status_code
     return jsonify(result), status_code
 
