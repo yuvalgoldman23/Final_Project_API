@@ -107,6 +107,7 @@ async def get_streaming_recommendation_data(watchlist_id, territory='US'):
     sorted_providers = OrderedDict(sorted_providers)
 
     if len(sorted_providers) == 0:
+        print("No providers found for watchlist")
         return jsonify({"providers": {}, "best_providers": {}}), 404
 
     top_value = next(iter(sorted_providers.values()))["count"]
