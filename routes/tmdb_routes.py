@@ -129,7 +129,7 @@ def get_movie_cast(movie_id):
 @tmdb_routes.route('/api/movie/<string:movie_id>', methods=['GET'])
 def get_movie_info(movie_id):
     # TODO remove or leave the append to response here? use this to understand https://developer.themoviedb.org/reference/movie-similar
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}?append_to_response=similar,videos,credits"
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}?append_to_response=recommendations,videos,credits"
     params = {
         "api_key": api_key
     }
