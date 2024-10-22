@@ -97,7 +97,7 @@ class DNNModel(nn.Module):
 # Instantiate the model, loss function, and optimizer
 model = DNNModel()
 
-model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
+model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
 trained_model=model
 
 
@@ -381,7 +381,7 @@ def filter_fields(data, fields):
 
 @recommendation_routes.route('/api/Media_recomandation', methods=['GET'])
 def get_media_recomandationv2():
-    fields_to_keep = ["title", "release_date", "vote_average","id","Recomended_by","trailer","poster_path","overview","name","Is_movie"]
+    fields_to_keep = ["title", "release_date", "vote_average","id","Recomended_by","trailer","poster_path","overview","name","Is_movie","genres"]
     usr_id = request.args.get("usr_id")
     query = f"SELECT *  from rating where rating.User_ID = %s "
     cursor2.execute(query, (usr_id,))
@@ -429,14 +429,38 @@ def get_media_recomandationv2():
             info["trailer"]= t
             info["Recomended_by"]="Algorithem1"
             info["Is_movie"]= 1
+
             info =filter_fields(info, fields_to_keep)
+            info["streaming_services"] = None
+            info["user_id"] = "0"
+            info["user_rating"] = 0
+            info["video_links"] = []
+            info["item_id"] = "0"
+            info["list_id"] = None
+            info["tmdb_rating"] = 1.0
+            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original" + info[
+                "poster_path"]
+            info["poster_path"] = "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original" + info[
+                "poster_path"]
         else:
             info= get_tv_show_info(a["media_ID"])
             t = get_tv_trailer(a["media_ID"])
             info["trailer"] = t
             info["Recomended_by"] = "Algorithem1"
             info["Is_movie"] = 0
+
             info = filter_fields(info, fields_to_keep)
+            info["streaming_services"] = None
+            info["user_id"] = "0"
+            info["user_rating"] = 0
+            info["video_links"] = []
+            info["item_id"] = "0"
+            info["list_id"] = None
+            info["tmdb_rating"] = 1.0
+            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original" + info[
+                "poster_path"]
+            info["poster_path"] = "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original" + info[
+                "poster_path"]
         return_arr.append (info)
 
     return return_arr
