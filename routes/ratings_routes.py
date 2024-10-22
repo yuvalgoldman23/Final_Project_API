@@ -116,9 +116,10 @@ def remove_update_rating(token_info):
 # TODO change the endpoint naming eventually
 
 
-async def fetch_movie(session, content_id, is_movie, api_key,  item_id, rating, user_id):
+async def fetch_movie(session, content_id, is_movie, api_key, item_id, rating, user_id):
     movie_url = f"https://api.themoviedb.org/3/movie/{content_id}?api_key={api_key}&append_to_response=videos"
     tv_url = f"https://api.themoviedb.org/3/tv/{content_id}?api_key={api_key}&append_to_response=videos"
+
     async with session.get(movie_url if is_movie else tv_url) as response:
         if response.status == 200:
             data = await response.json()
@@ -127,34 +128,34 @@ async def fetch_movie(session, content_id, is_movie, api_key,  item_id, rating, 
             media_info = {}
 
             # Constructing the media_info object based on whether it's a movie or a series
-            media_info['title'] = data['original_title'] if is_movie else data['original_name']
-            media_info['genres'] = [genre['name'] for genre in data['genres']]
+            media_info['title'] = data.get('original_title') if is_movie else data.get('original_name')
+            media_info['genres'] = [genre['name'] for genre in data.get('genres', [])]
             media_info['tmdb_id'] = content_id
             media_info['is_movie'] = is_movie
 
             # Poster paths
-            if data['poster_path']:
-                media_info['poster_path'] = "https://image.tmdb.org/t/p/original/" + data['poster_path']
-                media_info['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + data['poster_path']
+            poster_path = data.get('poster_path')
+            if poster_path:
+                media_info['poster_path'] = f"https://image.tmdb.org/t/p/original/{poster_path}"
+                media_info['small_poster_path'] = f"https://image.tmdb.org/t/p/w200/{poster_path}"
             else:
                 media_info['poster_path'] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
                 media_info['small_poster_path'] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
 
             # Overview
-            media_info['overview'] = data['overview'] if data['overview'] else None
+            media_info['overview'] = data.get('overview')
 
             # Release date
             media_info['release_date'] = data.get('release_date') if is_movie else data.get('first_air_date')
-            if not media_info['release_date']:
-                media_info['release_date'] = None
 
             # TMDB rating
-            media_info['tmdb_rating'] = data['vote_average'] if data['vote_average'] else None
+            media_info['tmdb_rating'] = data.get('vote_average')
 
             # Video links
-            media_info['video_links'] = data['videos']['results'][0]["key"] if data.get('videos') and data['videos'][
-                'results'] else None
+            videos = data.get('videos', {}).get('results', [])
+            media_info['video_links'] = videos[0].get('key') if videos else None
 
+            # Additional info
             media_info['list_item_id'] = item_id
             media_info['user_rating'] = rating
             media_info['user_id'] = user_id

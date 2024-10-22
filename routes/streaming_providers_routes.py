@@ -30,6 +30,7 @@ async def fetch_tmdb_data(tmdb_url, params, headers):
             return await response.json()
 
 
+# TODO add territory to this, and separate the endpoint logic from the function itself so we could use it separately
 async def produce_streaming_providers_list_for_content(content_id, territory, content_type):
     tmdb_url = f"https://api.themoviedb.org/3/{content_type}/{content_id}/watch/providers"
     headers = {

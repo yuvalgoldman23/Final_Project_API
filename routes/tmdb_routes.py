@@ -79,7 +79,7 @@ def get_tv_show_info(tv_show_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-    if not data["poster_path"]:
+    if not data.get("poster_path"):
         data["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
         data["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
     else:
@@ -87,6 +87,10 @@ def get_tv_show_info(tv_show_id):
         data['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + data['poster_path']
     if data["videos"]:
         data["video_links"] = data["videos"]["results"]
+        if not data["video_links"]:
+            data["video_links"] = []
+        else:
+            data["video_links"] = [data["videos"]["results"][0]["key"]]
         '''
         # First, check if there exists an 'official' video of type 'Trailer' from 'site' = YouTube
         for link in data["video_links"]:
@@ -95,7 +99,6 @@ def get_tv_show_info(tv_show_id):
                 data["video_links"] = link["key"]
                 break
         '''
-        data["video_links"] = [data["videos"]["results"][0]["key"]]
     return jsonify(data)
 
 
@@ -133,7 +136,7 @@ def get_movie_info(movie_id):
 
     response = requests.get(url, params=params)
     data = response.json()
-    if not data["poster_path"]:
+    if not data.get("poster_path"):
         data["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
         data["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
     else:
@@ -141,6 +144,10 @@ def get_movie_info(movie_id):
         data['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + data['poster_path']
     if "videos" in data and "results" in data["videos"] and len(data["videos"]["results"]) > 0:
             data["video_links"] = data["videos"]["results"]
+            if not data["video_links"]:
+                data["video_links"] = []
+            else:
+                data["video_links"] = [data["videos"]["results"][0]["key"]]
             '''
             # First, check if there exists an 'official' video of type 'Trailer' from 'site' = YouTube
             for link in data["video_links"]:
@@ -149,7 +156,6 @@ def get_movie_info(movie_id):
                     data["video_links"] = link["key"]
                     break
             '''
-            data["video_links"] = [data["videos"]["results"][0]["key"]]
     if "credits" in data and "crew" in data["credits"]:
         # Find the director and the screenwriter in the crew data and assign as "director" and "screenwriter"
         data["director"] = next((person for person in data["credits"]["crew"] if person["job"] == "Director"), None)

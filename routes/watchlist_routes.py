@@ -47,7 +47,7 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
         media_info['tmdb_id'] = watchlist_object['TMDB_ID']
         media_info['is_movie'] = is_movie
-        if tmdb_info['poster_path']:
+        if tmdb_info.get('poster_path'):
             media_info['poster_path'] = "https://image.tmdb.org/t/p/original/" + tmdb_info['poster_path']
             media_info['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + tmdb_info['poster_path']
         else:
@@ -70,8 +70,11 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         else:
             media_info['tmdb_rating'] = None
         if tmdb_info.get('videos'):
+            if not tmdb_info['videos']['results']:
+                media_info['video_links'] = None
+            else:
+                media_info['video_links'] = [tmdb_info['videos']['results'][0]['key']]
             # TODO choose the right video to be here! e.g. trailer, youtube, official etc
-            media_info['video_links'] = tmdb_info['videos']['results'][0]["key"]
             #print("provided the following video link",  media_info['video_links'])
         else:
             media_info['video_links'] = None
@@ -120,6 +123,7 @@ def get_main_watchlist(token_info):
 async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist_id, item_id):
     movie_url = f"https://api.themoviedb.org/3/movie/{content_id}?api_key={api_key}&append_to_response=videos"
     tv_url = f"https://api.themoviedb.org/3/tv/{content_id}?api_key={api_key}&append_to_response=videos"
+
     async with session.get(movie_url if is_movie else tv_url) as response:
         if response.status == 200:
             data = await response.json()
@@ -128,38 +132,37 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
             media_info = {}
 
             # Constructing the media_info object based on whether it's a movie or a series
-            media_info['title'] = data['original_title'] if is_movie else data['original_name']
-            media_info['genres'] = [genre['name'] for genre in data['genres']]
+            media_info['title'] = data.get('original_title') if is_movie else data.get('original_name')
+            media_info['genres'] = [genre['name'] for genre in data.get('genres', [])]
             media_info['tmdb_id'] = content_id
             media_info['is_movie'] = is_movie
 
             # Poster paths
-            if data['poster_path']:
-                media_info['poster_path'] = "https://image.tmdb.org/t/p/original/" + data['poster_path']
-                media_info['small_poster_path'] = "https://image.tmdb.org/t/p/w200/" + data['poster_path']
+            poster_path = data.get('poster_path')
+            if poster_path:
+                media_info['poster_path'] = f"https://image.tmdb.org/t/p/original/{poster_path}"
+                media_info['small_poster_path'] = f"https://image.tmdb.org/t/p/w200/{poster_path}"
             else:
                 media_info['poster_path'] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
                 media_info['small_poster_path'] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
 
             # Overview
-            media_info['overview'] = data['overview'] if data['overview'] else None
+            media_info['overview'] = data.get('overview')
 
             # Release date
             media_info['release_date'] = data.get('release_date') if is_movie else data.get('first_air_date')
-            if not media_info['release_date']:
-                media_info['release_date'] = None
 
             # TMDB rating
-            media_info['tmdb_rating'] = data['vote_average'] if data['vote_average'] else None
+            media_info['tmdb_rating'] = data.get('vote_average')
 
             # Video links
-            media_info['video_links'] = data['videos']['results'][0]["key"] if data.get('videos') and data['videos'][
-                'results'] else None
+            videos = data.get('videos', {}).get('results', [])
+            media_info['video_links'] = videos[0].get('key') if videos else None
+
             # User Rating
-            user_rating, status_code = rating_service.get_rating_of_user(user_id, content_id,
-                                                                         is_movie)
+            user_rating, status_code = rating_service.get_rating_of_user(user_id, content_id, is_movie)
             if status_code == 200:
-                media_info['user_rating'] = user_rating['rating']
+                media_info['user_rating'] = user_rating.get('rating')
             else:
                 media_info['user_rating'] = None
 
@@ -167,6 +170,7 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
 
             return media_info
         else:
+            print(f"Had an error returning the info for {content_id} with response of {response.status}")
             return None  # Handle errors appropriately
 
 
