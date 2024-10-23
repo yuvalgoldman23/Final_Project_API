@@ -157,7 +157,8 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
 
             # Video links
             videos = data.get('videos', {}).get('results', [])
-            media_info['video_links'] = videos[0].get('key') if videos else None
+            # Changed code to be an array here
+            media_info['video_links'] = [videos[0].get('key')] if videos else None
 
             # User Rating
             user_rating, status_code = rating_service.get_rating_of_user(user_id, content_id, is_movie)

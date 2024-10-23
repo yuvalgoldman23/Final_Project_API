@@ -72,7 +72,7 @@ def get_trending_movies():
 
 @tmdb_routes.route('/api/tv/<string:tv_show_id>', methods=['GET'])
 def get_tv_show_info(tv_show_id):
-    url = f"https://api.themoviedb.org/3/tv/{tv_show_id}?language=en&append_to_response=similar,videos,credits"
+    url = f"https://api.themoviedb.org/3/tv/{tv_show_id}?language=en&append_to_response=recommendations,videos,credits"
     params = {
         "api_key": api_key
     }
@@ -99,6 +99,8 @@ def get_tv_show_info(tv_show_id):
                 data["video_links"] = link["key"]
                 break
         '''
+    data["recommendations"] = data.get('recommendations').get('results', [])
+    
     return jsonify(data)
 
 
@@ -163,6 +165,8 @@ def get_movie_info(movie_id):
             (person for person in data["credits"]["crew"] if person["job"] == "Screenplay"),
             next((person for person in data["credits"]["crew"] if person["job"] == "Writer"), None)
         )
+
+    data["recommendations"] = data.get('recommendations').get('results', [])
 
     return data
 
