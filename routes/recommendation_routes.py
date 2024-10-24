@@ -3,6 +3,7 @@
 import copy
 import math
 import random
+import utils
 
 import numpy as np
 import requests
@@ -10,7 +11,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from flask import Blueprint, request
-
+import services.watchlist_services as ws
+import routes.watchlist_routes as rt
 from auth import auth_required
 from database_connector import connection, cursor, cursor2
 
@@ -105,7 +107,7 @@ class DNNModel(nn.Module):
 # Instantiate the model, loss function, and optimizer
 model = DNNModel()
 
-model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
+model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
 trained_model = model
 
 
@@ -321,68 +323,183 @@ def get_tv_trailer(tv_id):
         return None
     return youtube_trailer
 
+@recommendation_routes.route('/api/recommendation_feedbackv2', methods=['GET'])
+def update_prefrences2():
+   try:
+    data = request.json
+    usr_id = data.get('user_id')
+    is_movie= data.get('is_movie')
+    media_id= data.get('media_id')
+    liked = data.get("is_liked")
+    algorithm = data.get("algorithm")
+    query = f"SELECT COALESCE(  (SELECT ID  FROM recommendation_info  WHERE media_id = %s AND is_movie = %s AND user_ID = %s), '0') AS feedback_id;"
+    cursor2.execute(query, (media_id, is_movie, usr_id))
+    feedback_id = cursor2.fetchall()
+    check_query = """
+                             SELECT COALESCE(
+                                 (SELECT ID 
+                                  FROM watch_lists_names 
+                                  WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
+                             """
+    cursor2.execute(check_query, (usr_id,))
+    result = cursor2.fetchone()
+
+    watchlist_id = result['watchlist_id']
+
+    if  feedback_id[0]["feedback_id"] == '0':
+        insert_query = "  INSERT INTO recommendation_info (media_id, is_movie, user_ID, liked, Algorithm)  VALUES (%s, %s, %s, %s, %s)   "
+        cursor.execute(insert_query, (media_id, is_movie, usr_id, liked, algorithm))
+        if liked == 1 or liked == "1":
+
+
+            # If no such watchlist exists (watchlist_id is 0), insert a new one
+            if  watchlist_id[0] == '0':
+
+                insert_query = """
+                             INSERT INTO watch_lists_names ( User_ID, name, Main)
+                             VALUES ( %s, "Recommendation",2)                        
+                             """
+                cursor.execute(insert_query, (usr_id,))
+                connection.commit()
+            check_query = """
+                                      SELECT COALESCE(
+                                          (SELECT ID 
+                                           FROM watch_lists_names 
+                                           WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
+                                      """
+            cursor2.execute(check_query, (usr_id,))
+            result = cursor2.fetchone()
+
+            watchlist_id = result['watchlist_id']
+            insert_query = """
+                         INSERT INTO watch_lists_objects ( Parent_ID, TMDB_ID, user_ID, is_movie)
+                         VALUES ( %s, %s, %s, %s);
+                         """
+            cursor.execute(insert_query, (watchlist_id, media_id, usr_id, int(is_movie)))
+
+    else:
+
+        update_query = "  UPDATE recommendation_info  SET liked = %s, Algorithm = %s  WHERE ID = %s  "
+        cursor.execute(update_query, (liked, algorithm, feedback_id[0]["feedback_id"]))
+    connection.commit()
+    watchlist_object = ws.get_watchlist_by_id(watchlist_id)
+    if utils.is_db_response_error(watchlist_object):
+        return {'Error': str(watchlist_object)}, 404
+
+    # Extract TMDB IDs and is_movie from the watchlist object
+    extracted_watchlist = [
+        {
+            'TMDB_ID': item.get('TMDB_ID'),
+            'is_movie': item.get('is_movie'),
+            'ID': item.get('ID')
+        }
+        for item in watchlist_object
+        if item.get('TMDB_ID') is not None
+    ]
+
+    api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
+
+    # Fetch movies asynchronously, passing both TMDB_ID and is_movie
+    movie_data_list = rt.run_async(rt.fetch_movies, extracted_watchlist, api_key, usr_id, watchlist_id)
+
+    # Filter out None values and construct the result
+    result = [movie_data for movie_data in movie_data_list if movie_data is not None]
+
+    # Return the result as a dictionary
+    return {"Content": result, "ID": watchlist_id}, 200
+
+
+   except requests.exceptions.HTTPError:
+
+       return "0"
 
 @recommendation_routes.route('/api/recommendation_feedback', methods=['GET'])
 @auth_required
 def update_preferences(token_info):
-    try:
-        usr_id = token_info.get('user_id')
-        media_id = request.args.get("media_id")
-        is_movie = request.args.get("is_movie")
-        liked = request.args.get("is_liked")
-        algorithm = request.args.get("algo")
-        query = f"SELECT COALESCE(  (SELECT ID  FROM recommendation_info  WHERE media_id = %s AND is_movie = %s AND user_ID = %s), '0') AS feedback_id;"
-        cursor2.execute(query, (media_id, is_movie, usr_id))
-        feedback_id = cursor2.fetchall()
+ try:
+    data = request.json
+    usr_id = token_info.get('user_id')
+    is_movie = data.get('is_movie')
+    media_id = data.get('media_id')
+    liked = data.get("is_liked")
+    algorithm = data.get("algorithm")
+    query = f"SELECT COALESCE(  (SELECT ID  FROM recommendation_info  WHERE media_id = %s AND is_movie = %s AND user_ID = %s), '0') AS feedback_id;"
+    cursor2.execute(query, (media_id, is_movie, usr_id))
+    feedback_id = cursor2.fetchall()
+    check_query = """
+                                 SELECT COALESCE(
+                                     (SELECT ID 
+                                      FROM watch_lists_names 
+                                      WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
+                                 """
+    cursor2.execute(check_query, (usr_id,))
+    result = cursor2.fetchone()
 
-        if feedback_id and feedback_id[0]["feedback_id"] == '0':
-            insert_query = "  INSERT INTO recommendation_info (media_id, is_movie, user_ID, liked, Algorithm)  VALUES (%s, %s, %s, %s, %s)   "
-            cursor.execute(insert_query, (media_id, is_movie, usr_id, liked, algorithm))
-            if liked == 1 or liked == "1":
-                check_query = """
-                     SELECT COALESCE(
-                         (SELECT ID 
-                          FROM watch_lists_names 
-                          WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
-                     """
-                cursor2.execute(check_query, (usr_id,))
-                result = cursor2.fetchone()
+    watchlist_id = result['watchlist_id']
 
-                watchlist_id = result['watchlist_id']
+    if feedback_id[0]["feedback_id"] == '0':
+        insert_query = "  INSERT INTO recommendation_info (media_id, is_movie, user_ID, liked, Algorithm)  VALUES (%s, %s, %s, %s, %s)   "
+        cursor.execute(insert_query, (media_id, is_movie, usr_id, liked, algorithm))
+        if liked == 1 or liked == "1":
 
-                # If no such watchlist exists (watchlist_id is 0), insert a new one
-                if watchlist_id and watchlist_id[0] == 0:
-                    insert_query = """
-                         INSERT INTO watch_lists_names ( User_ID, 'Recomandation', Main)
-                         VALUES ( %s, 2)                        
-                         """
-                    cursor.execute(insert_query, (usr_id, watchlist_name))
-                    connection.commit()
-                check_query = """
-                                  SELECT COALESCE(
-                                      (SELECT ID 
-                                       FROM watch_lists_names 
-                                       WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
-                                  """
-                cursor2.execute(check_query, (usr_id,))
-                result = cursor2.fetchone()
-
-                watchlist_id = result['watchlist_id']
+            # If no such watchlist exists (watchlist_id is 0), insert a new one
+            if watchlist_id[0] == '0':
                 insert_query = """
-                     INSERT INTO watch_lists_objects ( Parent_ID, TMDB_ID, user_ID, is_movie)
-                     VALUES ( %s, %s, %s, %s);
-                     """
-                cursor.execute(insert_query, (watchlist_id, media_id, usr_id, int(is_movie)))
+                                 INSERT INTO watch_lists_names ( User_ID, name, Main)
+                                 VALUES ( %s, "Recommendation",2)                        
+                                 """
+                cursor.execute(insert_query, (usr_id,))
+                connection.commit()
+            check_query = """
+                                          SELECT COALESCE(
+                                              (SELECT ID 
+                                               FROM watch_lists_names 
+                                               WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
+                                          """
+            cursor2.execute(check_query, (usr_id,))
+            result = cursor2.fetchone()
 
-        else:
+            watchlist_id = result['watchlist_id']
+            insert_query = """
+                             INSERT INTO watch_lists_objects ( Parent_ID, TMDB_ID, user_ID, is_movie)
+                             VALUES ( %s, %s, %s, %s);
+                             """
+            cursor.execute(insert_query, (watchlist_id, media_id, usr_id, int(is_movie)))
 
-            update_query = "  UPDATE recommendation_info  SET liked = %s, Algorithm = %s  WHERE ID = %s  "
-            cursor.execute(update_query, (liked, algorithm, feedback_id[0]["feedback_id"]))
-        connection.commit()
-        return "1"
-    except requests.exceptions.HTTPError:
+    else:
 
-        return "0"
+        update_query = "  UPDATE recommendation_info  SET liked = %s, Algorithm = %s  WHERE ID = %s  "
+        cursor.execute(update_query, (liked, algorithm, feedback_id[0]["feedback_id"]))
+    connection.commit()
+    watchlist_object = ws.get_watchlist_by_id(watchlist_id)
+    if utils.is_db_response_error(watchlist_object):
+        return {'Error': str(watchlist_object)}, 404
+
+    # Extract TMDB IDs and is_movie from the watchlist object
+    extracted_watchlist = [
+        {
+            'TMDB_ID': item.get('TMDB_ID'),
+            'is_movie': item.get('is_movie'),
+            'ID': item.get('ID')
+        }
+        for item in watchlist_object
+        if item.get('TMDB_ID') is not None
+    ]
+
+    api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
+
+    # Fetch movies asynchronously, passing both TMDB_ID and is_movie
+    movie_data_list = rt.run_async(rt.fetch_movies, extracted_watchlist, api_key, usr_id, watchlist_id)
+
+    # Filter out None values and construct the result
+    result = [movie_data for movie_data in movie_data_list if movie_data is not None]
+
+    # Return the result as a dictionary
+    return {"Content": result, "ID": watchlist_id}, 200
+
+ except requests.exceptions.HTTPError:
+
+  return "0"
 
 
 def filter_fields(data, fields):
