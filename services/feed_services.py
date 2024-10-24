@@ -234,7 +234,6 @@ def get_tags_of_media(media_id):
         query = f"SELECT post_id FROM `final_project_db`.`tags` WHERE tagged_media_id = %s"
         cursor2.execute(query, (media_id,))
         post_ids = cursor2.fetchall()
-        print("post ids are " , post_ids)
         return cursor2.fetchall(), 200
 
     except mysql.connector.Error as err:

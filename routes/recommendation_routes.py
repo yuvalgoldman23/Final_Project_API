@@ -411,7 +411,9 @@ def get_media_recommendationv2(token_info):
     cursor2.execute(query, (usr_id,))
     rating_of_usr = cursor2.fetchall()
     usr_prefrence = []
+    print("number of user ratings is" , len(rating_of_usr))
     for r in rating_of_usr:
+        print("current r is" , r)
         if r['is_movie'] == 0:
             gen_str = get_tv_gen_by_id(api_key, r['media_ID'])
             r['genres'] = gen_str
@@ -430,7 +432,6 @@ def get_media_recommendationv2(token_info):
     # return usr_prefrence
     algo_recommendation = []
     while 1:
-        print("inside recommendation loop")
         if len(algo_recommendation) == 5:
             break
         can = greedy_random_selection(recommendation_candidates)
@@ -445,7 +446,7 @@ def get_media_recommendationv2(token_info):
             can_copy["likelihood"] = can_like - can_dislike
             algo_recommendation.append(can_copy)
     return_arr = []
-
+    print("after while, with recs of", algo_recommendation)
     for a in algo_recommendation:
 
         if a["is_movie"]:

@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import os
 import aiohttp
 from services.watchlist_services import get_watchlist_by_id, get_main_watchlist
-from concurrent.futures import ThreadPoolExecutor
 from collections import OrderedDict
 
 # Load environment variables from .env
@@ -20,7 +19,7 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_ACCESS_TOKEN = os.getenv("TMDB_ACCESS_TOKEN")
 
 
-# Make sure you have set up asyncio support in your Flask environment
+# Fetch TMDB data with retry on rate limit
 async def fetch_tmdb_data(tmdb_url, params, headers):
     async with aiohttp.ClientSession() as session:
         async with session.get(tmdb_url, params=params, headers=headers) as response:
@@ -30,7 +29,6 @@ async def fetch_tmdb_data(tmdb_url, params, headers):
             return await response.json()
 
 
-# TODO add territory to this, and separate the endpoint logic from the function itself so we could use it separately
 async def produce_streaming_providers_list_for_content(content_id, territory, content_type):
     tmdb_url = f"https://api.themoviedb.org/3/{content_type}/{content_id}/watch/providers"
     headers = {
@@ -118,7 +116,7 @@ async def get_streaming_recommendation_data(watchlist_id, territory='US'):
 
 @streaming_providers_routes.route('/api/watchlists/streaming_recommendation', methods=['GET', 'POST'])
 @auth_required
-def streaming_recommendation(token_info):
+async def streaming_recommendation(token_info):
     """
     Endpoint for fetching streaming provider recommendations. It uses the helper function
     and returns the result as a JSON response.
@@ -137,10 +135,9 @@ def streaming_recommendation(token_info):
     territory = data.get('territory', 'US')
 
     # Call the helper function and get the result asynchronously
-    result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id, territory))
+    result, status_code = await get_streaming_recommendation_data(watchlist_id, territory)
 
     # Return the result using jsonify for the API response
     if status_code != 200:
         return jsonify({"providers": {}, "best_providers": {}}), status_code
     return jsonify(result), status_code
-
