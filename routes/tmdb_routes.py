@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 import requests
-
+from routes.streaming_providers_routes import produce_streaming_providers_list_for_content
+from utils import filter_shortest_name_variants
 tmdb_routes = Blueprint('tmdb_routes', __name__)
 
 
@@ -71,7 +72,7 @@ def get_trending_movies():
 
 
 @tmdb_routes.route('/api/tv/<string:tv_show_id>', methods=['GET'])
-def get_tv_show_info(tv_show_id):
+async def get_tv_show_info(tv_show_id):
     url = f"https://api.themoviedb.org/3/tv/{tv_show_id}?language=en&append_to_response=recommendations,videos,credits"
     params = {
         "api_key": api_key
@@ -100,6 +101,19 @@ def get_tv_show_info(tv_show_id):
                 break
         '''
     data["recommendations"] = data.get('recommendations').get('results', [])
+
+
+    # Assuming territory is US for now, but you can modify this as needed
+    territory = "US"
+
+    # Use await to call the async method for fetching streaming services
+    data["streaming_services"] = await produce_streaming_providers_list_for_content(tv_show_id, territory,
+                                                                                    content_type="tv")
+    if not data.get("streaming_services"):
+        data["streaming_services"] = []
+    else:
+        data["streaming_services"] = filter_shortest_name_variants(data["streaming_services"])
+        print("filtered data", data["streaming_services"])
     
     return jsonify(data)
 
@@ -129,8 +143,7 @@ def get_movie_cast(movie_id):
 
 
 @tmdb_routes.route('/api/movie/<string:movie_id>', methods=['GET'])
-def get_movie_info(movie_id):
-    # TODO remove or leave the append to response here? use this to understand https://developer.themoviedb.org/reference/movie-similar
+async def get_movie_info(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?append_to_response=recommendations,videos,credits"
     params = {
         "api_key": api_key
@@ -138,37 +151,43 @@ def get_movie_info(movie_id):
 
     response = requests.get(url, params=params)
     data = response.json()
+
+    # Handle missing poster path
     if not data.get("poster_path"):
         data["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
         data["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
     else:
         data['poster_path'] = "https://image.tmdb.org/t/p/original" + data['poster_path']
         data['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + data['poster_path']
+
+    # Handle videos
     if "videos" in data and "results" in data["videos"] and len(data["videos"]["results"]) > 0:
-            data["video_links"] = data["videos"]["results"]
-            if not data["video_links"]:
-                data["video_links"] = []
-            else:
-                data["video_links"] = [data["videos"]["results"][0]["key"]]
-            '''
-            # First, check if there exists an 'official' video of type 'Trailer' from 'site' = YouTube
-            for link in data["video_links"]:
-                # TODO Currently we return a single video only, the first trailer found. Change the conditions/break if require something else
-                if link["type"] == "official" and link["site"] == "YouTube" and link["site"] == "Trailer":
-                    data["video_links"] = link["key"]
-                    break
-            '''
+        data["video_links"] = [data["videos"]["results"][0]["key"]]
+
+    # Find director and screenwriter
     if "credits" in data and "crew" in data["credits"]:
-        # Find the director and the screenwriter in the crew data and assign as "director" and "screenwriter"
         data["director"] = next((person for person in data["credits"]["crew"] if person["job"] == "Director"), None)
         data["screenwriter"] = next(
             (person for person in data["credits"]["crew"] if person["job"] == "Screenplay"),
             next((person for person in data["credits"]["crew"] if person["job"] == "Writer"), None)
         )
 
-    data["recommendations"] = data.get('recommendations').get('results', [])
+    data["recommendations"] = data.get('recommendations', {}).get('results', [])
 
-    return data
+    # Assuming territory is US for now, but you can modify this as needed
+    territory = "US"
+
+    # Use await to call the async method for fetching streaming services
+    data["streaming_services"] = await produce_streaming_providers_list_for_content(movie_id, territory,
+                                                                                    content_type="movie")
+    if not data.get("streaming_services"):
+        data["streaming_services"] = []
+    else:
+        data["streaming_services"] = filter_shortest_name_variants(data["streaming_services"])
+        print("filtered data", data["streaming_services"])
+
+    # Return the data as a JSON response
+    return jsonify(data)
 
 @tmdb_routes.route('/api/actor/<string:actor_id>', methods=['GET'])
 def get_actor_info(actor_id):
