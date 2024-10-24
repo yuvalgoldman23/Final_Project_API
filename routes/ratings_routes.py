@@ -44,10 +44,10 @@ def add_rating(token_info):
         return jsonify({'error': 'Content ID and Rating must be provided'}), 400
     else:
         return_val, status = service.Add_rating(user_id, content_id, rating, is_movie)
-        if status != 201:
+        if status != 201 and status != 200:
             return jsonify({'db_response': return_val}), status
         else:
-            return jsonify({'rating_id': return_val}), status
+            return jsonify({'rating_id': return_val, 'new_ratings': get_ratings_list_data(user_id)}), status
 
 @ratings_routes.route('/api/users/ratings_list', methods=['GET'])
 @auth_required
@@ -108,7 +108,8 @@ def remove_update_rating(token_info):
     else:
         new_rating = data.get('new_rating')
         db_response, status = service.update_rating(content_id,is_movie, user_id, new_rating)
-    return jsonify({'db_response': db_response}), status
+    print("new ratings are", get_ratings_list_data(user_id))
+    return jsonify({'db_response': db_response, 'new_ratings': get_ratings_list_data(user_id)}), status
 
 
 
