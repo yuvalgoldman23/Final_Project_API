@@ -288,40 +288,54 @@ def get_movie_info(movie_id):
     return data
 
 
+import requests
+
+
 def get_movie_trailer(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos"
     params = {
         "api_key": api_key
     }
-    response = requests.get(url, params=params)
-    data = response.json()
-    youtube_trailer = None
+
     try:
-        for video in data['results']:
-            if video['site'] == 'YouTube' and video['type'] == 'Trailer':
-                youtube_trailer = video['key']
-                break
+        response = requests.get(url, params=params)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+        data = response.json()
     except requests.exceptions.HTTPError:
         return None
+
+    youtube_trailer = None
+    results = data.get('results', [])
+    for video in results:
+        if video.get('site') == 'YouTube' and video.get('type') == 'Trailer':
+            youtube_trailer = video.get('key')
+            break
+
     return youtube_trailer
 
 
 def get_tv_trailer(tv_id):
-    url = f"https://api.themoviedb.org/3/movie/{tv_id}/videos"
+    url = f"https://api.themoviedb.org/3/tv/{tv_id}/videos"  # Changed to /tv/ endpoint
     params = {
         "api_key": api_key
     }
-    response = requests.get(url, params=params)
-    data = response.json()
-    youtube_trailer = None
+
     try:
-        for video in data['results']:
-            if video['site'] == 'YouTube' and video['type'] == 'Trailer':
-                youtube_trailer = video['key']
-                break
+        response = requests.get(url, params=params)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+        data = response.json()
     except requests.exceptions.HTTPError:
         return None
+
+    youtube_trailer = None
+    results = data.get('results', [])
+    for video in results:
+        if video.get('site') == 'YouTube' and video.get('type') == 'Trailer':
+            youtube_trailer = video.get('key')
+            break
+
     return youtube_trailer
+
 
 @recommendation_routes.route('/api/watchlists/recommendation2', methods=['GET'])
 def get_recommendation2():
@@ -661,7 +675,6 @@ def get_media_recommendationv2(token_info):
             info["trailer"] = t
             info["recommended_by"] = "Algorithm1"
             info["Is_movie"] = 1
-
             info = filter_fields(info, fields_to_keep)
             info["streaming_services"] = None
             info["user_id"] = "0"
@@ -670,9 +683,10 @@ def get_media_recommendationv2(token_info):
             info["item_id"] = "0"
             info["list_id"] = None
             info["tmdb_rating"] = 1.0
-            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original" + info[
+            # TODO missing the default path, doesn't protect against no image....
+            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
                 "poster_path"]
-            info["poster_path"] = "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original" + info[
+            info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                 "poster_path"]
         else:
             info = get_tv_show_info(a["media_ID"])
@@ -689,9 +703,9 @@ def get_media_recommendationv2(token_info):
             info["item_id"] = "0"
             info["list_id"] = None
             info["tmdb_rating"] = 1.0
-            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original" + info[
+            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
                 "poster_path"]
-            info["poster_path"] = "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original" + info[
+            info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                 "poster_path"]
         return_arr.append(info)
 
