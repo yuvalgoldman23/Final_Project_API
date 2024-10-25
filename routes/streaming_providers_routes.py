@@ -1,5 +1,7 @@
 import time
 import asyncio
+
+import requests
 from flask import Blueprint, request, jsonify
 import utils
 from auth import auth_required
@@ -20,7 +22,26 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_ACCESS_TOKEN = os.getenv("TMDB_ACCESS_TOKEN")
 
 
-# Make sure you have set up asyncio support in your Flask environment
+def media_page_streaming_services(content_id, content_type):
+    tmdb_url = f"https://api.themoviedb.org/3/{content_type}/{content_id}/watch/providers?api_key={TMDB_API_KEY}"
+    headers = {
+        "api_key": f"{TMDB_API_KEY}",
+        "accept": "application/json"
+    }
+    params = {"api_key": TMDB_API_KEY}
+
+    try:
+        data = requests.get(tmdb_url, headers=headers).json()
+        streaming_providers = data.get("results", {})
+        for country, info in streaming_providers.items():
+            data['results'][country] = info.get('flatrate', [])  # Retain 'flatrate' if available, else empty list
+        # TODO shall we filter variants here or not? if so, use the function in utils, but first make sure it fits the new countries structure
+        return streaming_providers
+    except Exception as error:
+        print("TMDB Error", error)
+        return []
+
+
 async def fetch_tmdb_data(tmdb_url, params, headers):
     async with aiohttp.ClientSession() as session:
         async with session.get(tmdb_url, params=params, headers=headers) as response:
@@ -143,4 +164,3 @@ def streaming_recommendation(token_info):
     if status_code != 200:
         return jsonify({"providers": {}, "best_providers": {}}), status_code
     return jsonify(result), status_code
-
