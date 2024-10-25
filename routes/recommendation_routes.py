@@ -323,6 +323,93 @@ def get_tv_trailer(tv_id):
         return None
     return youtube_trailer
 
+@recommendation_routes.route('/api/watchlists/recommendation2', methods=['GET'])
+def get_recommendation2():
+   try:
+    data = request.json
+    usr_id = data.get('user_id')
+
+    check_query = """
+                                 SELECT COALESCE(
+                                     (SELECT ID 
+                                      FROM watch_lists_names 
+                                      WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
+                                 """
+    cursor2.execute(check_query, (usr_id,))
+    result = cursor2.fetchone()
+
+    watchlist_id = result['watchlist_id']
+    if watchlist_id == "0":
+        return {"Content": [], "ID": "0"}, 200
+    watchlist_object = ws.get_watchlist_by_id(watchlist_id)
+    if utils.is_db_response_error(watchlist_object):
+        return {'Error': str(watchlist_object)}, 404
+    extracted_watchlist = [
+        {
+            'TMDB_ID': item.get('TMDB_ID'),
+            'is_movie': item.get('is_movie'),
+            'ID': item.get('ID')
+        }
+        for item in watchlist_object
+        if item.get('TMDB_ID') is not None
+    ]
+    # Fetch movies asynchronously, passing both TMDB_ID and is_movie
+    movie_data_list = rt.run_async(rt.fetch_movies, extracted_watchlist, api_key, usr_id, watchlist_id)
+
+    # Filter out None values and construct the result
+    result = [movie_data for movie_data in movie_data_list if movie_data is not None]
+
+    # Return the result as a dictionary
+    return {"Content": result, "ID": watchlist_id}, 200
+   except requests.exceptions.HTTPError:
+
+       return {"Error:": "error"}, 404
+
+@recommendation_routes.route('/api/watchlists/recommendation', methods=['GET'])
+@auth_required
+def get_recommendation(token_info):
+   try:
+    #data = request.json
+    #usr_id = data.get('user_id')
+    usr_id=token_info.get('user_id')
+
+    check_query = """
+                                 SELECT COALESCE(
+                                     (SELECT ID 
+                                      FROM watch_lists_names 
+                                      WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
+                                 """
+    cursor2.execute(check_query, (usr_id,))
+    result = cursor2.fetchone()
+
+    watchlist_id = result['watchlist_id']
+    if watchlist_id == "0":
+        return {"Content": [], "ID": "0"}, 200
+    watchlist_object = ws.get_watchlist_by_id(watchlist_id)
+    if utils.is_db_response_error(watchlist_object):
+        return {'Error': str(watchlist_object)}, 404
+    extracted_watchlist = [
+        {
+            'TMDB_ID': item.get('TMDB_ID'),
+            'is_movie': item.get('is_movie'),
+            'ID': item.get('ID')
+        }
+        for item in watchlist_object
+        if item.get('TMDB_ID') is not None
+    ]
+    # Fetch movies asynchronously, passing both TMDB_ID and is_movie
+    movie_data_list = rt.run_async(rt.fetch_movies, extracted_watchlist, api_key, usr_id, watchlist_id)
+
+    # Filter out None values and construct the result
+    result = [movie_data for movie_data in movie_data_list if movie_data is not None]
+
+    # Return the result as a dictionary
+    return {"Content": result, "ID": watchlist_id}, 200
+   except requests.exceptions.HTTPError:
+
+       return {"Error:": "error"}, 404
+
+
 @recommendation_routes.route('/api/recommendation_feedbackv2', methods=['GET'])
 def update_prefrences2():
    try:
@@ -397,6 +484,8 @@ def update_prefrences2():
         if item.get('TMDB_ID') is not None
     ]
 
+    if watchlist_id == "0":
+        return {"Content": [], "ID": "0"}, 200
     api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
 
     # Fetch movies asynchronously, passing both TMDB_ID and is_movie
@@ -411,7 +500,8 @@ def update_prefrences2():
 
    except requests.exceptions.HTTPError:
 
-       return "0"
+       return {"Error:": "error"}, 404
+
 
 @recommendation_routes.route('/api/recommendation_feedback', methods=['GET'])
 @auth_required
@@ -471,6 +561,8 @@ def update_preferences(token_info):
         update_query = "  UPDATE recommendation_info  SET liked = %s, Algorithm = %s  WHERE ID = %s  "
         cursor.execute(update_query, (liked, algorithm, feedback_id[0]["feedback_id"]))
     connection.commit()
+    if watchlist_id == "0":
+        return {"Content": [], "ID": "0"}, 200
     watchlist_object = ws.get_watchlist_by_id(watchlist_id)
     if utils.is_db_response_error(watchlist_object):
         return {'Error': str(watchlist_object)}, 404
