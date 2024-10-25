@@ -2178,3 +2178,39 @@ Empty
       ```
       "0" other wise
     
+### 26. Get Recommendation Watchlist
+**URL:** `/api/watchlists/recommendation`  
+**Method:** `GET`  
+**Description:** Retrieves the main watchlist of the logged-in user.  
+**Authorization:** Token-based authentication required.
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Content": [
+        {
+            "genres": [
+                "Horror",
+                "Thriller"
+            ],
+            "is_movie": 1,
+            "overview": "Five years after surviving Art the Clown's Halloween massacre, Sienna and Jonathan are still struggling to rebuild their shattered lives. As the holiday season approaches, they try to embrace the Christmas spirit and leave the horrors of the past behind. But just when they think they're safe, Art returns, determined to turn their holiday cheer into a new nightmare. The festive season quickly unravels as Art unleashes his twisted brand of terror, proving that no holiday is safe.",
+            "poster_path": "https://image.tmdb.org/t/p/original//63xYQj1BwRFielxsBDXvHIJyXVm.jpg",
+            "release_date": "2024-10-09",
+            "small_poster_path": "https://image.tmdb.org/t/p/w200//63xYQj1BwRFielxsBDXvHIJyXVm.jpg",
+            "title": "Terrifier 3",
+            "tmdb_id": "1034541",
+            "tmdb_rating": 7.189,
+            "user_rating": null,
+            "video_links": [
+                "zb2P9y70lJE"
+            ],
+            "watchlist_item_id": "ca3aa35509de"
+        }
+    ],
+    "ID": "7bc95103afe4"
+}
+  ```
