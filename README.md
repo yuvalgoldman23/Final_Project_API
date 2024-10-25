@@ -25,13 +25,19 @@ pip install -r requirements.txt
 
 ## Usage
 
-To start the Flask server, run the following command:
+To start the Flask server in development mode, run the following command:
 
 ```bash
 python app.py
 ```
 
 By default, the server will run on `http://127.0.0.1:5000/`.
+
+To start the Flask server in production mode, run the following command instead:
+
+```bash
+waitress-serve --host=127.0.0.1 --port=5000 app:app
+```
 
 **IMPORTANT**
 For the purpose of testing, API endpoints that require authorization should be accessed via Postman with the following fields:

@@ -11,27 +11,29 @@ import torch.nn as nn
 import torch.nn.functional as F
 from flask import Blueprint, request
 
+from auth import auth_required
 from database_connector import connection, cursor, cursor2
 
 recommendation_routes = Blueprint('recommendation_routes', __name__)
 
-query=f"SELECT * FROM media_data "
+query = f"SELECT * FROM media_data "
 cursor2.execute(query)
 
-movie_data= cursor2.fetchall()
+movie_data = cursor2.fetchall()
 
-query=f"SELECT media_ID, is_movie, AVG(rating) AS avg_rating, COUNT(User_ID) AS num_raters FROM rating GROUP BY media_ID, is_movie HAVING AVG(rating) >= 7; "
+query = f"SELECT media_ID, is_movie, AVG(rating) AS avg_rating, COUNT(User_ID) AS num_raters FROM rating GROUP BY media_ID, is_movie HAVING AVG(rating) >= 7; "
 cursor2.execute(query)
 
-recommendation_candidates=cursor2.fetchall()
+recommendation_candidates = cursor2.fetchall()
 api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
 
-
-for r in  recommendation_candidates:
+for r in recommendation_candidates:
     r['weight'] = math.sqrt(r['num_raters'])
 total_weight = sum(r['weight'] for r in recommendation_candidates)
-for r in  recommendation_candidates:
+for r in recommendation_candidates:
     r['probability'] = r['weight'] / total_weight
+
+
 def greedy_random_selection(Recomandation_canidentes):
     rand = random.random()  # Random float between 0 and 1
     cumulative_probability = 0.0
@@ -39,6 +41,8 @@ def greedy_random_selection(Recomandation_canidentes):
         cumulative_probability += media['probability']
         if rand <= cumulative_probability:
             return media
+
+
 def create_genre_matrix(genres_str):
     genre_ids = [int(id) for id in genres_str.split(',') if id]
     # Number of rows and columns
@@ -75,30 +79,34 @@ def create_genre_matrix(genres_str):
             matrix[i, col_index] = 1.0
 
     return matrix.astype(float)
+
+
 # Define the neural network model
 class DNNModel(nn.Module):
     def __init__(self):
         super(DNNModel, self).__init__()
         self.fc1 = nn.Linear(5 * 19, 128)  # Flatten 5x19 input to 95 features, then 128 neurons in the first layer
-        self.fc2 = nn.Linear(128, 64)      # Second layer with 64 neurons
-        self.fc3 = nn.Linear(64, 64)       # Third layer with 64 neurons
-        self.fc4 = nn.Linear(64, 32)       # Fourth layer with 32 neurons
-        self.fc5 = nn.Linear(32, 2)        # Output layer for 2 classes (class 1 and class 0)
+        self.fc2 = nn.Linear(128, 64)  # Second layer with 64 neurons
+        self.fc3 = nn.Linear(64, 64)  # Third layer with 64 neurons
+        self.fc4 = nn.Linear(64, 32)  # Fourth layer with 32 neurons
+        self.fc5 = nn.Linear(32, 2)  # Output layer for 2 classes (class 1 and class 0)
 
     def forward(self, x):
-        x = x.view(-1, 5 * 19)                   # Flatten the matrix input
+        x = x.view(-1, 5 * 19)  # Flatten the matrix input
         x = F.leaky_relu(self.fc1(x), negative_slope=0.01)  # Leaky ReLU with negative slope 0.01
         x = F.leaky_relu(self.fc2(x), negative_slope=0.01)  # Leaky ReLU for second layer
         x = F.leaky_relu(self.fc3(x), negative_slope=0.01)  # Leaky ReLU for third layer
         x = F.leaky_relu(self.fc4(x), negative_slope=0.01)  # Leaky ReLU for fourth layer
-        x = torch.softmax(self.fc5(x), dim=1)    # Softmax output for class probabilities
-        #x = torch.log_softmax(self.fc3(x), dim=1)
+        x = torch.softmax(self.fc5(x), dim=1)  # Softmax output for class probabilities
+        # x = torch.log_softmax(self.fc3(x), dim=1)
         return x
+
+
 # Instantiate the model, loss function, and optimizer
 model = DNNModel()
 
 model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
-trained_model=model
+trained_model = model
 
 
 def get_movie_gen_by_id(api_key, movie_id):
@@ -115,15 +123,17 @@ def get_movie_gen_by_id(api_key, movie_id):
 
     # If the request was successful
     if response.status_code == 200:
-        movie= response.json()
-        gen_str=""
+        movie = response.json()
+        gen_str = ""
         for g in movie["genres"]:
-            gen=g['id']
+            gen = g['id']
             gen_str = gen_str + str(gen) + ","
-        return  gen_str
+        return gen_str
 
     else:
         return ""
+
+
 def get_tv_gen_by_id(api_key, tv_id):
     # Base URL for TMDb API
     url = f"https://api.themoviedb.org/3/tv/{tv_id}"
@@ -138,10 +148,10 @@ def get_tv_gen_by_id(api_key, tv_id):
 
     # If the request was successful
     if response.status_code == 200:
-        tv= response.json()
-        gen_str=""
+        tv = response.json()
+        gen_str = ""
         for g in tv["genres"]:
-            gen= g['id']
+            gen = g['id']
             if gen < 10000:
                 gen_str = gen_str + str(gen) + ","
             else:
@@ -162,40 +172,43 @@ def get_tv_gen_by_id(api_key, tv_id):
         return gen_str
     else:
         return ""
-def check_compatibility(usr_rating,cannidate):
-    like=0
-    dislike=0
+
+
+def check_compatibility(usr_rating, cannidate):
+    like = 0
+    dislike = 0
     movie_entry = next((movie for movie in movie_data if movie['id'] == cannidate), None)
-    matrix_cannidate= create_genre_matrix(movie_entry['genres'])
+    matrix_cannidate = create_genre_matrix(movie_entry['genres'])
     if movie_entry:
         for rating in usr_rating:
             if cannidate != rating["media_ID"]:
-              matrix_rating=create_genre_matrix(rating['genres'])
-              mat= (matrix_cannidate-matrix_rating)*(matrix_cannidate-matrix_rating)
-              mat_tensor= torch.tensor(mat, dtype=torch.float32)
-              propabillity=trained_model(mat_tensor)
-              p1=propabillity[0,0].item()
-              p2=propabillity[0,1].item()
-              if rating['rating'] >=7:
-                  like=like+ p1
-                  dislike=dislike+ p2
-              else :
-                    like=like+ p2
-                    dislike=dislike+ p1
-    #print(like)
-    #print(dislike)
-    if like >=dislike:
+                matrix_rating = create_genre_matrix(rating['genres'])
+                mat = (matrix_cannidate - matrix_rating) * (matrix_cannidate - matrix_rating)
+                mat_tensor = torch.tensor(mat, dtype=torch.float32)
+                propabillity = trained_model(mat_tensor)
+                p1 = propabillity[0, 0].item()
+                p2 = propabillity[0, 1].item()
+                if rating['rating'] >= 7:
+                    like = like + p1
+                    dislike = dislike + p2
+                else:
+                    like = like + p2
+                    dislike = dislike + p1
+    # print(like)
+    # print(dislike)
+    if like >= dislike:
         return 1
     else:
-      return 0
+        return 0
+
 
 def check_compatibility_v2(usr_preperense, cannidate):
-    like=0.0
+    like = 0.0
     dislike = 0.0
     matrix_cannidate = create_genre_matrix(cannidate)
     for p in usr_preperense:
-        matrix_p=create_genre_matrix(p['gnr_str'])
-        mat= (matrix_cannidate-matrix_p)*(matrix_cannidate-matrix_p)
+        matrix_p = create_genre_matrix(p['gnr_str'])
+        mat = (matrix_cannidate - matrix_p) * (matrix_cannidate - matrix_p)
         mat_tensor = torch.tensor(mat, dtype=torch.float32)
         propabillity = trained_model(mat_tensor)
         p1 = propabillity[0, 0].item()
@@ -206,48 +219,51 @@ def check_compatibility_v2(usr_preperense, cannidate):
         else:
             like = like + p2
             dislike = dislike + p1
-    return like,dislike
+    return like, dislike
+
 
 def get_media_recomandation():
-    usr_id= request.args.get("usr_id")
+    usr_id = request.args.get("usr_id")
     query = f"SELECT *  from rating where rating.User_ID = %s "
     cursor2.execute(query, (usr_id,))
-    rating_of_usr=cursor2.fetchall()
-    for r in  rating_of_usr:
-        if r['is_movie'] ==0 :
-            gen_str= get_tv_gen_by_id(api_key, r['media_ID'])
-            r['genres']= gen_str
-        elif   r['is_movie'] ==1:
+    rating_of_usr = cursor2.fetchall()
+    for r in rating_of_usr:
+        if r['is_movie'] == 0:
+            gen_str = get_tv_gen_by_id(api_key, r['media_ID'])
+            r['genres'] = gen_str
+        elif r['is_movie'] == 1:
             gen_str = get_movie_gen_by_id(api_key, r['media_ID'])
             r['genres'] = gen_str
 
-    query_get_id=f"SELECT COALESCE( (SELECT ID FROM watch_lists_names WHERE User_ID = %s AND Main = 2),0) AS Recomendetion_list_id;"
+    query_get_id = f"SELECT COALESCE( (SELECT ID FROM watch_lists_names WHERE User_ID = %s AND Main = 2),0) AS Recomendetion_list_id;"
     cursor2.execute(query_get_id, (usr_id,))
-    id=cursor2.fetchall()[0]["Recomendetion_list_id"]
-    if id==0 or id=="0":
-        create_id_query=f"INSERT INTO watch_lists_names (User_ID, name, Main) VALUES ( %s, 'Recomendetion_list', 2);"
+    id = cursor2.fetchall()[0]["Recomendetion_list_id"]
+    if id == 0 or id == "0":
+        create_id_query = f"INSERT INTO watch_lists_names (User_ID, name, Main) VALUES ( %s, 'Recomendetion_list', 2);"
         cursor.execute(create_id_query, (usr_id,))
         connection.commit()
         query_get_id = f"SELECT COALESCE( (SELECT ID FROM watch_lists_names WHERE User_ID = %s AND Main = 2),0) AS Recomendetion_list_id;"
         cursor2.execute(query_get_id, (usr_id,))
         id = cursor2.fetchall()[0]["Recomendetion_list_id"]
 
-    added_tolist=0
+    added_tolist = 0
     while 1:
-        if added_tolist==5:
+        if added_tolist == 5:
             break
-        randmovie= random.choice(movie_data)
+        randmovie = random.choice(movie_data)
         if not any(obj.get('media_ID') == randmovie["id"] for obj in rating_of_usr):
-         is_good=check_compatibility(rating_of_usr,randmovie["id"])
-         if  is_good == 1 or  is_good == "1":
-            query_add_to_watch_list=f"INSERT INTO watch_lists_objects ( Parent_ID, TMDB_ID, User_ID, is_movie) VALUES (%s, %s, %s, %s);"
-            cursor.execute(query_add_to_watch_list, (id,randmovie["id"],usr_id, randmovie["is_movie"]))
-            connection.commit()
-            added_tolist=added_tolist+1
-         #return str(is_good)
-    
+            is_good = check_compatibility(rating_of_usr, randmovie["id"])
+            if is_good == 1 or is_good == "1":
+                query_add_to_watch_list = f"INSERT INTO watch_lists_objects ( Parent_ID, TMDB_ID, User_ID, is_movie) VALUES (%s, %s, %s, %s);"
+                cursor.execute(query_add_to_watch_list, (id, randmovie["id"], usr_id, randmovie["is_movie"]))
+                connection.commit()
+                added_tolist = added_tolist + 1
+            # return str(is_good)
+
     return id
-    #return  usr_id
+    # return  usr_id
+
+
 def get_tv_show_info(tv_show_id):
     url = f"https://api.themoviedb.org/3/tv/{tv_show_id}"
     params = {
@@ -258,6 +274,7 @@ def get_tv_show_info(tv_show_id):
     data = response.json()
     return data
 
+
 def get_movie_info(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}"
     params = {
@@ -267,8 +284,10 @@ def get_movie_info(movie_id):
     response = requests.get(url, params=params)
     data = response.json()
     return data
+
+
 def get_movie_trailer(movie_id):
-    url= f"https://api.themoviedb.org/3/movie/{movie_id}/videos"
+    url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos"
     params = {
         "api_key": api_key
     }
@@ -276,15 +295,17 @@ def get_movie_trailer(movie_id):
     data = response.json()
     youtube_trailer = None
     try:
-     for video in data['results']:
-        if video['site'] == 'YouTube' and video['type'] == 'Trailer':
-            youtube_trailer = video['key']
-            break
-    except requests.exceptions.HTTPError :
+        for video in data['results']:
+            if video['site'] == 'YouTube' and video['type'] == 'Trailer':
+                youtube_trailer = video['key']
+                break
+    except requests.exceptions.HTTPError:
         return None
     return youtube_trailer
+
+
 def get_tv_trailer(tv_id):
-    url= f"https://api.themoviedb.org/3/movie/{tv_id}/videos"
+    url = f"https://api.themoviedb.org/3/movie/{tv_id}/videos"
     params = {
         "api_key": api_key
     }
@@ -292,76 +313,74 @@ def get_tv_trailer(tv_id):
     data = response.json()
     youtube_trailer = None
     try:
-     for video in data['results']:
-        if video['site'] == 'YouTube' and video['type'] == 'Trailer':
-            youtube_trailer = video['key']
-            break
-    except requests.exceptions.HTTPError :
+        for video in data['results']:
+            if video['site'] == 'YouTube' and video['type'] == 'Trailer':
+                youtube_trailer = video['key']
+                break
+    except requests.exceptions.HTTPError:
         return None
     return youtube_trailer
 
 
-
-
-
-@recommendation_routes.route('/api/recomandation_feedback', methods=['GET'])
-def update_prefrences():
+@recommendation_routes.route('/api/recommendation_feedback', methods=['GET'])
+@auth_required
+def update_preferences(token_info):
     try:
-     usr_id = request.args.get("usr_id")
-     media_id=request.args.get("media_id")
-     is_movie=request.args.get("is_movie")
-     liked= request.args.get("is_liked")
-     algoritem=request.args.get("algo")
-     query = f"SELECT COALESCE(  (SELECT ID  FROM recommendation_info  WHERE media_id = %s AND is_movie = %s AND user_ID = %s), '0') AS feedback_id;"
-     cursor2.execute(query, (media_id,is_movie,usr_id))
-     feedback_id=cursor2.fetchall()
+        usr_id = token_info.get('user_id')
+        media_id = request.args.get("media_id")
+        is_movie = request.args.get("is_movie")
+        liked = request.args.get("is_liked")
+        algorithm = request.args.get("algo")
+        query = f"SELECT COALESCE(  (SELECT ID  FROM recommendation_info  WHERE media_id = %s AND is_movie = %s AND user_ID = %s), '0') AS feedback_id;"
+        cursor2.execute(query, (media_id, is_movie, usr_id))
+        feedback_id = cursor2.fetchall()
 
-     if feedback_id and feedback_id[0]["feedback_id"]=='0':
-         insert_query = "  INSERT INTO recommendation_info (media_id, is_movie, user_ID, liked, Algorithm)  VALUES (%s, %s, %s, %s, %s)   "
-         cursor.execute(insert_query, (media_id, is_movie, usr_id, liked, algoritem))
-         if liked==1 or liked =="1":
-             check_query = """
+        if feedback_id and feedback_id[0]["feedback_id"] == '0':
+            insert_query = "  INSERT INTO recommendation_info (media_id, is_movie, user_ID, liked, Algorithm)  VALUES (%s, %s, %s, %s, %s)   "
+            cursor.execute(insert_query, (media_id, is_movie, usr_id, liked, algorithm))
+            if liked == 1 or liked == "1":
+                check_query = """
                      SELECT COALESCE(
                          (SELECT ID 
                           FROM watch_lists_names 
                           WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
                      """
-             cursor2.execute(check_query, (usr_id,))
-             result = cursor2.fetchone()
+                cursor2.execute(check_query, (usr_id,))
+                result = cursor2.fetchone()
 
-             watchlist_id = result['watchlist_id']
+                watchlist_id = result['watchlist_id']
 
-             # If no such watchlist exists (watchlist_id is 0), insert a new one
-             if watchlist_id and watchlist_id[0] == 0:
-                 insert_query = """
+                # If no such watchlist exists (watchlist_id is 0), insert a new one
+                if watchlist_id and watchlist_id[0] == 0:
+                    insert_query = """
                          INSERT INTO watch_lists_names ( User_ID, 'Recomandation', Main)
                          VALUES ( %s, 2)                        
                          """
-                 cursor.execute(insert_query, (usr_id, watchlist_name))
-                 connection.commit()
-             check_query = """
+                    cursor.execute(insert_query, (usr_id, watchlist_name))
+                    connection.commit()
+                check_query = """
                                   SELECT COALESCE(
                                       (SELECT ID 
                                        FROM watch_lists_names 
                                        WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
                                   """
-             cursor2.execute(check_query, (usr_id,))
-             result = cursor2.fetchone()
+                cursor2.execute(check_query, (usr_id,))
+                result = cursor2.fetchone()
 
-             watchlist_id = result['watchlist_id']
-             insert_query = """
+                watchlist_id = result['watchlist_id']
+                insert_query = """
                      INSERT INTO watch_lists_objects ( Parent_ID, TMDB_ID, user_ID, is_movie)
                      VALUES ( %s, %s, %s, %s);
                      """
-             cursor.execute(insert_query, (watchlist_id, media_id, usr_id, int(is_movie)))
+                cursor.execute(insert_query, (watchlist_id, media_id, usr_id, int(is_movie)))
 
-     else:
+        else:
 
-      update_query = "  UPDATE recommendation_info  SET liked = %s, Algorithm = %s  WHERE ID = %s  "
-      cursor.execute(update_query, (liked, algoritem, feedback_id[0]["feedback_id"]))
-     connection.commit()
-     return "1"
-    except requests.exceptions.HTTPError :
+            update_query = "  UPDATE recommendation_info  SET liked = %s, Algorithm = %s  WHERE ID = %s  "
+            cursor.execute(update_query, (liked, algorithm, feedback_id[0]["feedback_id"]))
+        connection.commit()
+        return "1"
+    except requests.exceptions.HTTPError:
 
         return "0"
 
@@ -379,58 +398,65 @@ def filter_fields(data, fields):
     """
     return {key: data[key] for key in fields if key in data}
 
-@recommendation_routes.route('/api/Media_recomandation', methods=['GET'])
-def get_media_recomandationv2():
-    fields_to_keep = ["title", "release_date", "vote_average","id","Recomended_by","trailer","poster_path","overview","name","Is_movie","genres"]
-    usr_id = request.args.get("usr_id")
+
+@recommendation_routes.route('/api/Media_recommendation', methods=['GET'])
+@auth_required
+def get_media_recommendationv2(token_info):
+    print("starting recommendation process")
+    fields_to_keep = ["title", "release_date", "vote_average", "id", "Recommended_by", "trailer", "poster_path",
+                      "overview", "name", "Is_movie", "genres"]
+    usr_id = token_info.get('sub')
+    print("user id for recommendation is", usr_id)
     query = f"SELECT *  from rating where rating.User_ID = %s "
     cursor2.execute(query, (usr_id,))
     rating_of_usr = cursor2.fetchall()
-    usr_prefrence=[]
-    for r in  rating_of_usr:
-        if r['is_movie'] ==0 :
-            gen_str= get_tv_gen_by_id(api_key, r['media_ID'])
-            r['genres']= gen_str
-        elif   r['is_movie'] ==1:
+    usr_prefrence = []
+    print("number of user ratings is" , len(rating_of_usr))
+    for r in rating_of_usr:
+        print("current r is" , r)
+        if r['is_movie'] == 0:
+            gen_str = get_tv_gen_by_id(api_key, r['media_ID'])
+            r['genres'] = gen_str
+        elif r['is_movie'] == 1:
             gen_str = get_movie_gen_by_id(api_key, r['media_ID'])
             r['genres'] = gen_str
-        p={}
-        p["media_Id"]= r["media_ID"]
-        p['gnr_str']=  r['genres']
-        p['is_movie']= r['is_movie']
-        if r['rating'] >=7:
-            p['is_liked']= 1
+        p = {}
+        p["media_Id"] = r["media_ID"]
+        p['gnr_str'] = r['genres']
+        p['is_movie'] = r['is_movie']
+        if r['rating'] >= 7:
+            p['is_liked'] = 1
         else:
             p['is_liked'] = 0
         usr_prefrence.append(p)
-    #return usr_prefrence
-    algo_recomandation=[]
+    # return usr_prefrence
+    algo_recommendation = []
     while 1:
-        if len(algo_recomandation)== 5:
+        if len(algo_recommendation) == 5:
             break
-        can= greedy_random_selection(recommendation_candidates)
-        can_gnr_str=""
-        if (can["is_movie"]) :
-            can_gnr_str= get_movie_gen_by_id(api_key, can["media_ID"])
+        can = greedy_random_selection(recommendation_candidates)
+        can_gnr_str = ""
+        if (can["is_movie"]):
+            can_gnr_str = get_movie_gen_by_id(api_key, can["media_ID"])
         else:
             can_gnr_str = get_tv_gen_by_id(api_key, can["media_ID"])
-        can_like,can_dislike= check_compatibility_v2(usr_prefrence,can_gnr_str)
+        can_like, can_dislike = check_compatibility_v2(usr_prefrence, can_gnr_str)
         if (can_like > can_dislike):
-            can_copy=copy.deepcopy(can)
-            can_copy["likelihood"]= can_like- can_dislike
-            algo_recomandation.append(can_copy)
-    return_arr=[]
-
-    for a in algo_recomandation:
+            can_copy = copy.deepcopy(can)
+            can_copy["likelihood"] = can_like - can_dislike
+            algo_recommendation.append(can_copy)
+    return_arr = []
+    print("after while, with recs of", algo_recommendation)
+    for a in algo_recommendation:
 
         if a["is_movie"]:
-            info=get_movie_info(a["media_ID"])
-            t= get_movie_trailer(a["media_ID"])
-            info["trailer"]= t
-            info["Recomended_by"]="Algorithem1"
-            info["Is_movie"]= 1
+            info = get_movie_info(a["media_ID"])
+            t = get_movie_trailer(a["media_ID"])
+            info["trailer"] = t
+            info["Recomended_by"] = "Algorithem1"
+            info["Is_movie"] = 1
 
-            info =filter_fields(info, fields_to_keep)
+            info = filter_fields(info, fields_to_keep)
             info["streaming_services"] = None
             info["user_id"] = "0"
             info["user_rating"] = 0
@@ -443,10 +469,10 @@ def get_media_recomandationv2():
             info["poster_path"] = "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original" + info[
                 "poster_path"]
         else:
-            info= get_tv_show_info(a["media_ID"])
+            info = get_tv_show_info(a["media_ID"])
             t = get_tv_trailer(a["media_ID"])
             info["trailer"] = t
-            info["Recomended_by"] = "Algorithem1"
+            info["Recommended_by"] = "Algorithm1"
             info["Is_movie"] = 0
 
             info = filter_fields(info, fields_to_keep)
@@ -461,6 +487,6 @@ def get_media_recomandationv2():
                 "poster_path"]
             info["poster_path"] = "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original" + info[
                 "poster_path"]
-        return_arr.append (info)
+        return_arr.append(info)
 
     return return_arr
