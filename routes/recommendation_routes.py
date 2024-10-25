@@ -659,7 +659,7 @@ def get_media_recommendationv2(token_info):
             info = get_movie_info(a["media_ID"])
             t = get_movie_trailer(a["media_ID"])
             info["trailer"] = t
-            info["Recomended_by"] = "Algorithem1"
+            info["recommended_by"] = "Algorithm1"
             info["Is_movie"] = 1
 
             info = filter_fields(info, fields_to_keep)
