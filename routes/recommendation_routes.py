@@ -518,7 +518,7 @@ def update_prefrences2():
        return {"Error:": "error"}, 404
 
 
-@recommendation_routes.route('/api/recommendation_feedback', methods=['GET'])
+@recommendation_routes.route('/api/recommendation_feedback', methods=['POST'])
 @auth_required
 def update_preferences(token_info):
  try:
