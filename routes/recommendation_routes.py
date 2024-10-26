@@ -695,7 +695,7 @@ def get_media_recommendationv2(token_info):
             t = get_tv_trailer(a["media_ID"])
             info["trailer"] = t
             info["Recommended_by"] = "Algorithm1"
-            info["Is_movie"] = 0
+            info["is_movie"] = 0
             info["tmdb_id"] = a["media_ID"]
             info = filter_fields(info, fields_to_keep)
             info["streaming_services"] = None
