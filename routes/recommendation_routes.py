@@ -628,7 +628,7 @@ def filter_fields(data, fields):
 def get_media_recommendationv2(token_info):
     print("starting recommendation process")
     fields_to_keep = ["title", "release_date", "vote_average", "Recommended_by", "trailer", "poster_path",
-                      "overview", "name", "is_movie", "genres","tmdb_id"]
+                      "overview", "name", "is_movie", "genres","tmdb_id", "original_title", "original_name", "first_air_date"]
     usr_id = token_info.get('sub')
     query = f"SELECT *  from rating where rating.User_ID = %s "
     cursor2.execute(query, (usr_id,))
@@ -667,7 +667,6 @@ def get_media_recommendationv2(token_info):
             can_copy["likelihood"] = can_like - can_dislike
             algo_recommendation.append(can_copy)
     return_arr = []
-    print("after while, with recs of", algo_recommendation)
     for a in algo_recommendation:
 
         if a["is_movie"]:
@@ -684,7 +683,7 @@ def get_media_recommendationv2(token_info):
             info["video_links"] = []
             info["item_id"] = "0"
             info["list_id"] = None
-            info["tmdb_rating"] = 1.0
+            info["tmdb_rating"] = info.get("vote_average")
             # TODO missing the default path, doesn't protect against no image....
             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
                 "poster_path"]
@@ -694,6 +693,7 @@ def get_media_recommendationv2(token_info):
             info = get_tv_show_info(a["media_ID"])
             t = get_tv_trailer(a["media_ID"])
             info["trailer"] = t
+            info["title"] = info.get("name")
             info["Recommended_by"] = "Algorithm1"
             info["is_movie"] = 0
             info["tmdb_id"] = a["media_ID"]
@@ -702,13 +702,14 @@ def get_media_recommendationv2(token_info):
             info["user_id"] = "0"
             info["user_rating"] = 0
             info["video_links"] = []
+            info["release_date"] = info.get('first_air_date')
             info["item_id"] = "0"
             info["list_id"] = None
-            info["tmdb_rating"] = 1.0
+            info["tmdb_rating"] = info.get("vote_average")
             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
                 "poster_path"]
             info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                 "poster_path"]
         return_arr.append(info)
-
+    print("return value is", return_arr)
     return return_arr

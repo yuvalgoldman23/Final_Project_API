@@ -132,6 +132,7 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
             media_info = {}
 
             # Constructing the media_info object based on whether it's a movie or a series
+            # TODO check if we need original or without original here to always get the english name
             media_info['title'] = data.get('original_title') if is_movie else data.get('original_name')
             media_info['genres'] = [genre['name'] for genre in data.get('genres', [])]
             media_info['tmdb_id'] = content_id
