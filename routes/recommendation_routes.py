@@ -628,7 +628,7 @@ def filter_fields(data, fields):
 def get_media_recommendationv2(token_info):
     print("starting recommendation process")
     fields_to_keep = ["title", "release_date", "vote_average", "Recommended_by", "trailer", "poster_path",
-                      "overview", "name", "Is_movie", "genres"]
+                      "overview", "name", "is_movie", "genres","tmdb_id"]
     usr_id = token_info.get('sub')
     query = f"SELECT *  from rating where rating.User_ID = %s "
     cursor2.execute(query, (usr_id,))
@@ -696,7 +696,7 @@ def get_media_recommendationv2(token_info):
             info["trailer"] = t
             info["Recommended_by"] = "Algorithm1"
             info["Is_movie"] = 0
-
+            info["tmdb_id"] = a["media_ID"]
             info = filter_fields(info, fields_to_keep)
             info["streaming_services"] = None
             info["user_id"] = "0"
