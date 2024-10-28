@@ -2139,18 +2139,84 @@ Empty
 ```
 ### 25. FeedBack for recomandation:
 
-- **URL:** `/api/recomandation_feedback?usr_id={user_id}&media_id={media_id}&is_movie={1 or 0}&is_liked={1 or 0}&algo={algorithem}`
+- **URL:** `/api/recomandation_feedback`
 - **Method:** `GET`
 - **Description:** Get recomandation for a user
-- **Parameters:** 
-  - `usr_id` : The id of the user that wants recomandation
-  -  `media_id` : The media id of the media in tmdb
-  -   `is_movie` : if the media is movie
-  -   `is_liked` : If the media is liked or disliked
-  -   `algo` : The algo that recomanded this media
+- **Body:**
+  ```Json
+  
+  {
+  
+  "is_movie" :  1,
+  "media_id" : "945961",
+  "is_liked":1,
+  "algorithm":"algo1"
+  }
+  ```
 - **Authorization:** Not required.
 - **Response:** 
   - **200 OK** - Successfully retrieved serch results.
-      return "1"
+      ```Json
+      
+    "Content": [
+        {
+            "genres": [
+                "Science Fiction",
+                "Horror"
+            ],
+            "is_movie": 1,
+            "overview": "While scavenging the deep ends of a derelict space station, a group of young space colonizers come face to face with the most terrifying life form in the universe.",
+            "poster_path": "https://image.tmdb.org/t/p/original//b33nnKl1GSFbao4l3fZDDqsMx0F.jpg",
+            "release_date": "2024-08-13",
+            "small_poster_path": "https://image.tmdb.org/t/p/w200//b33nnKl1GSFbao4l3fZDDqsMx0F.jpg",
+            "title": "Alien: Romulus",
+            "tmdb_id": "945961",
+            "tmdb_rating": 7.3,
+            "user_rating": null,
+            "video_links": [
+                "H68iU7fqW-w"
+            ],
+            "watchlist_item_id": "bb88295414e7"
+        }
+    ],
+    "ID": "1806f2f489f2"
+    
+      ```
       "0" other wise
     
+### 26. Get Recommendation Watchlist
+**URL:** `/api/watchlists/recommendation`  
+**Method:** `GET`  
+**Description:** Retrieves the main watchlist of the logged-in user.  
+**Authorization:** Token-based authentication required.
+
+**Success Response:**
+- **Status Code:** `200 OK`
+- **Content Type:** `application/json`
+- **Response Body:**
+  ```json
+  {
+    "Content": [
+        {
+            "genres": [
+                "Horror",
+                "Thriller"
+            ],
+            "is_movie": 1,
+            "overview": "Five years after surviving Art the Clown's Halloween massacre, Sienna and Jonathan are still struggling to rebuild their shattered lives. As the holiday season approaches, they try to embrace the Christmas spirit and leave the horrors of the past behind. But just when they think they're safe, Art returns, determined to turn their holiday cheer into a new nightmare. The festive season quickly unravels as Art unleashes his twisted brand of terror, proving that no holiday is safe.",
+            "poster_path": "https://image.tmdb.org/t/p/original//63xYQj1BwRFielxsBDXvHIJyXVm.jpg",
+            "release_date": "2024-10-09",
+            "small_poster_path": "https://image.tmdb.org/t/p/w200//63xYQj1BwRFielxsBDXvHIJyXVm.jpg",
+            "title": "Terrifier 3",
+            "tmdb_id": "1034541",
+            "tmdb_rating": 7.189,
+            "user_rating": null,
+            "video_links": [
+                "zb2P9y70lJE"
+            ],
+            "watchlist_item_id": "ca3aa35509de"
+        }
+    ],
+    "ID": "7bc95103afe4"
+}
+  ```

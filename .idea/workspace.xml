@@ -7,9 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added streaming service data without async to media pages,some minor changes in recommendation_routes.py">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated the recommendations method so it returns the correct titles, release dates and tmdb ratings">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/recommendation_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/recommendation_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -254,7 +253,9 @@
       <workItem from="1729860128066" duration="7030000" />
       <workItem from="1729874020107" duration="969000" />
       <workItem from="1729876433040" duration="791000" />
-      <workItem from="1729974375057" duration="3408000" />
+      <workItem from="1729974375057" duration="3507000" />
+      <workItem from="1730045665981" duration="1523000" />
+      <workItem from="1730055724629" duration="1314000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -276,14 +277,6 @@
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
       <updated>1718181979884</updated>
-    </task>
-    <task id="LOCAL-00012" summary="Updated the readme file to fit the new watchlist routes, update login readme">
-      <option name="closed" value="true" />
-      <created>1719005135351</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1719005135351</updated>
     </task>
     <task id="LOCAL-00013" summary="Updated add watch  list item readme to include duplicate content addition protection">
       <option name="closed" value="true" />
@@ -645,7 +638,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729877173407</updated>
     </task>
-    <option name="localTasksCounter" value="58" />
+    <task id="LOCAL-00058" summary="Updated the recommendations method so it returns the correct titles, release dates and tmdb ratings">
+      <option name="closed" value="true" />
+      <created>1729977837526</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1729977837527</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -663,7 +664,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed a slight error in ratings where tv shows rating could not be added, changd watchlist content addition to post" />
     <MESSAGE value="Changed post_services to feed_services. Created 'add post' endpoint, documented in README." />
     <MESSAGE value="Added about half of the required feed routes, updated in README with usage instructions" />
     <MESSAGE value="Updated the watchlist API to handle the bug of adding some content for the first time, fixed an issue of inability to produce media_info correctly for watchlist-added content" />
@@ -688,7 +688,8 @@
     <MESSAGE value="Fixed some issue in the addition/update response of a rating" />
     <MESSAGE value="Added streaming service data without async to media pages" />
     <MESSAGE value="Added streaming service data without async to media pages,some minor changes in recommendation_routes.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added streaming service data without async to media pages,some minor changes in recommendation_routes.py" />
+    <MESSAGE value="Updated the recommendations method so it returns the correct titles, release dates and tmdb ratings" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated the recommendations method so it returns the correct titles, release dates and tmdb ratings" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -702,7 +703,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1729977329888" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1730055724506" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1728581461220" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
