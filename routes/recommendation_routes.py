@@ -108,6 +108,7 @@ class DNNModel(nn.Module):
 model = DNNModel()
 
 model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
+#model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
 trained_model = model
 
 
@@ -288,40 +289,54 @@ def get_movie_info(movie_id):
     return data
 
 
+import requests
+
+
 def get_movie_trailer(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}/videos"
     params = {
         "api_key": api_key
     }
-    response = requests.get(url, params=params)
-    data = response.json()
-    youtube_trailer = None
+
     try:
-        for video in data['results']:
-            if video['site'] == 'YouTube' and video['type'] == 'Trailer':
-                youtube_trailer = video['key']
-                break
+        response = requests.get(url, params=params)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+        data = response.json()
     except requests.exceptions.HTTPError:
         return None
+
+    youtube_trailer = None
+    results = data.get('results', [])
+    for video in results:
+        if video.get('site') == 'YouTube' and video.get('type') == 'Trailer':
+            youtube_trailer = video.get('key')
+            break
+
     return youtube_trailer
 
 
 def get_tv_trailer(tv_id):
-    url = f"https://api.themoviedb.org/3/movie/{tv_id}/videos"
+    url = f"https://api.themoviedb.org/3/tv/{tv_id}/videos"  # Changed to /tv/ endpoint
     params = {
         "api_key": api_key
     }
-    response = requests.get(url, params=params)
-    data = response.json()
-    youtube_trailer = None
+
     try:
-        for video in data['results']:
-            if video['site'] == 'YouTube' and video['type'] == 'Trailer':
-                youtube_trailer = video['key']
-                break
+        response = requests.get(url, params=params)
+        response.raise_for_status()  # Raises an HTTPError for bad responses
+        data = response.json()
     except requests.exceptions.HTTPError:
         return None
+
+    youtube_trailer = None
+    results = data.get('results', [])
+    for video in results:
+        if video.get('site') == 'YouTube' and video.get('type') == 'Trailer':
+            youtube_trailer = video.get('key')
+            break
+
     return youtube_trailer
+
 
 @recommendation_routes.route('/api/watchlists/recommendation2', methods=['GET'])
 def get_recommendation2():
@@ -371,7 +386,7 @@ def get_recommendation(token_info):
    try:
     #data = request.json
     #usr_id = data.get('user_id')
-    usr_id=token_info.get('user_id')
+    usr_id=token_info.get('sub')
 
     check_query = """
                                  SELECT COALESCE(
@@ -503,12 +518,12 @@ def update_prefrences2():
        return {"Error:": "error"}, 404
 
 
-@recommendation_routes.route('/api/recommendation_feedback', methods=['GET'])
+@recommendation_routes.route('/api/recommendation_feedback', methods=['POST'])
 @auth_required
 def update_preferences(token_info):
  try:
     data = request.json
-    usr_id = token_info.get('user_id')
+    usr_id = token_info.get('sub')
     is_movie = data.get('is_movie')
     media_id = data.get('media_id')
     liked = data.get("is_liked")
@@ -612,17 +627,14 @@ def filter_fields(data, fields):
 @auth_required
 def get_media_recommendationv2(token_info):
     print("starting recommendation process")
-    fields_to_keep = ["title", "release_date", "vote_average", "id", "Recommended_by", "trailer", "poster_path",
-                      "overview", "name", "Is_movie", "genres"]
+    fields_to_keep = ["title", "release_date", "vote_average", "Recommended_by", "trailer", "poster_path",
+                      "overview", "name", "is_movie", "genres","tmdb_id", "original_title", "original_name", "first_air_date"]
     usr_id = token_info.get('sub')
-    print("user id for recommendation is", usr_id)
     query = f"SELECT *  from rating where rating.User_ID = %s "
     cursor2.execute(query, (usr_id,))
     rating_of_usr = cursor2.fetchall()
     usr_prefrence = []
-    print("number of user ratings is" , len(rating_of_usr))
     for r in rating_of_usr:
-        print("current r is" , r)
         if r['is_movie'] == 0:
             gen_str = get_tv_gen_by_id(api_key, r['media_ID'])
             r['genres'] = gen_str
@@ -655,16 +667,15 @@ def get_media_recommendationv2(token_info):
             can_copy["likelihood"] = can_like - can_dislike
             algo_recommendation.append(can_copy)
     return_arr = []
-    print("after while, with recs of", algo_recommendation)
     for a in algo_recommendation:
 
         if a["is_movie"]:
             info = get_movie_info(a["media_ID"])
             t = get_movie_trailer(a["media_ID"])
             info["trailer"] = t
-            info["Recomended_by"] = "Algorithem1"
-            info["Is_movie"] = 1
-
+            info["recommended_by"] = "Algorithm1"
+            info["is_movie"] = 1
+            info["tmdb_id"]= a["media_ID"]
             info = filter_fields(info, fields_to_keep)
             info["streaming_services"] = None
             info["user_id"] = "0"
@@ -672,30 +683,33 @@ def get_media_recommendationv2(token_info):
             info["video_links"] = []
             info["item_id"] = "0"
             info["list_id"] = None
-            info["tmdb_rating"] = 1.0
-            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original" + info[
+            info["tmdb_rating"] = info.get("vote_average")
+            # TODO missing the default path, doesn't protect against no image....
+            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
                 "poster_path"]
-            info["poster_path"] = "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original" + info[
+            info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                 "poster_path"]
         else:
             info = get_tv_show_info(a["media_ID"])
             t = get_tv_trailer(a["media_ID"])
             info["trailer"] = t
+            info["title"] = info.get("name")
             info["Recommended_by"] = "Algorithm1"
-            info["Is_movie"] = 0
-
+            info["is_movie"] = 0
+            info["tmdb_id"] = a["media_ID"]
             info = filter_fields(info, fields_to_keep)
             info["streaming_services"] = None
             info["user_id"] = "0"
             info["user_rating"] = 0
             info["video_links"] = []
+            info["release_date"] = info.get('first_air_date')
             info["item_id"] = "0"
             info["list_id"] = None
-            info["tmdb_rating"] = 1.0
-            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/https://image.tmdb.org/t/p/original" + info[
+            info["tmdb_rating"] = info.get("vote_average")
+            info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
                 "poster_path"]
-            info["poster_path"] = "https://image.tmdb.org/t/p/original/https://image.tmdb.org/t/p/original" + info[
+            info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                 "poster_path"]
         return_arr.append(info)
-
+    print("return value is", return_arr)
     return return_arr

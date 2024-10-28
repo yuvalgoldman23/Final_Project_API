@@ -13,7 +13,6 @@ def isNegative(num):
     else:
         return False
 
-
 def filter_shortest_name_variants(streaming_services):
     main_providers = {}
 

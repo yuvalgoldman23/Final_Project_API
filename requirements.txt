@@ -12,4 +12,5 @@ aiohttp
 mysql
 numpy
 torch
-flask[async]
+waitress
+
