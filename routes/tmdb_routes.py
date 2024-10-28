@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify
 import requests
 
+from routes.streaming_providers_routes import media_page_streaming_services
+
 tmdb_routes = Blueprint('tmdb_routes', __name__)
 
 
@@ -100,6 +102,8 @@ def get_tv_show_info(tv_show_id):
                 break
         '''
     data["recommendations"] = data.get('recommendations').get('results', [])
+
+    data['streaming_services'] = media_page_streaming_services(tv_show_id, "tv")
     
     return jsonify(data)
 
@@ -167,6 +171,8 @@ def get_movie_info(movie_id):
         )
 
     data["recommendations"] = data.get('recommendations').get('results', [])
+
+    data['streaming_services'] = media_page_streaming_services(movie_id, "movie")
 
     return data
 

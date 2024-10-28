@@ -12,3 +12,5 @@ aiohttp
 mysql
 numpy
 torch
+waitress
+

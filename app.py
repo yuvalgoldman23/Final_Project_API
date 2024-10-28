@@ -4,6 +4,7 @@ from flask import Flask
 from flask_session import Session
 from routes import watchlists_routes, feed_routes, streaming_providers_routes, user_routes, tmdb_routes, reviews_routes, ratings_routes, recommendation_routes
 from flask_cors import CORS
+import asyncio
 from datetime import timedelta
 import database_connector
 
