@@ -711,5 +711,5 @@ def get_media_recommendationv2(token_info):
             info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                 "poster_path"]
         return_arr.append(info)
-    print("return value is", return_arr)
+    #print("return value is", return_arr)
     return return_arr

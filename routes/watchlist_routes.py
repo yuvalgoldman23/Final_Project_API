@@ -43,7 +43,7 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
         if is_movie:
             tmdb_info = jsonify(tmdb_info)
         tmdb_info = tmdb_info.json
-        media_info['title'] = tmdb_info['original_title'] if is_movie else tmdb_info['original_name']
+        media_info['title'] = tmdb_info['title'] if is_movie else tmdb_info['name']
         media_info['genres'] = [genre['name'] for genre in tmdb_info['genres']]
         media_info['tmdb_id'] = watchlist_object['TMDB_ID']
         media_info['is_movie'] = is_movie
@@ -133,7 +133,7 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
 
             # Constructing the media_info object based on whether it's a movie or a series
             # TODO check if we need original or without original here to always get the english name
-            media_info['title'] = data.get('original_title') if is_movie else data.get('original_name')
+            media_info['title'] = data.get('title') if is_movie else data.get('name')
             media_info['genres'] = [genre['name'] for genre in data.get('genres', [])]
             media_info['tmdb_id'] = content_id
             media_info['is_movie'] = is_movie
