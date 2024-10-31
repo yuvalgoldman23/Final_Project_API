@@ -15,7 +15,8 @@ import services.watchlist_services as ws
 import routes.watchlist_routes as rt
 from auth import auth_required
 from database_connector import connection, cursor, cursor2
-
+from mysql.connector import Error
+import time
 recommendation_routes = Blueprint('recommendation_routes', __name__)
 
 query = f"SELECT * FROM media_data "
@@ -394,7 +395,12 @@ def get_recommendation(token_info):
                                       FROM watch_lists_names 
                                       WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
                                  """
-    cursor2.execute(check_query, (usr_id,))
+    while 1:
+        try:
+             cursor2.execute(check_query, (usr_id,))
+             break
+        except Error as e:
+            time.sleep(0.1)
     result = cursor2.fetchone()
 
     watchlist_id = result['watchlist_id']
@@ -631,7 +637,12 @@ def get_media_recommendationv2(token_info):
                       "overview", "name", "is_movie", "genres","tmdb_id", "original_title", "original_name", "first_air_date"]
     usr_id = token_info.get('sub')
     query = f"SELECT *  from rating where rating.User_ID = %s "
-    cursor2.execute(query, (usr_id,))
+    while 1:
+     try:
+      cursor2.execute(query, (usr_id,))
+      break
+     except Error as e:
+         time.sleep(0.1)
     rating_of_usr = cursor2.fetchall()
     usr_prefrence = []
     for r in rating_of_usr:
@@ -651,12 +662,43 @@ def get_media_recommendationv2(token_info):
             p['is_liked'] = 0
         usr_prefrence.append(p)
     # return usr_prefrence
+    query = f"SELECT *  from recommendation_info where user_ID = %s "
+    while 1:
+        try:
+            cursor2.execute(query, (usr_id,))
+            break
+        except Error as e:
+            time.sleep(0.1)
+    feedbackes= cursor2.fetchall()
+    for r in feedbackes:
+        if r['is_movie'] == 0:
+            gen_str = get_tv_gen_by_id(api_key, r['media_id'])
+            r['genres'] = gen_str
+        elif r['is_movie'] == 1:
+            gen_str = get_movie_gen_by_id(api_key, r['media_id'])
+            r['genres'] = gen_str
+        p = {}
+        p["media_Id"] = r["media_id"]
+        p['gnr_str'] = r['genres']
+        p['is_movie'] = r['is_movie']
+        if r['liked'] == 1:
+            p['is_liked'] = 1
+        else:
+            p['is_liked'] = 0
+        usr_prefrence.append(p)
     algo_recommendation = []
     while 1:
         if len(algo_recommendation) == 5:
             break
         can = greedy_random_selection(recommendation_candidates)
         can_gnr_str = ""
+        can_media_id = can["media_ID"]
+
+        # Check if can_media_id exists in usr_pref
+        exists_in_usr_pref = any(item["media_Id"] == can_media_id for item in usr_prefrence)
+
+        if exists_in_usr_pref:
+            continue
         if (can["is_movie"]):
             can_gnr_str = get_movie_gen_by_id(api_key, can["media_ID"])
         else:
