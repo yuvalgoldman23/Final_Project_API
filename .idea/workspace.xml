@@ -7,11 +7,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated the recommendations method so it returns the correct titles, release dates and tmdb ratings">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Type safety, fixed title language to always be English, if possible">
+      <change afterPath="$PROJECT_DIR$/routes/discover_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/recommendation_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/recommendation_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/tmdb_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/tmdb_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_tmdb.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_tmdb.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -258,7 +260,13 @@
       <workItem from="1729974375057" duration="3507000" />
       <workItem from="1730045665981" duration="1523000" />
       <workItem from="1730055724629" duration="1314000" />
-      <workItem from="1730112811213" duration="7861000" />
+      <workItem from="1730112811213" duration="8634000" />
+      <workItem from="1730314992506" duration="2994000" />
+      <workItem from="1730464596714" duration="6690000" />
+      <workItem from="1730490144955" duration="770000" />
+      <workItem from="1730556403233" duration="2264000" />
+      <workItem from="1730733774011" duration="2917000" />
+      <workItem from="1730806473335" duration="4492000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -280,14 +288,6 @@
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
       <updated>1718181979884</updated>
-    </task>
-    <task id="LOCAL-00013" summary="Updated add watch  list item readme to include duplicate content addition protection">
-      <option name="closed" value="true" />
-      <created>1719044205956</created>
-      <option name="number" value="00013" />
-      <option name="presentableId" value="LOCAL-00013" />
-      <option name="project" value="LOCAL" />
-      <updated>1719044205956</updated>
     </task>
     <task id="LOCAL-00014" summary="Created a basic, working version of the streaming service recommendation engine. Currently returns the top service covering the watchlist">
       <option name="closed" value="true" />
@@ -649,7 +649,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729977837527</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="Type safety, fixed title language to always be English, if possible">
+      <option name="closed" value="true" />
+      <created>1730217662974</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1730217662974</updated>
+    </task>
+    <option name="localTasksCounter" value="60" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -667,7 +675,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Changed post_services to feed_services. Created 'add post' endpoint, documented in README." />
     <MESSAGE value="Added about half of the required feed routes, updated in README with usage instructions" />
     <MESSAGE value="Updated the watchlist API to handle the bug of adding some content for the first time, fixed an issue of inability to produce media_info correctly for watchlist-added content" />
     <MESSAGE value="Fixed rating_id return error" />
@@ -692,7 +699,8 @@
     <MESSAGE value="Added streaming service data without async to media pages" />
     <MESSAGE value="Added streaming service data without async to media pages,some minor changes in recommendation_routes.py" />
     <MESSAGE value="Updated the recommendations method so it returns the correct titles, release dates and tmdb ratings" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated the recommendations method so it returns the correct titles, release dates and tmdb ratings" />
+    <MESSAGE value="Type safety, fixed title language to always be English, if possible" />
+    <option name="LAST_COMMIT_MESSAGE" value="Type safety, fixed title language to always be English, if possible" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -706,7 +714,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1730217482162" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1730806942311" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1728581461220" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
