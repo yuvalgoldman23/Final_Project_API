@@ -5,7 +5,9 @@ connection = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
     password="password",
-    database="final_project_db"
+    database="final_project_db",
+    connection_timeout=28800
+
 )
 
 # Check if connection is successful
