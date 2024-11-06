@@ -112,8 +112,8 @@ class DNNModel(nn.Module):
 # Instantiate the model, loss function, and optimizer
 model = DNNModel()
 
-model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
-#model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
+#model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
+model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
 trained_model = model
 
 
@@ -141,7 +141,7 @@ def get_movie_gen_by_id(api_key, movie_id):
     else:
         return ""
 
-def get_tv_keywordes(apokey,tv_id):
+def get_tv_keywords(apikey,tv_id):
     url = f"https://api.themoviedb.org/3/tv/{tv_id}/keywords"
 
     # Parameters including the API key
@@ -155,7 +155,7 @@ def get_tv_keywordes(apokey,tv_id):
         return response.json()
     else:
         return ""
-def get_movie_keywordes(apokey,movie_id):
+def get_movie_keywords(apikey,movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}/keywords"
 
     # Parameters including the API key
@@ -768,12 +768,12 @@ def get_media_recommendationv2(token_info):
         if r['is_movie'] == 0:
             gen_str = get_tv_gen_by_id(api_key, r['media_ID'])
             r['genres'] = gen_str
-            x=get_tv_keywordes(api_key, r['media_ID'])
+            x=get_tv_keywords(api_key, r['media_ID'])
             if "results" in x:
              r['key_words'] = x["results"]
         elif r['is_movie'] == 1:
             gen_str = get_movie_gen_by_id(api_key, r['media_ID'])
-            x= get_movie_keywordes(api_key, r['media_ID'])
+            x= get_movie_keywords(api_key, r['media_ID'])
             if "results" in x:
                 r['key_words'] =x["results"]
             r['genres'] = gen_str
@@ -801,13 +801,13 @@ def get_media_recommendationv2(token_info):
         if r['is_movie'] == 0:
             gen_str = get_tv_gen_by_id(api_key, r['media_id'])
             r['genres'] = gen_str
-            x = get_tv_keywordes(api_key, r['media_id'])
+            x = get_tv_keywords(api_key, r['media_id'])
             if "results" in x:
               r['key_words']= x["results"]
         elif r['is_movie'] == 1:
             gen_str = get_movie_gen_by_id(api_key, r['media_id'])
             r['genres'] = gen_str
-            x = get_movie_keywordes(api_key, r['media_id'])
+            x = get_movie_keywords(api_key, r['media_id'])
             if "results" in x:
              r['key_words'] = x["results"]
         p = {}
@@ -1015,10 +1015,8 @@ def get_media_recommendationv2(token_info):
                     info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
                     info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
                 else:
-                    info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                        "poster_path"]
-                    info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
-                        "poster_path"]
+                    info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + str(info["poster_path"])
+                    info["poster_path"] = "https://image.tmdb.org/t/p/original/" + str(info["poster_path"])
             else:
                 info = get_tv_show_info(a["id"])
                 t = get_tv_trailer(a["id"])
@@ -1040,10 +1038,8 @@ def get_media_recommendationv2(token_info):
                     info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
                     info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
                 else:
-                    info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                        "poster_path"]
-                    info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
-                        "poster_path"]
+                    info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + str(info[ "poster_path"])
+                    info["poster_path"] = "https://image.tmdb.org/t/p/original/" + str(info["poster_path"])
             return_arr.append(info)
         if len(return_arr) >5:
             break
