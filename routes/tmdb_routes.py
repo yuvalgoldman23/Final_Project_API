@@ -87,9 +87,9 @@ def get_tv_show_info(tv_show_id):
     else:
         data['poster_path'] = "https://image.tmdb.org/t/p/original" + data['poster_path']
         data['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + data['poster_path']
-    if data["videos"]:
+    if data.get("videos") and data.get("videos").get("results"):
         data["video_links"] = data["videos"]["results"]
-        if not data["video_links"]:
+        if not data.get("video_links"):
             data["video_links"] = []
         else:
             data["video_links"] = [data["videos"]["results"][0]["key"]]

@@ -112,8 +112,7 @@ class DNNModel(nn.Module):
 # Instantiate the model, loss function, and optimizer
 model = DNNModel()
 
-#model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
-model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
+model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
 trained_model = model
 
 
@@ -960,7 +959,7 @@ def get_media_recommendationv2(token_info):
                 info["item_id"] = "0"
                 info["list_id"] = None
                 info["tmdb_rating"] = info.get("vote_average")
-                if not info["poster_path"]:
+                if not info.get("poster_path"):
                     info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
                     info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
                 else:
@@ -1150,7 +1149,4 @@ def get_media_recommendationv2(token_info):
              info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                 "poster_path"]
         return_arr.append(info)
-    #print("return value is", return_arr)
-    '''
-    t=5
     return return_arr

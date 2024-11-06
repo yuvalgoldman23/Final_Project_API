@@ -34,6 +34,7 @@ async def discover_movies(session, provider_id, country_code, num_pages=1):
     for page in range(1, num_pages + 1):
         url = f"{BASE_URL}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_watch_providers={provider_id}&watch_region={country_code}&page={page}"
         tasks.append(fetch(session, url))
+        print("url is " , url)
 
     results = await asyncio.gather(*tasks)
 
