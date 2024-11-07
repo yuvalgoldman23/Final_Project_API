@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 import requests
+import asyncio
+import aiohttp
 
 discover_routes = Blueprint('discover_routes', __name__)
 
@@ -14,6 +16,24 @@ headers = {
     "accept": "application/json",
     "Authorization": AUTH_TOKEN
 }
+
+
+def construct_response(tmdb_response, is_movie):
+    tmdb_response = tmdb_response.json().get('results', [])
+    for item in tmdb_response:
+        item["media_kind"] = "movie" if is_movie else "tv"
+        if is_movie:
+            item["original_title"] = item.get('title') if item.get('title') else item.get('original_title')
+        if not is_movie:
+            item["release_date"] = item["first_air_date"]
+            #item["original_title"] = item["name"]
+        if not item["poster_path"]:
+            item["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+            item["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+        else:
+            item['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + item['poster_path']
+            item['poster_path'] = "https://image.tmdb.org/t/p/original" + item['poster_path']
+    return tmdb_response
 
 
 def construct_query(data, is_movie):
@@ -31,7 +51,6 @@ def construct_query(data, is_movie):
         if min_year := data.get("year"):
             query_parts.append(f"primary_release_date.gte={min_year}-01-01")
     else:
-        # TODO check if gte even works here
         if min_year := data.get("year"):
             query_parts.append(f"first_air_date.gte={min_year}-01-01")
     if min_vote_average := data.get("vote_average"):
@@ -61,21 +80,27 @@ def discover():
     if content_type == "movie":
         query_movie = construct_query(data, is_movie=True)
         tmdb_response = requests.get(movie_url + query_movie, headers=headers)
-        print("tmdb response: ", tmdb_response.json())
-        return tmdb_response.json().get("results") if tmdb_response.status_code == 200 else tmdb_response.text
+        if tmdb_response.status_code == 200:
+            return construct_response(tmdb_response, True), 200
+        else:
+            return tmdb_response.text, 404
     elif content_type == "tv":
         query_tv = construct_query(data, is_movie=False)
         tmdb_response = requests.get(tv_url + query_tv, headers=headers)
-        return tmdb_response.json().get("results") if tmdb_response.status_code == 200 else tmdb_response.text
-    # "Mixed" case
+        if tmdb_response.status_code == 200:
+            return construct_response(tmdb_response, False), 200
+        else:
+            return tmdb_response.text, 404    # "Mixed" case
     else:
         query_movie = construct_query(data, is_movie=False)
         tmdb_response_movie = requests.get(movie_url + query_movie, headers=headers)
         query_tv = construct_query(data, is_movie=True)
         tmdb_response_tv = requests.get(tv_url + query_tv, headers=headers)
         if tmdb_response_movie.status_code == 200 and tmdb_response_tv.status_code == 200:
-            tmdb_response = tmdb_response_movie.json().get("results") + tmdb_response_tv.json().get("results")
+            tmdb_response = construct_response(tmdb_response_movie, is_movie=True) + construct_response(tmdb_response_tv, is_movie=False)
             # Sort the mixed response by the content popularity
-            return jsonify(sorted(tmdb_response, key=lambda x: x["popularity"], reverse=True))
+            return jsonify(sorted(tmdb_response, key=lambda x: x["popularity"], reverse=True)), 200
+        else:
+            return "Error in mixed discovery", 404
 
 

@@ -5,7 +5,6 @@ PyJWT
 Flask-CORS
 Werkzeug
 mysql-connector-python
-flask-session
 
 
 aiohttp
@@ -13,4 +12,8 @@ mysql
 numpy
 torch
 waitress
+
+spacy
+
+sentence_transformers
 
