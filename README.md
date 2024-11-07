@@ -23,6 +23,7 @@ To run this server, make sure you have Python installed on your system. Clone th
 git clone https://github.com/yuvalgoldman23/Final_Project_API.git
 cd Final_Project_API
 pip install -r requirements.txt
+python -m spacy download en_core_web_md
 ```
 
 ## Usage
