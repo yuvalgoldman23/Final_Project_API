@@ -11,8 +11,8 @@ api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
 @tmdb_routes.route('/api/Media_search', methods=['GET'])
 def combine_search():
     query= request.args.get("query")
-    movieurl=f"https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={query}"
-    tvurl=f"https://api.themoviedb.org/3/search/tv?api_key={api_key}&query={query}"
+    movieurl=f"https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={query}&include_adult=false"
+    tvurl=f"https://api.themoviedb.org/3/search/tv?api_key={api_key}&query={query}&include_adult=false"
     response_movie=requests.get(movieurl)
     response_tv = requests.get(tvurl)
     if  response_movie.status_code == 200:
@@ -228,124 +228,58 @@ def get_actor_tv_credits(actor_id):
 
 @tmdb_routes.route('/api/actor/combine_credits/<string:actor_id>', methods=['GET'])
 def get_actor_combine_credits(actor_id):
-    url = f"https://api.themoviedb.org/3/person/{actor_id}/tv_credits"
-    params = {
-        "api_key": api_key
-    }
+    url_tv = f"https://api.themoviedb.org/3/person/{actor_id}/tv_credits"
+    url_movie = f"https://api.themoviedb.org/3/person/{actor_id}/movie_credits"
+    params = {"api_key": api_key}
 
-    response = requests.get(url, params=params)
-    data = response.json()
-    url1 = f"https://api.themoviedb.org/3/person/{actor_id}/movie_credits"
-    params = {
-        "api_key": api_key
-    }
+    # Fetch TV and movie credits
+    response_tv = requests.get(url_tv, params=params)
+    response_movie = requests.get(url_movie, params=params)
+    data_tv = response_tv.json()
+    data_movie = response_movie.json()
 
-    response = requests.get(url1, params=params)
-    data2 = response.json()
-    t=5
-    tv_credit_cast=[]
+    # Separate cast and crew credits for both TV and movie
+    tv_credit_cast = data_tv.get('cast', [])
+    movie_credit_cast = data_movie.get('cast', [])
+    tv_credit_crew = data_tv.get('crew', [])
+    movie_credit_crew = data_movie.get('crew', [])
 
-    tv_credit_cast =data.get('cast',[])
-    for t in tv_credit_cast:
-        t['media_kind'] = 'tv'
-    movie_credit_cast = []
+    # Assign media type
+    for credit in tv_credit_cast + tv_credit_crew:
+        credit['media_kind'] = 'tv'
+    for credit in movie_credit_cast + movie_credit_crew:
+        credit['media_kind'] = 'movie'
 
-    movie_credit_cast = data2.get('cast', [])
-    for t in  movie_credit_cast:
-        t['media_kind'] = 'movie'
-    tv_credit_craw = []
+    # Combine cast credits
+    combined_cast_credits = tv_credit_cast + movie_credit_cast
 
-    tv_credit_craw  = data.get('craw', [])
-    for t in tv_credit_craw :
-        t['media_kind'] = 'tv'
-    movie_credit_craw = []
-
-    movie_credit_craw = data2.get('crew', [])
-    for t in movie_credit_craw:
-        t['media_kind'] = 'movie'
-
-    combined_cast_credits= movie_credit_cast+tv_credit_cast
-    combined_craw_credits = movie_credit_craw + tv_credit_craw
-
-    for credit in combined_cast_credits:
-        if not credit["poster_path"]:
-            credit["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
-            credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
+    # Combine crew credits and consolidate roles
+    combined_crew_credits = {}
+    for credit in tv_credit_crew + movie_credit_crew:
+        key = (credit['id'], credit['media_kind'], credit['title'])
+        if key not in combined_crew_credits:
+            combined_crew_credits[key] = credit
         else:
-            credit['poster_path'] = "https://image.tmdb.org/t/p/original" + credit['poster_path']
-            credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + credit['poster_path']
-    for credit in combined_craw_credits:
-        if not credit["poster_path"]:
+            combined_crew_credits[key]['job'] += f", {credit['job']}"
+
+    # Convert crew dictionary back to a list
+    consolidated_crew_credits = list(combined_crew_credits.values())
+
+    # Set default or construct poster paths
+    for credit in combined_cast_credits + consolidated_crew_credits:
+        if not credit.get("poster_path"):
             credit["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
             credit["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
         else:
             credit['poster_path'] = "https://image.tmdb.org/t/p/original" + credit['poster_path']
             credit['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + credit['poster_path']
 
-    new_combined_cast_credits=[]
-    for x in  combined_cast_credits:
-        if "backdrop_path" in x:
-            x.pop("backdrop_path")
-        if "episode_count" in x:
-            x.pop("episode_count")
-        if "origin_country" in x:
-            x.pop("origin_country")
-        if "overview" in x:
-            x.pop("overview")
-        if "vote_average" in x:
-            x.pop("vote_average")
-        if "vote_average" in x:
-            x.pop("vote_average")
-        if "vote_average" in x:
-            x.pop("vote_average")
-        if "genre_ids" in x:
-            x.pop("genre_ids")
-        if "episode_count" in x:
-            x.pop("episode_count")
-        if "credit_id" in x:
-            x.pop("credit_id")
-        if "credit_id" in x:
-            x.pop("credit_id")
-        if "vote_count" in x:
-            x.pop("vote_count")
-        if "original_language" in x:
-            x.pop("original_language")
-        #new_combined_cast_credits.append(x)
-    for x in  combined_craw_credits:
-        if "backdrop_path" in x:
-            x.pop("backdrop_path")
-        if "episode_count" in x:
-            x.pop("episode_count")
-        if "origin_country" in x:
-            x.pop("origin_country")
-        if "overview" in x:
-            x.pop("overview")
-        if "vote_average" in x:
-            x.pop("vote_average")
-        if "vote_average" in x:
-            x.pop("vote_average")
-        if "vote_average" in x:
-            x.pop("vote_average")
-        if "genre_ids" in x:
-            x.pop("genre_ids")
-        if "episode_count" in x:
-            x.pop("episode_count")
-        if "credit_id" in x:
-            x.pop("credit_id")
-        if "credit_id" in x:
-            x.pop("credit_id")
-        if "vote_count" in x:
-            x.pop("vote_count")
-        if "original_language" in x:
-            x.pop("original_language")
-        #new_combined_cast_credits.append(x)
-
-
-
-    ret={ "cast":sorted(combined_cast_credits,key= lambda  x: x["popularity"],reverse=True),
-          "crew":sorted(combined_craw_credits,key= lambda  x: x["popularity"],reverse=True)
+    # Return sorted cast and crew credits
+    ret = {
+        "cast": sorted(combined_cast_credits, key=lambda x: x["popularity"], reverse=True),
+        "crew": sorted(consolidated_crew_credits, key=lambda x: x["popularity"], reverse=True)
     }
-
     return jsonify(ret)
+
 
 

@@ -40,7 +40,7 @@ def construct_query(data, is_movie):
     # Default query parameters
     query_parts = [
         "language=en-US",
-        "sort_by=popularity.desc"
+        "sort_by=popularity.desc",
         # TODO maybe remove this part? Since the client's list allows non flatrate providers too
         "with_watch_monetization_types=flatrate"
     ]
@@ -55,10 +55,8 @@ def construct_query(data, is_movie):
             query_parts.append(f"first_air_date.gte={min_year}-01-01")
     if min_vote_average := data.get("vote_average"):
         query_parts.append(f"vote_average.gte={min_vote_average}")
-    if country_code := data.get("country_code"):
-        if region := data.get("region"):
-            query_parts.append(f"with_origin_country={country_code}")
-            query_parts.append(f"watch_region={region}")
+    if region := data.get("region"):
+        query_parts.append(f"watch_region={region}")
     if provider_id := data.get("provider"):
         query_parts.append(f"with_watch_providers={provider_id}")
     if genres := data.get("genres"):
@@ -67,6 +65,7 @@ def construct_query(data, is_movie):
 
     # Combine query parts into a single string
     query = "&".join(query_parts)
+    print("full query" , query)
     return query
 
 
