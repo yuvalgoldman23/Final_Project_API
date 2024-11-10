@@ -52,7 +52,7 @@ async def fetch_tmdb_data(tmdb_url, params, headers):
 
 
 # TODO add territory to this, and separate the endpoint logic from the function itself so we could use it separately
-async def produce_streaming_providers_list_for_content(content_id, territory, content_type):
+async def produce_streaming_providers_list_for_content(content_id, content_type):
     tmdb_url = f"https://api.themoviedb.org/3/{content_type}/{content_id}/watch/providers"
     headers = {
         "api_key": f"{TMDB_API_KEY}",
@@ -62,20 +62,27 @@ async def produce_streaming_providers_list_for_content(content_id, territory, co
 
     try:
         data = await fetch_tmdb_data(tmdb_url, params, headers)
-        streaming_providers = data.get("results", {}).get(territory, {}).get("flatrate", [])
-        provider_info = [
-            {
-                "name": provider.get("provider_name"),
-                "logo_path": provider.get("logo_path"),
-                "provider_id": provider.get("provider_id"),
-                "display_priority": provider.get("display_priority")
-            }
-            for provider in streaming_providers
-        ]
-        return provider_info
+        streaming_providers = data.get("results", {})
+        providers_by_territory = {}
+
+        # Process each territory's providers
+        for territory, territory_data in streaming_providers.items():
+            territory_providers = territory_data.get('flatrate', [])
+            if territory_providers:
+                providers_by_territory[territory] = [
+                    {
+                        "name": provider.get("provider_name"),
+                        "logo_path": provider.get("logo_path"),
+                        "provider_id": provider.get("provider_id"),
+                        "display_priority": provider.get("display_priority")
+                    }
+                    for provider in territory_providers
+                ]
+
+        return providers_by_territory
     except Exception as error:
         print("TMDB Error", error)
-        return []
+        return {}
 
 
 def merge_provider_counts(main_providers, new_providers):
@@ -93,56 +100,81 @@ def merge_provider_counts(main_providers, new_providers):
                 main_providers[provider_name]["tmdb_ids"].extend(data["tmdb_ids"])
 
 
-async def get_streaming_recommendation_data(watchlist_id, territory='US'):
+async def get_streaming_recommendation_data(watchlist_id):
     """
-    This helper function processes the watchlist and gathers streaming provider data.
-    It returns the result as a dictionary with sorted providers and the best providers.
+    This helper function processes the watchlist and gathers streaming provider data for all territories.
+    It returns the result as a dictionary with sorted providers and the best providers for each territory.
     """
     watchlist = get_watchlist_by_id(watchlist_id)
-
-    providers = {}
+    territory_results = {}
 
     async def process_watchlist_item(watchlist_object):
         is_movie = 'movie' if watchlist_object.get("is_movie") else 'tv'
         tmdb_id = watchlist_object["TMDB_ID"]
-        current_providers = await produce_streaming_providers_list_for_content(tmdb_id, territory, is_movie)
-        provider_counts = {}
-        for provider in current_providers:
-            provider_name = provider["name"]
-            tmdb_id_object = [{"tmdb_id": tmdb_id, "is_movie": watchlist_object.get("is_movie")}]
-            if provider_name not in provider_counts:
-                provider_counts[provider_name] = {"count": 1, "tmdb_ids": tmdb_id_object}
-            else:
-                provider_counts[provider_name]["count"] += 1
-                provider_counts[provider_name]["tmdb_ids"].append(tmdb_id_object[0])
-        return provider_counts
+        territories_providers = await produce_streaming_providers_list_for_content(tmdb_id, is_movie)
+
+        # Initialize provider counts for each territory
+        territory_provider_counts = {}
+
+        for territory, providers in territories_providers.items():
+            if territory not in territory_provider_counts:
+                territory_provider_counts[territory] = {}
+
+            for provider in providers:
+                provider_name = provider["name"]
+                tmdb_id_object = {"tmdb_id": tmdb_id, "is_movie": watchlist_object.get("is_movie")}
+
+                if provider_name not in territory_provider_counts[territory]:
+                    territory_provider_counts[territory][provider_name] = {
+                        "count": 1,
+                        "tmdb_ids": [tmdb_id_object]
+                    }
+                else:
+                    territory_provider_counts[territory][provider_name]["count"] += 1
+                    territory_provider_counts[territory][provider_name]["tmdb_ids"].append(tmdb_id_object)
+
+        return territory_provider_counts
 
     async def gather_provider_data():
         tasks = [process_watchlist_item(watchlist_object) for watchlist_object in watchlist]
         results = await asyncio.gather(*tasks)
-        for new_providers in results:
-            merge_provider_counts(providers, new_providers)
+
+        # Merge results for each territory
+        for result in results:
+            for territory, providers in result.items():
+                if territory not in territory_results:
+                    territory_results[territory] = {}
+                merge_provider_counts(territory_results[territory], providers)
 
     await gather_provider_data()
 
-    sorted_providers = sorted(providers.items(), key=lambda item: item[1]["count"], reverse=True)
-    sorted_providers = OrderedDict(sorted_providers)
+    # Process and sort providers for each territory
+    final_results = {}
+    for territory, providers in territory_results.items():
+        sorted_providers = sorted(providers.items(), key=lambda item: item[1]["count"], reverse=True)
+        sorted_providers = OrderedDict(sorted_providers)
 
-    if len(sorted_providers) == 0:
-        print("No providers found for watchlist")
-        return jsonify({"providers": {}, "best_providers": {}}), 404
+        if len(sorted_providers) > 0:
+            top_value = next(iter(sorted_providers.values()))["count"]
+            best_providers = {
+                provider: data
+                for provider, data in sorted_providers.items()
+                if data["count"] == top_value
+            }
 
-    top_value = next(iter(sorted_providers.values()))["count"]
-    best_providers = {provider: data for provider, data in sorted_providers.items() if data["count"] == top_value}
-    return {"providers": sorted_providers, "best_providers": best_providers}, 200
+            final_results[territory] = {
+                "providers": sorted_providers,
+                "best_providers": best_providers
+            }
+
+    return final_results, 200 if final_results else 404
 
 
 @streaming_providers_routes.route('/api/watchlists/streaming_recommendation', methods=['GET', 'POST'])
 @auth_required
 def streaming_recommendation(token_info):
     """
-    Endpoint for fetching streaming provider recommendations. It uses the helper function
-    and returns the result as a JSON response.
+    Endpoint for fetching streaming provider recommendations for all available territories.
     """
     data = request.json
 
@@ -155,12 +187,7 @@ def streaming_recommendation(token_info):
     else:
         watchlist_id = data['watchlist_id']
 
-    territory = data.get('territory', 'US')
-
     # Call the helper function and get the result asynchronously
-    result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id, territory))
-
-    # Return the result using jsonify for the API response
-    if status_code != 200:
-        return jsonify({"providers": {}, "best_providers": {}}), status_code
+    result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id))
+    print("result is " , result)
     return jsonify(result), status_code

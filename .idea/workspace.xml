@@ -7,10 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated the discovery route, added new requirements for algo no. 2">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Fixed an issue where actor pages had no average votes due to an issue with tmdb_routes.py, fixed an issue with discover_routes.py sending a wrong provider query">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/discover_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/discover_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/tmdb_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/tmdb_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/streaming_providers_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/streaming_providers_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -261,7 +261,9 @@
       <workItem from="1730904990878" duration="846000" />
       <workItem from="1730906110378" duration="14669000" />
       <workItem from="1731079834448" duration="1153000" />
-      <workItem from="1731105945929" duration="4360000" />
+      <workItem from="1731105945929" duration="4512000" />
+      <workItem from="1731159408125" duration="499000" />
+      <workItem from="1731253289088" duration="5508000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -283,14 +285,6 @@
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
       <updated>1718181979884</updated>
-    </task>
-    <task id="LOCAL-00015" summary="Created a concurrent basic, working version of the streaming service recommendation engine. Currently returns the top service covering the watchlist.">
-      <option name="closed" value="true" />
-      <created>1719049044662</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1719049044662</updated>
     </task>
     <task id="LOCAL-00016" summary="Added review routes, updated the readme accordingly">
       <option name="closed" value="true" />
@@ -652,7 +646,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730998583690</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="Fixed an issue where actor pages had no average votes due to an issue with tmdb_routes.py, fixed an issue with discover_routes.py sending a wrong provider query">
+      <option name="closed" value="true" />
+      <created>1731111836025</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1731111836026</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -670,7 +672,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added about half of the required feed routes, updated in README with usage instructions" />
     <MESSAGE value="Updated the watchlist API to handle the bug of adding some content for the first time, fixed an issue of inability to produce media_info correctly for watchlist-added content" />
     <MESSAGE value="Fixed rating_id return error" />
     <MESSAGE value="Updated &quot;get rating by user&quot; to also include a possibility of getting a specific content's rating, instead of all of the user's ratings.&#10;&#10;Updated and tested remove/update rating. Updated readme to reflect changes. As requested by Omer, instead of requiring &quot;Rating id&quot;, we now require &quot;content_id&quot; and &quot;is_movie&quot; for update/removal of rating." />
@@ -695,7 +696,8 @@
     <MESSAGE value="Added streaming service data without async to media pages,some minor changes in recommendation_routes.py" />
     <MESSAGE value="Updated the recommendations method so it returns the correct titles, release dates and tmdb ratings" />
     <MESSAGE value="Updated the discovery route, added new requirements for algo no. 2" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated the discovery route, added new requirements for algo no. 2" />
+    <MESSAGE value="Fixed an issue where actor pages had no average votes due to an issue with tmdb_routes.py, fixed an issue with discover_routes.py sending a wrong provider query" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed an issue where actor pages had no average votes due to an issue with tmdb_routes.py, fixed an issue with discover_routes.py sending a wrong provider query" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -709,7 +711,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1731110867081" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1731258514342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1728581461220" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
