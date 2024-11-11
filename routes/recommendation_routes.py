@@ -995,8 +995,10 @@ def get_media_recommendationv2(token_info):
         movie_res= get_movies_by_keyword(w)
         tv_res= get_tv_shows_by_keyword(w)
         for m in movie_res:
+            m["is_movie"]=1
             movies_canidate.append(m)
         for t in tv_res:
+            t["is_movie"] = 1
             tv_canidate.append(t)
     algo_recommendation2=[]
     while 1:
@@ -1021,7 +1023,7 @@ def get_media_recommendationv2(token_info):
                 can_copy["Recommended_by"] = "Algorithm2"
                 algo_recommendation2.append(can_copy)
         if rnd ==2:
-            random_element = random.choice(movies_canidate)
+            random_element = random.choice(tv_canidate)
             can_id=random_element["id"]
             exists_in_usr_pref = any(item["media_Id"] == can_id for item in usr_prefrence)
             exist_in_algo= any(item["id"] == can_id for item in algo_recommendation2)
