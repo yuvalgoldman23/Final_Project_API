@@ -1,7 +1,8 @@
 from database_connector import connection, cursor, cursor2
 import mysql.connector
 from mysql.connector import errorcode
-from flask import jsonify
+from flask import jsonify , session
+from routes import recommendation_routes as rr
 from services import  watchlist_services as service
 
 
@@ -19,11 +20,36 @@ def login_google(id,email):
                 connection.commit()
                 print(f"ID {id} was added to the table .")
                 main_watchlist_id = service.create_watchlist(id, "Main", True)
+                usr=session.get('usr',None)
+                if usr==id:
+                  if not (session.get('usr_pref', None)):
+                      x,rr.get_usr_prep(id)
+                      session['usr_pref'] = x
+
+                else:
+                    session['usr']=id
+                    x = rr.get_usr_prep(id)
+                    session['usr_pref'] = x
+
+
+
                 return main_watchlist_id, 200
             else:
                 print(f"ID {id} already exists in the table .")
                 try:
                     main_watchlist_id = service.get_main_watchlist(id)[0].get('ID')
+                    usr = session.get('usr', None)
+                    if usr == id:
+                        if not (session.get('usr_pref', None)):
+                            x,  = rr.get_usr_prep(id)
+                            session['usr_pref'] = x
+
+                    else:
+                        session['usr'] = id
+                        x = rr.get_usr_prep(id)
+                        session['usr_pref'] = x
+
+                    t=5
                     return main_watchlist_id, 200
                 except TypeError:
                     return "Couldn't find main watchlist due to a DB error", 400

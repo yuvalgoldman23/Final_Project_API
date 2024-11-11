@@ -10,7 +10,7 @@ import requests
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from flask import Blueprint, request
+from flask import Blueprint, request , session
 import services.watchlist_services as ws
 import routes.watchlist_routes as rt
 from auth import auth_required
@@ -112,7 +112,9 @@ class DNNModel(nn.Module):
 # Instantiate the model, loss function, and optimizer
 model = DNNModel()
 
-model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
+#model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
+model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
+
 trained_model = model
 
 
@@ -641,16 +643,25 @@ def get_tv_count(api_key, keyword_id):
         print("Failed to retrieve data for TV shows:", response.json())
         return 0
 
+
 @recommendation_routes.route('/api/recommendation_feedback', methods=['POST'])
 @auth_required
 def update_preferences(token_info):
  try:
+
     data = request.json
     usr_id = token_info.get('sub')
     is_movie = data.get('is_movie')
     media_id = data.get('media_id')
     liked = data.get("is_liked")
     algorithm = data.get("algorithm")
+    x=[]
+    if not (session.get('usr_pref', None)):
+         x = get_usr_prep(usr_id)
+         x=update_user_prep_item(x,media_id,is_movie,liked,"feedback")
+    else:
+        x = update_user_prep_item(x, media_id, is_movie, liked, "feedback")
+    session['usr_pref'] = x
     query = f"SELECT COALESCE(  (SELECT ID  FROM recommendation_info  WHERE media_id = %s AND is_movie = %s AND user_ID = %s), '0') AS feedback_id;"
     cursor2.execute(query, (media_id, is_movie, usr_id))
     feedback_id = cursor2.fetchall()
@@ -745,6 +756,105 @@ def filter_fields(data, fields):
     """
     return {key: data[key] for key in fields if key in data}
 
+def remove_user_prep_item(usr_prep,tmdb_id,is_movie):
+    return [item for item in usr_prep if not (item["media_id"] == tmdb_id and item["is_movie"] == is_movie)]
+def update_user_prep_item(usr_prep,tmdb_id,is_movie,is_liked,type):
+    for p in usr_prep:
+        if p["media_Id"] ==tmdb_id:
+            p["is_liked"]= is_liked
+            return usr_prep
+
+    new={}
+    new['media_Id']= tmdb_id
+    new["is_movie"]=is_movie
+    new["is_liked"]=is_liked
+    new["type"]=type
+    if is_movie==0:
+        gen_str = get_tv_gen_by_id(api_key, tmdb_id)
+        new['genres']= gen_str
+        x = get_tv_keywords(api_key, tmdb_id)
+        if "results" in x:
+            new['key_words'] = x["results"]
+    else :
+        gen_str = get_movie_gen_by_id(api_key, tmdb_id)
+        new['genres'] = gen_str
+        x = get_movie_keywords(api_key, tmdb_id)
+        if "results" in x:
+            new['key_words'] = x["results"]
+    usr_prep.append(new)
+    return usr_prep
+
+
+def get_usr_prep(usr_id):
+    query = f"SELECT *  from rating where rating.User_ID = %s "
+    while 1:
+        try:
+            cursor2.execute(query, (usr_id,))
+            break
+        except Error as e:
+            time.sleep(0.1)
+    rating_of_usr = cursor2.fetchall()
+    usr_prefrence = []
+    for r in rating_of_usr:
+        if r['is_movie'] == 0:
+            gen_str = get_tv_gen_by_id(api_key, r['media_ID'])
+            r['genres'] = gen_str
+            x = get_tv_keywords(api_key, r['media_ID'])
+            if "results" in x:
+                r['key_words'] = x["results"]
+        elif r['is_movie'] == 1:
+            gen_str = get_movie_gen_by_id(api_key, r['media_ID'])
+            x = get_movie_keywords(api_key, r['media_ID'])
+            if "results" in x:
+                r['key_words'] = x["results"]
+            r['genres'] = gen_str
+        p = {}
+        p["media_Id"] = r["media_ID"]
+        p['gnr_str'] = r['genres']
+        p['is_movie'] = r['is_movie']
+        p['type']= "rating"
+        if "key_words" in r:
+            p['key_words'] = r['key_words']
+        if r['rating'] >= 7:
+            p['is_liked'] = 1
+        else:
+            p['is_liked'] = 0
+        usr_prefrence.append(p)
+    # return usr_prefrence
+    query = f"SELECT *  from recommendation_info where user_ID = %s "
+    while 1:
+        try:
+            cursor2.execute(query, (usr_id,))
+            break
+        except Error as e:
+            time.sleep(0.1)
+    feedbackes = cursor2.fetchall()
+    for r in feedbackes:
+        if r['is_movie'] == 0:
+            gen_str = get_tv_gen_by_id(api_key, r['media_id'])
+            r['genres'] = gen_str
+            x = get_tv_keywords(api_key, r['media_id'])
+            if "results" in x:
+                r['key_words'] = x["results"]
+        elif r['is_movie'] == 1:
+            gen_str = get_movie_gen_by_id(api_key, r['media_id'])
+            r['genres'] = gen_str
+            x = get_movie_keywords(api_key, r['media_id'])
+            if "results" in x:
+                r['key_words'] = x["results"]
+        p = {}
+        p["media_Id"] = r["media_id"]
+        p['gnr_str'] = r['genres']
+        p['is_movie'] = r['is_movie']
+        p['type'] = "feedback"
+        if "key_words" in r:
+            p['key_words'] = r['key_words']
+        if r['liked'] == 1:
+            p['is_liked'] = 1
+        else:
+            p['is_liked'] = 0
+        usr_prefrence.append(p)
+    return usr_prefrence
 
 @recommendation_routes.route('/api/Media_recommendation', methods=['GET'])
 @auth_required
@@ -754,6 +864,15 @@ def get_media_recommendationv2(token_info):
     fields_to_keep = ["title", "release_date", "vote_average", "Recommended_by", "trailer", "poster_path",
                       "overview", "name", "is_movie", "genres","tmdb_id", "original_title", "original_name", "first_air_date"]
     usr_id = token_info.get('sub')
+    query = f"SELECT *  from rating where rating.User_ID = %s "
+    while 1:
+        try:
+            cursor2.execute(query, (usr_id,))
+            break
+        except Error as e:
+            time.sleep(0.1)
+    rating_of_usr = cursor2.fetchall()
+    '''
     query = f"SELECT *  from rating where rating.User_ID = %s "
     while 1:
      try:
@@ -820,6 +939,13 @@ def get_media_recommendationv2(token_info):
         else:
             p['is_liked'] = 0
         usr_prefrence.append(p)
+    '''
+    if not (session.get('usr_pref', None)):
+        x = get_usr_prep(usr_id)
+        session['usr_pref'] = x
+
+
+    usr_prefrence= session.get('usr_pref',[])
     algo_recommendation = []
     key_words=[]
 
