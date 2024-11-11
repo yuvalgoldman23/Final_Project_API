@@ -42,49 +42,6 @@ def media_page_streaming_services(content_id, content_type):
         return []
 
 
-async def fetch_tmdb_data(tmdb_url, params, headers):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(tmdb_url, params=params, headers=headers) as response:
-            if response.status == 429:
-                await asyncio.sleep(3)
-                return await fetch_tmdb_data(tmdb_url, params, headers)  # Retry after rate limit
-            return await response.json()
-
-
-# TODO add territory to this, and separate the endpoint logic from the function itself so we could use it separately
-async def produce_streaming_providers_list_for_content(content_id, content_type):
-    tmdb_url = f"https://api.themoviedb.org/3/{content_type}/{content_id}/watch/providers"
-    headers = {
-        "api_key": f"{TMDB_API_KEY}",
-        "accept": "application/json"
-    }
-    params = {"api_key": TMDB_API_KEY}
-
-    try:
-        data = await fetch_tmdb_data(tmdb_url, params, headers)
-        streaming_providers = data.get("results", {})
-        providers_by_territory = {}
-
-        # Process each territory's providers
-        for territory, territory_data in streaming_providers.items():
-            territory_providers = territory_data.get('flatrate', [])
-            if territory_providers:
-                providers_by_territory[territory] = [
-                    {
-                        "name": provider.get("provider_name"),
-                        "logo_path": provider.get("logo_path"),
-                        "provider_id": provider.get("provider_id"),
-                        "display_priority": provider.get("display_priority")
-                    }
-                    for provider in territory_providers
-                ]
-
-        return providers_by_territory
-    except Exception as error:
-        print("TMDB Error", error)
-        return {}
-
-
 def merge_provider_counts(main_providers, new_providers):
     for provider_name, data in new_providers.items():
         new_first_word = provider_name.split()[0]
@@ -98,7 +55,47 @@ def merge_provider_counts(main_providers, new_providers):
             if provider_name in main_providers:
                 main_providers[provider_name]["count"] += data["count"]
                 main_providers[provider_name]["tmdb_ids"].extend(data["tmdb_ids"])
+                # Ensure we keep the logo_path if it exists
+                if "logo_path" in data and data["logo_path"]:
+                    main_providers[provider_name]["logo_path"] = data["logo_path"]
 
+async def fetch_tmdb_data(tmdb_url, params, headers):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(tmdb_url, params=params, headers=headers) as response:
+            if response.status == 429:
+                await asyncio.sleep(3)
+                return await fetch_tmdb_data(tmdb_url, params, headers)  # Retry after rate limit
+            return await response.json()
+
+async def produce_streaming_providers_list_for_content(content_id, content_type):
+    tmdb_url = f"https://api.themoviedb.org/3/{content_type}/{content_id}/watch/providers"
+    headers = {
+        "api_key": f"{TMDB_API_KEY}",
+        "accept": "application/json"
+    }
+    params = {"api_key": TMDB_API_KEY}
+
+    try:
+        data = await fetch_tmdb_data(tmdb_url, params, headers)
+        streaming_providers = data.get("results", {})
+        providers_by_territory = {}
+
+        for territory, territory_data in streaming_providers.items():
+            territory_providers = territory_data.get('flatrate', [])
+            if territory_providers:
+                providers_by_territory[territory] = [
+                    {
+                        "name": provider.get("provider_name"),
+                        "logo_path": provider.get("logo_path"),
+                        "provider_id": provider.get("provider_id"),
+                        "display_priority": provider.get("display_priority")
+                    }
+                    for provider in territory_providers
+                ]
+        return providers_by_territory
+    except Exception as error:
+        print("TMDB Error", error)
+        return {}
 
 async def get_streaming_recommendation_data(watchlist_id):
     """
@@ -113,7 +110,6 @@ async def get_streaming_recommendation_data(watchlist_id):
         tmdb_id = watchlist_object["TMDB_ID"]
         territories_providers = await produce_streaming_providers_list_for_content(tmdb_id, is_movie)
 
-        # Initialize provider counts for each territory
         territory_provider_counts = {}
 
         for territory, providers in territories_providers.items():
@@ -127,7 +123,9 @@ async def get_streaming_recommendation_data(watchlist_id):
                 if provider_name not in territory_provider_counts[territory]:
                     territory_provider_counts[territory][provider_name] = {
                         "count": 1,
-                        "tmdb_ids": [tmdb_id_object]
+                        "tmdb_ids": [tmdb_id_object],
+                        "logo_path": provider["logo_path"],  # Store the logo path
+                        "provider_id": provider["provider_id"]  # Store the provider ID
                     }
                 else:
                     territory_provider_counts[territory][provider_name]["count"] += 1
@@ -139,7 +137,6 @@ async def get_streaming_recommendation_data(watchlist_id):
         tasks = [process_watchlist_item(watchlist_object) for watchlist_object in watchlist]
         results = await asyncio.gather(*tasks)
 
-        # Merge results for each territory
         for result in results:
             for territory, providers in result.items():
                 if territory not in territory_results:
@@ -148,7 +145,6 @@ async def get_streaming_recommendation_data(watchlist_id):
 
     await gather_provider_data()
 
-    # Process and sort providers for each territory
     final_results = {}
     for territory, providers in territory_results.items():
         sorted_providers = sorted(providers.items(), key=lambda item: item[1]["count"], reverse=True)
@@ -169,7 +165,6 @@ async def get_streaming_recommendation_data(watchlist_id):
 
     return final_results, 200 if final_results else 404
 
-
 @streaming_providers_routes.route('/api/watchlists/streaming_recommendation', methods=['GET', 'POST'])
 @auth_required
 def streaming_recommendation(token_info):
@@ -187,7 +182,5 @@ def streaming_recommendation(token_info):
     else:
         watchlist_id = data['watchlist_id']
 
-    # Call the helper function and get the result asynchronously
     result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id))
-    print("result is " , result)
     return jsonify(result), status_code
