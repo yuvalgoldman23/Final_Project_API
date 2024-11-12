@@ -940,9 +940,12 @@ def get_media_recommendationv2(token_info):
             p['is_liked'] = 0
         usr_prefrence.append(p)
     '''
-    if not (session.get('usr_pref', None)):
+    if not  session.get('usr_pref',[])  :
         x = get_usr_prep(usr_id)
         session['usr_pref'] = x
+        print("not in session")
+    else:
+        print("in session")
 
 
     usr_prefrence= session.get('usr_pref',[])
@@ -1095,6 +1098,7 @@ def get_media_recommendationv2(token_info):
                         "poster_path"]
                     info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                         "poster_path"]
+                return_arr.append(info)
             else:
                 info = get_tv_show_info(a["media_ID"])
                 t = get_tv_trailer(a["media_ID"])
@@ -1120,7 +1124,7 @@ def get_media_recommendationv2(token_info):
                         "poster_path"]
                     info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                         "poster_path"]
-            return_arr.append(info)
+                return_arr.append(info)
         if a["Recommended_by"] == "Algorithm2":
             if a["is_movie"]:
                 info = get_movie_info(a["id"])
@@ -1144,6 +1148,7 @@ def get_media_recommendationv2(token_info):
                 else:
                     info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + str(info["poster_path"])
                     info["poster_path"] = "https://image.tmdb.org/t/p/original/" + str(info["poster_path"])
+                return_arr.append(info)
             else:
                 info = get_tv_show_info(a["id"])
                 t = get_tv_trailer(a["id"])
@@ -1167,9 +1172,10 @@ def get_media_recommendationv2(token_info):
                 else:
                     info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + str(info[ "poster_path"])
                     info["poster_path"] = "https://image.tmdb.org/t/p/original/" + str(info["poster_path"])
-            return_arr.append(info)
-        if len(return_arr) >5:
-            break
+                return_arr.append(info)
+        if len(return_arr) >9:
+         break
+    return return_arr
 
 
 
@@ -1181,7 +1187,7 @@ def get_media_recommendationv2(token_info):
             info = get_movie_info(a["media_ID"])
             t = get_movie_trailer(a["media_ID"])
             info["trailer"] = t
-            info["recommended_by"] = "Algorithm1"
+            info["Recommended_by"] = "Algorithm1"
             info["is_movie"] = 1
             info["tmdb_id"]= a["media_ID"]
             info = filter_fields(info, fields_to_keep)
@@ -1277,4 +1283,6 @@ def get_media_recommendationv2(token_info):
              info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                 "poster_path"]
         return_arr.append(info)
+        if len(return_arr) >10:
+         break
     return return_arr
