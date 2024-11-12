@@ -828,9 +828,9 @@ def get_media_recommendationv2(token_info):
             if u["is_liked"] ==1:
              for x in u["key_words"]:
                 key_words.append(x)
-    
+
     counter = Counter((item['id'], item['name']) for item in key_words)
-    
+
     key_words= [{'id': id, 'name': name, 'count': count} for (id, name), count in counter.items()]
     '''
     for k in key_words:
@@ -1140,13 +1140,14 @@ def get_media_recommendationv2(token_info):
             info["item_id"] = "0"
             info["list_id"] = None
             info["tmdb_rating"] = info.get("vote_average")
-            if not ("poster_path" in info):
+            if not info.get("poster_path"):
                 info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
                 info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
             else:
-             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                "poster_path"]
              info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
                 "poster_path"]
+             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
+                "poster_path"]
         return_arr.append(info)
+    #print("the return arr is" , return_arr)
     return return_arr
