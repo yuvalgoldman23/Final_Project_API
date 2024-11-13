@@ -940,6 +940,7 @@ def get_media_recommendationv2(token_info):
             p['is_liked'] = 0
         usr_prefrence.append(p)
     '''
+    '''
     if not  session.get('usr_pref',[])  :
         x = get_usr_prep(usr_id)
         session['usr_pref'] = x
@@ -949,6 +950,8 @@ def get_media_recommendationv2(token_info):
 
 
     usr_prefrence= session.get('usr_pref',[])
+    '''
+    usr_prefrence= get_usr_prep(usr_id)
     algo_recommendation = []
     key_words=[]
 
