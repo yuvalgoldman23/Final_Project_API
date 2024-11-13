@@ -7,8 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated region support">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc.xml" afterDir="false" />
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/recommendation_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/recommendation_routes.py" afterDir="false" />
     </list>
@@ -270,7 +269,7 @@
       <workItem from="1731423450773" duration="4352000" />
       <workItem from="1731427852337" duration="3031000" />
       <workItem from="1731433626301" duration="317000" />
-      <workItem from="1731488114308" duration="9944000" />
+      <workItem from="1731488114308" duration="11796000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -292,14 +291,6 @@
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
       <updated>1718181979884</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Added tmdb id to watchlist">
-      <option name="closed" value="true" />
-      <created>1719149613716</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1719149613716</updated>
     </task>
     <task id="LOCAL-00019" summary="Added tmdb id to watchlist">
       <option name="closed" value="true" />
@@ -661,7 +652,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731433935108</updated>
     </task>
-    <option name="localTasksCounter" value="64" />
+    <task id="LOCAL-00064" summary="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation">
+      <option name="closed" value="true" />
+      <created>1731531692203</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1731531692203</updated>
+    </task>
+    <option name="localTasksCounter" value="65" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -679,7 +678,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updated &quot;get rating by user&quot; to also include a possibility of getting a specific content's rating, instead of all of the user's ratings.&#10;&#10;Updated and tested remove/update rating. Updated readme to reflect changes. As requested by Omer, instead of requiring &quot;Rating id&quot;, we now require &quot;content_id&quot; and &quot;is_movie&quot; for update/removal of rating." />
     <MESSAGE value="Fixed &quot;get_ratings_by_user&quot; to allow no user_id - just get the logged-in user's ratings instead" />
     <MESSAGE value="Updated the rating_services.py file to remove &quot;fetchone&quot; queries, which caused some errors in repeated querying attempts." />
     <MESSAGE value="Updated readme to include new watchlist object, added an example" />
@@ -704,7 +702,8 @@
     <MESSAGE value="Fixed an issue where actor pages had no average votes due to an issue with tmdb_routes.py, fixed an issue with discover_routes.py sending a wrong provider query" />
     <MESSAGE value="Updated the streaming endpoint to include logos" />
     <MESSAGE value="Updated region support" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated region support" />
+    <MESSAGE value="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -718,7 +717,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1731531145552" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1731532394416" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1728581461220" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
