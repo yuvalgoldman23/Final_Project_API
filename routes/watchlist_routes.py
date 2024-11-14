@@ -8,6 +8,7 @@ from auth import auth_required
 import services.watchlist_services as service
 import routes.tmdb_routes as tmdb
 import services.rating_services as rating_service
+from routes.streaming_providers_routes import media_page_streaming_services
 watchlists_routes = Blueprint('watchlists_routes', __name__)
 
 # Get the watchlist's owner's ID
@@ -170,6 +171,7 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
 
             media_info['watchlist_item_id'] = item_id
 
+            #media_info['streaming_services'] = media_page_streaming_services(content_id, "movie") if is_movie else media_page_streaming_services(content_id, "tv")
             return media_info
         else:
             print(f"Had an error returning the info for {content_id} with response of {response.status}")

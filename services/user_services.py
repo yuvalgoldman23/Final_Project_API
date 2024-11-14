@@ -15,8 +15,11 @@ def login_google(id,email):
 
             if not exists:
                 # Registration: Insert the ID if it does not exist
-                insert_query = f"INSERT INTO `final_project_db`.`users` (id,username,password,email,google_auth) VALUES (%s,%s,%s,%s,%s)"
-                cursor.execute(insert_query, (id,email.split("@")[0],id,email,1))
+                # Add a default region
+                # TODO should the client ask upon registration?
+                default_region = "US"
+                insert_query = f"INSERT INTO `final_project_db`.`users` (id,username,password,email,google_auth, region) VALUES (%s,%s,%s,%s,%s,%s)"
+                cursor.execute(insert_query, (id,email.split("@")[0],id,email,1, default_region))
                 connection.commit()
                 print(f"ID {id} was added to the table .")
                 main_watchlist_id = service.create_watchlist(id, "Main", True)
@@ -64,6 +67,43 @@ def login_google(id,email):
             else:
                 print("unknown error", err)
                 return str(err), 404
+
+
+
+def get_user_region_db(user_id):
+    try:
+        query =  f"SELECT region from `final_project_db`.`users` WHERE id = %s"
+        cursor.execute(query, (user_id,))
+        region = cursor.fetchall()[0][0]
+        return region, 200
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return "Wrong credentials", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return "Database does not exist", 404
+        else:
+            print("unknown error", err)
+            return str(err), 404
+
+def update_user_region(user_id,region):
+    try:
+        query = f"UPDATE `final_project_db`.`users` SET region = %s WHERE id = %s"
+        cursor.execute(query, (region, user_id))
+        connection.commit()
+        print(f"ID {user_id} was updated to the table .")
+        return 200
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+            return "Wrong credentials", 404
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+            return "Database does not exist", 404
+        else:
+            print("unknown error", err)
+            return str(err), 404
 
 
 def get_user_details(id):
