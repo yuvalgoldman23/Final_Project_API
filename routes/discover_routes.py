@@ -65,7 +65,6 @@ def construct_query(data, is_movie):
 
     # Combine query parts into a single string
     query = "&".join(query_parts)
-    print("full query" , query)
     return query
 
 

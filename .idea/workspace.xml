@@ -7,74 +7,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Updated the discovery route, added new requirements for algo no. 2">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Final_Project_API.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Final_Project_API.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc/storage_v2/_src_/schema/information_schema.FNRwLQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc/storage_v2/_src_/schema/information_schema.FNRwLQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc/storage_v2/_src_/schema/mysql.osA4Bg.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc/storage_v2/_src_/schema/mysql.osA4Bg.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc/storage_v2/_src_/schema/performance_schema.kIw0nw.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc/storage_v2/_src_/schema/performance_schema.kIw0nw.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc/storage_v2/_src_/schema/sys.zb4BAA.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/6c56b6fb-672a-4022-bed4-07729a5705fc/storage_v2/_src_/schema/sys.zb4BAA.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DataBase_Export/readme" beforeDir="false" afterPath="$PROJECT_DIR$/DataBase_Export/readme" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/List.py" beforeDir="false" afterPath="$PROJECT_DIR$/List.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/New Text Document.txt" beforeDir="false" afterPath="$PROJECT_DIR$/New Text Document.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/async_tmdb_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/async_tmdb_test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database_connector.py" beforeDir="false" afterPath="$PROJECT_DIR$/database_connector.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/cd.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/cd.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/cli/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/cli/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/constant.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/constant.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/legacy.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/legacy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/md.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/md.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/version.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/charset_normalizer/version.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/click-8.1.7.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/click-8.1.7.dist-info/RECORD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/colorama-0.4.6.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/colorama-0.4.6.dist-info/RECORD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/itsdangerous-2.2.0.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/itsdangerous-2.2.0.dist-info/RECORD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/jinja2-3.1.4.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/jinja2-3.1.4.dist-info/RECORD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_native.py" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_native.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_speedups.c" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_speedups.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_speedups.pyi" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/markupsafe/_speedups.pyi" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Lib/site-packages/pip-24.0.dist-info/RECORD" beforeDir="false" afterPath="$PROJECT_DIR$/env/Lib/site-packages/pip-24.0.dist-info/RECORD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Scripts/Activate.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/env/Scripts/Activate.ps1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Scripts/activate.bat" beforeDir="false" afterPath="$PROJECT_DIR$/env/Scripts/activate.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/Scripts/deactivate.bat" beforeDir="false" afterPath="$PROJECT_DIR$/env/Scripts/deactivate.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/env/pyvenv.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/env/pyvenv.cfg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old_services/feed_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/old_services/feed_services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old_services/post_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/old_services/post_services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old_services/rating_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/old_services/rating_services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old_services/reviews_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/old_services/reviews_services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old_services/user_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/old_services/user_services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old_services/watchlist_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/old_services/watchlist_services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/discover_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/discover_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/feed_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/feed_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/lists_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/lists_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/ratings_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/ratings_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/recommendation_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/recommendation_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/reviews_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/reviews_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/streaming_providers_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/streaming_providers_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/user_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/watchlist_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/watchlist_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/rating_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/rating_services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/user_services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/user_services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_tmdb.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_tmdb.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,13 +101,13 @@
   <component name="RunManager">
     <configuration name="Final_Project_API" type="PythonConfigurationType" factoryName="Python">
       <module name="Final_Project_API" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\Yanovsky\Documents\GitHub\Final_Project_API\env\Scripts\python.exe" />
-      <option name="SDK_NAME" value="Python 3.12 (Final_Project_API)" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -325,7 +259,16 @@
       <workItem from="1730904990878" duration="846000" />
       <workItem from="1730906110378" duration="14669000" />
       <workItem from="1731079834448" duration="1153000" />
-      <workItem from="1731105945929" duration="4360000" />
+      <workItem from="1731105945929" duration="4512000" />
+      <workItem from="1731159408125" duration="499000" />
+      <workItem from="1731253289088" duration="8151000" />
+      <workItem from="1731322004780" duration="2571000" />
+      <workItem from="1731343244617" duration="1166000" />
+      <workItem from="1731352127767" duration="3103000" />
+      <workItem from="1731423450773" duration="4352000" />
+      <workItem from="1731427852337" duration="3031000" />
+      <workItem from="1731433626301" duration="317000" />
+      <workItem from="1731488114308" duration="14023000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -347,46 +290,6 @@
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
       <updated>1718181979884</updated>
-    </task>
-    <task id="LOCAL-00015" summary="Created a concurrent basic, working version of the streaming service recommendation engine. Currently returns the top service covering the watchlist.">
-      <option name="closed" value="true" />
-      <created>1719049044662</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1719049044662</updated>
-    </task>
-    <task id="LOCAL-00016" summary="Added review routes, updated the readme accordingly">
-      <option name="closed" value="true" />
-      <created>1719082100719</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1719082100719</updated>
-    </task>
-    <task id="LOCAL-00017" summary="Added review routes, updated the readme accordingly">
-      <option name="closed" value="true" />
-      <created>1719082124325</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1719082124325</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Added tmdb id to watchlist">
-      <option name="closed" value="true" />
-      <created>1719149613716</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1719149613716</updated>
-    </task>
-    <task id="LOCAL-00019" summary="Added tmdb id to watchlist">
-      <option name="closed" value="true" />
-      <created>1719153480669</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1719153480669</updated>
     </task>
     <task id="LOCAL-00020" summary="Updated the content deletion from watchlist endpoint. changes reflected in README.md">
       <option name="closed" value="true" />
@@ -716,7 +619,47 @@
       <option name="project" value="LOCAL" />
       <updated>1730998583690</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="Fixed an issue where actor pages had no average votes due to an issue with tmdb_routes.py, fixed an issue with discover_routes.py sending a wrong provider query">
+      <option name="closed" value="true" />
+      <created>1731111836025</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1731111836026</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Updated the streaming endpoint to include logos">
+      <option name="closed" value="true" />
+      <created>1731324729008</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1731324729008</updated>
+    </task>
+    <task id="LOCAL-00063" summary="Updated region support">
+      <option name="closed" value="true" />
+      <created>1731433935108</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1731433935108</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation">
+      <option name="closed" value="true" />
+      <created>1731531692203</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1731531692203</updated>
+    </task>
+    <task id="LOCAL-00065" summary="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation">
+      <option name="closed" value="true" />
+      <created>1731533471017</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1731533471017</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -734,10 +677,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added about half of the required feed routes, updated in README with usage instructions" />
-    <MESSAGE value="Updated the watchlist API to handle the bug of adding some content for the first time, fixed an issue of inability to produce media_info correctly for watchlist-added content" />
-    <MESSAGE value="Fixed rating_id return error" />
-    <MESSAGE value="Updated &quot;get rating by user&quot; to also include a possibility of getting a specific content's rating, instead of all of the user's ratings.&#10;&#10;Updated and tested remove/update rating. Updated readme to reflect changes. As requested by Omer, instead of requiring &quot;Rating id&quot;, we now require &quot;content_id&quot; and &quot;is_movie&quot; for update/removal of rating." />
     <MESSAGE value="Fixed &quot;get_ratings_by_user&quot; to allow no user_id - just get the logged-in user's ratings instead" />
     <MESSAGE value="Updated the rating_services.py file to remove &quot;fetchone&quot; queries, which caused some errors in repeated querying attempts." />
     <MESSAGE value="Updated readme to include new watchlist object, added an example" />
@@ -759,7 +698,11 @@
     <MESSAGE value="Added streaming service data without async to media pages,some minor changes in recommendation_routes.py" />
     <MESSAGE value="Updated the recommendations method so it returns the correct titles, release dates and tmdb ratings" />
     <MESSAGE value="Updated the discovery route, added new requirements for algo no. 2" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated the discovery route, added new requirements for algo no. 2" />
+    <MESSAGE value="Fixed an issue where actor pages had no average votes due to an issue with tmdb_routes.py, fixed an issue with discover_routes.py sending a wrong provider query" />
+    <MESSAGE value="Updated the streaming endpoint to include logos" />
+    <MESSAGE value="Updated region support" />
+    <MESSAGE value="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -773,7 +716,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1731110867081" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1731594989314" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1728581461220" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

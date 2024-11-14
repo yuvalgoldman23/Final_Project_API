@@ -20,6 +20,8 @@ import time
 import spacy
 from itertools import combinations
 from sentence_transformers import SentenceTransformer, util
+from routes.streaming_providers_routes import media_page_streaming_services
+
 nlp = spacy.load("en_core_web_md")
 recommendation_routes = Blueprint('recommendation_routes', __name__)
 
@@ -960,9 +962,9 @@ def get_media_recommendationv2(token_info):
             if u["is_liked"] ==1:
              for x in u["key_words"]:
                 key_words.append(x)
-    
+
     counter = Counter((item['id'], item['name']) for item in key_words)
-    
+
     key_words= [{'id': id, 'name': name, 'count': count} for (id, name), count in counter.items()]
     '''
     for k in key_words:
@@ -1086,7 +1088,7 @@ def get_media_recommendationv2(token_info):
                 info["is_movie"] = 1
                 info["tmdb_id"] = a["media_ID"]
                 info = filter_fields(info, fields_to_keep)
-                info["streaming_services"] = None
+                info["streaming_services"] = media_page_streaming_services(a["media_ID"], "movie")
                 info["user_id"] = "0"
                 info["user_rating"] = 0
                 info["video_links"] = []
@@ -1111,7 +1113,7 @@ def get_media_recommendationv2(token_info):
                 info["is_movie"] = 0
                 info["tmdb_id"] = a["media_ID"]
                 info = filter_fields(info, fields_to_keep)
-                info["streaming_services"] = None
+                info["streaming_services"] = media_page_streaming_services(a["media_ID"], "tv")
                 info["user_id"] = "0"
                 info["user_rating"] = 0
                 info["video_links"] = []
@@ -1137,7 +1139,7 @@ def get_media_recommendationv2(token_info):
                 info["is_movie"] = 1
                 info["tmdb_id"] = a["id"]
                 info = filter_fields(info, fields_to_keep)
-                info["streaming_services"] = None
+                info["streaming_services"] = media_page_streaming_services(a["id"], "movie")
                 info["user_id"] = "0"
                 info["user_rating"] = 0
                 info["video_links"] = []
@@ -1161,7 +1163,7 @@ def get_media_recommendationv2(token_info):
                 info["is_movie"] = 0
                 info["tmdb_id"] = a["id"]
                 info = filter_fields(info, fields_to_keep)
-                info["streaming_services"] = None
+                info["streaming_services"] = media_page_streaming_services(a["id"], "tv")
                 info["user_id"] = "0"
                 info["user_rating"] = 0
                 info["video_links"] = []
@@ -1194,7 +1196,7 @@ def get_media_recommendationv2(token_info):
             info["is_movie"] = 1
             info["tmdb_id"]= a["media_ID"]
             info = filter_fields(info, fields_to_keep)
-            info["streaming_services"] = None
+            info["streaming_services"] = media_page_streaming_services(a["media_ID"], "movie")
             info["user_id"] = "0"
             info["user_rating"] = 0
             info["video_links"] = []
@@ -1218,7 +1220,7 @@ def get_media_recommendationv2(token_info):
             info["is_movie"] = 0
             info["tmdb_id"] = a["media_ID"]
             info = filter_fields(info, fields_to_keep)
-            info["streaming_services"] = None
+            info["streaming_services"] = media_page_streaming_services(a["media_ID"], "tv")
             info["user_id"] = "0"
             info["user_rating"] = 0
             info["video_links"] = []
@@ -1244,7 +1246,7 @@ def get_media_recommendationv2(token_info):
             info["is_movie"] = 1
             info["tmdb_id"]= a["id"]
             info = filter_fields(info, fields_to_keep)
-            info["streaming_services"] = None
+            info["streaming_services"] = media_page_streaming_services(a["id"], "movie")
             info["user_id"] = "0"
             info["user_rating"] = 0
             info["video_links"] = []
@@ -1269,7 +1271,7 @@ def get_media_recommendationv2(token_info):
             info["is_movie"] = 0
             info["tmdb_id"] = a["id"]
             info = filter_fields(info, fields_to_keep)
-            info["streaming_services"] = None
+            info["streaming_services"] = media_page_streaming_services(a["id"], "tv")
             info["user_id"] = "0"
             info["user_rating"] = 0
             info["video_links"] = []
@@ -1277,15 +1279,16 @@ def get_media_recommendationv2(token_info):
             info["item_id"] = "0"
             info["list_id"] = None
             info["tmdb_rating"] = info.get("vote_average")
-            if not ("poster_path" in info):
+            if not info.get("poster_path"):
                 info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
                 info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
             else:
-             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                "poster_path"]
              info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
+                "poster_path"]
+             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
                 "poster_path"]
         return_arr.append(info)
         if len(return_arr) >10:
          break
+    #print("the return arr is" , return_arr)
     return return_arr
