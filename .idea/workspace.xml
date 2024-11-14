@@ -9,7 +9,6 @@
   <component name="ChangeListManager">
     <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/recommendation_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/recommendation_routes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -269,7 +268,7 @@
       <workItem from="1731423450773" duration="4352000" />
       <workItem from="1731427852337" duration="3031000" />
       <workItem from="1731433626301" duration="317000" />
-      <workItem from="1731488114308" duration="11796000" />
+      <workItem from="1731488114308" duration="14023000" />
     </task>
     <task id="LOCAL-00001" summary="Update">
       <created>1718128859500</created>
@@ -291,14 +290,6 @@
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
       <updated>1718181979884</updated>
-    </task>
-    <task id="LOCAL-00019" summary="Added tmdb id to watchlist">
-      <option name="closed" value="true" />
-      <created>1719153480669</created>
-      <option name="number" value="00019" />
-      <option name="presentableId" value="LOCAL-00019" />
-      <option name="project" value="LOCAL" />
-      <updated>1719153480669</updated>
     </task>
     <task id="LOCAL-00020" summary="Updated the content deletion from watchlist endpoint. changes reflected in README.md">
       <option name="closed" value="true" />
@@ -660,7 +651,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731531692203</updated>
     </task>
-    <option name="localTasksCounter" value="65" />
+    <task id="LOCAL-00065" summary="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation">
+      <option name="closed" value="true" />
+      <created>1731533471017</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1731533471017</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -717,7 +716,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1731532394416" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1731594989314" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1728581461220" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
