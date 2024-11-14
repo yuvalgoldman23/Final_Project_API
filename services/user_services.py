@@ -24,6 +24,7 @@ def login_google(id,email):
                 print(f"ID {id} was added to the table .")
                 main_watchlist_id = service.create_watchlist(id, "Main", True)
                 usr=session.get('usr',None)
+                ''''
                 if usr==id:
                   if not (session.get('usr_pref', None)):
                       x,rr.get_usr_prep(id)
@@ -33,9 +34,7 @@ def login_google(id,email):
                     session['usr']=id
                     x = rr.get_usr_prep(id)
                     session['usr_pref'] = x
-
-
-
+                '''
                 return main_watchlist_id, 200
             else:
                 print(f"ID {id} already exists in the table .")

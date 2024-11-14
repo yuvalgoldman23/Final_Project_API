@@ -9,6 +9,7 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
     print("starting add rating process")
 
     try:
+        '''
         if not (session.get('usr_pref', None)):
             x = rr.get_usr_prep(User_ID)
             session['usr_pref'] = x
@@ -16,7 +17,9 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
         if rating > 6:
             liked = 1
         y = rr.update_user_prep_item(session.pop('usr_pref', None), Media_id, is_movie, liked, "rating")
+        
         session['usr_pref'] = y
+        '''
         # Check if a rating already exists for the given user and media
         check_existing_query = "SELECT EXISTS(SELECT 1 FROM `final_project_db`.`rating` WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s)"
         cursor.execute(check_existing_query, (User_ID, Media_id, is_movie))
@@ -96,11 +99,13 @@ def get_rating_of_user(user_id, content_id, is_movie):
 
 def Remove_rating(content_id, is_movie, User_ID):
     try:
+        '''
         if not (session.get('usr_pref', None)):
             x = rr.get_usr_prep(User_ID)
             session['usr_pref'] = x
 
         y = rr.remove_user_prep_item(session.pop('usr_pref', None), Media_id, is_movie)
+        '''
         delete_query = "DELETE FROM `final_project_db`.`rating` WHERE `media_ID`= %s AND is_movie = %s AND `User_ID`= %s;"
         cursor.execute(delete_query, (content_id, is_movie, User_ID))
         connection.commit()
@@ -123,9 +128,11 @@ def Remove_rating(content_id, is_movie, User_ID):
 def update_rating(content_id, is_movie, User_ID, new_rating):
     try:
         # Step 1: Check the current rating
+        '''
         if not (session.get('usr_pref', None)):
             x = rr.get_usr_prep(User_ID)
             session['usr_pref'] = x
+        '''
         liked = 0
         if new_rating > 6:
             liked = 1

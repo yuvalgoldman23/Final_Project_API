@@ -35,6 +35,8 @@ app.register_blueprint(ratings_routes)
 
 app.register_blueprint(recommendation_routes)
 app.register_blueprint(discover_routes)
-
+app.permanent_session_lifetime = timedelta(days=1)  # Set session lifetime
+Session.permanent = True  # Mark this session as permanent
+app.secret_key = 'your_fixed_secret_key'
 if __name__ == '__main__':
     app.run(debug=True, )
