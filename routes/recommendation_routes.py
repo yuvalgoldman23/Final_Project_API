@@ -114,9 +114,7 @@ class DNNModel(nn.Module):
 # Instantiate the model, loss function, and optimizer
 model = DNNModel()
 
-#model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
-model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
-
+model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
 trained_model = model
 
 
