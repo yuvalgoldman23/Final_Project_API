@@ -1181,9 +1181,6 @@ def get_media_recommendationv2(token_info):
     return return_arr
 
 
-
-
-
     for a in algo_recommendation:
 
         if a["is_movie"]:
