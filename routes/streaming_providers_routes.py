@@ -2,7 +2,7 @@ import time
 import asyncio
 
 import requests
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import utils
 from auth import auth_required
 from dotenv import load_dotenv
@@ -20,6 +20,19 @@ streaming_providers_routes = Blueprint('streaming_providers_routes', __name__)
 # Fetch TMDB API key from environment variables
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_ACCESS_TOKEN = os.getenv("TMDB_ACCESS_TOKEN")
+
+
+def get_prices():
+    # Access the scraper instance from the app's context
+    scraper = current_app.netflix_scraper
+    # Call the get_latest_prices function
+    data = scraper.get_latest_prices()
+    return jsonify(data)
+
+
+@streaming_providers_routes.route('/api/netflix_prices', methods=['GET'])
+def get_netflix_prices():
+    return get_prices()
 
 
 def media_page_streaming_services(content_id, content_type):

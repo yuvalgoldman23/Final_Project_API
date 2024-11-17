@@ -9,6 +9,9 @@ import asyncio
 from datetime import timedelta
 import database_connector
 
+from scrapers.netflix_scraper import NetflixPriceScraper
+
+
 app = Flask(__name__)
 '''
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -22,7 +25,10 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 Session(app)'''
 
 CORS(app, supports_credentials=True ,resources={r"/*": {"origins": "http://localhost:3000"}})
-
+netflix_scraper = NetflixPriceScraper()
+netflix_scraper.initialize_netflix_scraper(hours=24)
+# Setting up a global instance of the netflix scraper
+app.netflix_scraper = netflix_scraper
 
 # Register blueprints for each set of routes
 app.register_blueprint(watchlists_routes)
