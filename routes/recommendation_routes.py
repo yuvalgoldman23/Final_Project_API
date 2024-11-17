@@ -19,10 +19,13 @@ from mysql.connector import Error
 import time
 import spacy
 from itertools import combinations
+import mysql.connector
+import threading
 from sentence_transformers import SentenceTransformer, util
 nlp = spacy.load("en_core_web_md")
 recommendation_routes = Blueprint('recommendation_routes', __name__)
 
+db_lock = threading.Lock()
 query = f"SELECT * FROM media_data "
 cursor2.execute(query)
 
@@ -324,7 +327,7 @@ def calculate_keyword_similarity(keywords):
         embedding2 = model.encode(kw2['name'])
         similarity = util.cos_sim(embedding1, embedding2)
         '''
-        if similarity >=0.80:
+        if similarity >=0.80 and (kw1['name'] !=  kw2['name']):
          similarities.append({
             "keyword1": kw1['name'],
             "keyword2": kw2['name'],
@@ -412,28 +415,45 @@ def get_tv_trailer(tv_id):
 
 def get_movies_by_keyword(keyword_id):
     """Fetch movies associated with the keyword ID."""
+    """Fetch movies associated with the keyword ID from pages 1 to 3."""
     url = f"https://api.themoviedb.org/3/keyword/{keyword_id}/movies"
     params = {
-        "api_key": api_key
+        "api_key": api_key,
+        "page": 1
     }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-     return response.json().get('results', [])
-    else:
-        return []
+    all_results = []
+
+    for page in range(1, 4):  # Loop through pages 1 to 3
+        params["page"] = page
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            results = response.json().get('results', [])
+            all_results.extend(results)
+        else:
+            break  # Stop if there's an error in any of the pages
+
+    return all_results
 
 def get_tv_shows_by_keyword(keyword_id):
-    """Fetch TV shows associated with the keyword ID."""
-    url = f"https://api.themoviedb.org/3/discover/tv"
+    """Fetch TV shows associated with the keyword ID from pages 1 to 3."""
+    url = "https://api.themoviedb.org/3/discover/tv"
     params = {
         "api_key": api_key,
-        "with_keywords": keyword_id
+        "with_keywords": keyword_id,
+        "page": 1
     }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-     return response.json().get('results', [])
-    else:
-        return []
+    all_results = []
+
+    for page in range(1, 4):  # Loop through pages 1 to 3
+        params["page"] = page
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            results = response.json().get('results', [])
+            all_results.extend(results)
+        else:
+            break  # Stop if there's an error in any of the pages
+
+    return all_results
 
 @recommendation_routes.route('/api/watchlists/recommendation2', methods=['GET'])
 def get_recommendation2():
@@ -480,24 +500,27 @@ def get_recommendation2():
 @recommendation_routes.route('/api/watchlists/recommendation', methods=['GET'])
 @auth_required
 def get_recommendation(token_info):
+  with db_lock:
+   print('gETING RECOMANDATION WATCH LIST')
    try:
     #data = request.json
     #usr_id = data.get('user_id')
     usr_id=token_info.get('sub')
 
+    cursor3 = connection.cursor(dictionary=True)
     check_query = """
                                  SELECT COALESCE(
                                      (SELECT ID 
                                       FROM watch_lists_names 
                                       WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
                                  """
-    while 1:
-        try:
-             cursor2.execute(check_query, (usr_id,))
-             break
-        except Error as e:
-            time.sleep(0.1)
-    result = cursor2.fetchone()
+
+    try:
+             cursor3.execute(check_query, (usr_id,))
+
+    except Error as e:
+            {"Error:": "error"}, 404
+    result = cursor3.fetchone()
 
     watchlist_id = result['watchlist_id']
     if watchlist_id == "0":
@@ -520,10 +543,13 @@ def get_recommendation(token_info):
     # Filter out None values and construct the result
     result = [movie_data for movie_data in movie_data_list if movie_data is not None]
 
+
+    cursor3.close()
     # Return the result as a dictionary
     return {"Content": result, "ID": watchlist_id}, 200
    except requests.exceptions.HTTPError:
-
+       #cursor.close()
+       cursor3.close()
        return {"Error:": "error"}, 404
 
 
@@ -647,7 +673,8 @@ def get_tv_count(api_key, keyword_id):
 @recommendation_routes.route('/api/recommendation_feedback', methods=['POST'])
 @auth_required
 def update_preferences(token_info):
- try:
+ with db_lock:
+  try:
 
     data = request.json
     usr_id = token_info.get('sub')
@@ -656,12 +683,16 @@ def update_preferences(token_info):
     liked = data.get("is_liked")
     algorithm = data.get("algorithm")
     x=[]
+    '''
     if not (session.get('usr_pref', None)):
          x = get_usr_prep(usr_id)
          x=update_user_prep_item(x,media_id,is_movie,liked,"feedback")
     else:
         x = update_user_prep_item(x, media_id, is_movie, liked, "feedback")
     session['usr_pref'] = x
+    '''
+    cursor = connection.cursor()
+    cursor2 = connection.cursor(dictionary=True)
     query = f"SELECT COALESCE(  (SELECT ID  FROM recommendation_info  WHERE media_id = %s AND is_movie = %s AND user_ID = %s), '0') AS feedback_id;"
     cursor2.execute(query, (media_id, is_movie, usr_id))
     feedback_id = cursor2.fetchall()
@@ -736,11 +767,14 @@ def update_preferences(token_info):
     result = [movie_data for movie_data in movie_data_list if movie_data is not None]
 
     # Return the result as a dictionary
+    cursor.close()
+    cursor2.close()
     return {"Content": result, "ID": watchlist_id}, 200
 
- except requests.exceptions.HTTPError:
-
-  return "0"
+  except requests.exceptions.HTTPError:
+     cursor.close()
+     cursor2.close()
+     return "0"
 
 
 def filter_fields(data, fields):
@@ -787,12 +821,12 @@ def update_user_prep_item(usr_prep,tmdb_id,is_movie,is_liked,type):
 
 def get_usr_prep(usr_id):
     query = f"SELECT *  from rating where rating.User_ID = %s "
-    while 1:
-        try:
+
+    try:
             cursor2.execute(query, (usr_id,))
-            break
-        except Error as e:
-            time.sleep(0.1)
+
+    except Error as e:
+            return []
     rating_of_usr = cursor2.fetchall()
     usr_prefrence = []
     for r in rating_of_usr:
@@ -865,12 +899,12 @@ def get_media_recommendationv2(token_info):
                       "overview", "name", "is_movie", "genres","tmdb_id", "original_title", "original_name", "first_air_date"]
     usr_id = token_info.get('sub')
     query = f"SELECT *  from rating where rating.User_ID = %s "
-    while 1:
-        try:
+
+    try:
             cursor2.execute(query, (usr_id,))
-            break
-        except Error as e:
-            time.sleep(0.1)
+
+    except Error as e:
+            return []
     rating_of_usr = cursor2.fetchall()
     '''
     query = f"SELECT *  from rating where rating.User_ID = %s "
@@ -1082,7 +1116,7 @@ def get_media_recommendationv2(token_info):
                 info = get_movie_info(a["media_ID"])
                 t = get_movie_trailer(a["media_ID"])
                 info["trailer"] = t
-                info["Recommended_by"] = "Algorithm1"
+                info["Recommended_by"] = "Popularity"
                 info["is_movie"] = 1
                 info["tmdb_id"] = a["media_ID"]
                 info = filter_fields(info, fields_to_keep)
@@ -1107,7 +1141,7 @@ def get_media_recommendationv2(token_info):
                 t = get_tv_trailer(a["media_ID"])
                 info["trailer"] = t
                 info["title"] = info.get("name")
-                info["Recommended_by"] = "Algorithm1"
+                info["Recommended_by"] = "Popularity"
                 info["is_movie"] = 0
                 info["tmdb_id"] = a["media_ID"]
                 info = filter_fields(info, fields_to_keep)
@@ -1133,7 +1167,7 @@ def get_media_recommendationv2(token_info):
                 info = get_movie_info(a["id"])
                 t = get_movie_trailer(a["id"])
                 info["trailer"] = t
-                info["Recommended_by"] = "Algorithm2"
+                info["Recommended_by"] = "Key words"
                 info["is_movie"] = 1
                 info["tmdb_id"] = a["id"]
                 info = filter_fields(info, fields_to_keep)
@@ -1157,7 +1191,7 @@ def get_media_recommendationv2(token_info):
                 t = get_tv_trailer(a["id"])
                 info["trailer"] = t
                 info["title"] = info.get("name")
-                info["Recommended_by"] = "Algorithm2"
+                info["Recommended_by"] = "Key words"
                 info["is_movie"] = 0
                 info["tmdb_id"] = a["id"]
                 info = filter_fields(info, fields_to_keep)
