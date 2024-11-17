@@ -27,12 +27,23 @@ def get_prices():
     scraper = current_app.netflix_scraper
     # Call the get_latest_prices function
     data = scraper.get_latest_prices()
-    return jsonify(data)
+    return data
 
 
 @streaming_providers_routes.route('/api/netflix_prices', methods=['GET'])
 def get_netflix_prices():
     return get_prices()
+
+
+@streaming_providers_routes.route('/api/netflix_price_region', methods=['GET'])
+def get_netflix_prices_by_region():
+    data = request.json
+    if not data.get("region"):
+        return jsonify({"error": "No region provided"}), 400
+    scraper = current_app.netflix_scraper
+    region_code = data.get("region")
+    data = scraper.get_latest_price_by_region(region_code)
+    return jsonify(data)
 
 
 def media_page_streaming_services(content_id, content_type):
@@ -173,7 +184,7 @@ async def get_streaming_recommendation_data(watchlist_id):
 
             final_results[territory] = {
                 "providers": sorted_providers,
-                "best_providers": best_providers
+                "best_providers": best_providers,
             }
 
     return final_results, 200 if final_results else 404
@@ -196,4 +207,4 @@ def streaming_recommendation(token_info):
         watchlist_id = data['watchlist_id']
 
     result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id))
-    return jsonify(result), status_code
+    return jsonify(result, get_prices()), status_code

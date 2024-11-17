@@ -165,7 +165,30 @@ class NetflixPriceScraper:
             latest_record_id = cursor.fetchone()['id']
 
             # Get the prices associated with the latest record
-            cursor.execute('SELECT * FROM netflix_prices WHERE record_id = %s', (latest_record_id,))
+            cursor.execute('SELECT price, country_code FROM netflix_prices WHERE record_id = %s', (latest_record_id,))
+            prices = cursor.fetchall()
+
+            # Transform the list of prices into a dictionary with country_code as the key
+            price_dict = {price['country_code']: price['price'] for price in prices}
+
+            print("Successfully returning Netflix pricing records", price_dict)
+            return {"record_id": latest_record_id, "prices": price_dict}
+
+        except Exception as e:
+            print("Error:", str(e))
+            logger.error(f"Error fetching latest prices: {e}")
+            return {"error": "Unable to retrieve data"}
+
+    def get_latest_price_by_region(self, region_code):
+        """Retrieve the latest pricing data from the database."""
+        cursor = connection.cursor(dictionary=True)
+        try:
+            # Get the latest version
+            cursor.execute('SELECT id FROM price_records ORDER BY version DESC LIMIT 1')
+            latest_record_id = cursor.fetchone()['id']
+
+            # Get the prices associated with the latest record
+            cursor.execute('SELECT price FROM netflix_prices WHERE record_id = %s AND country_code = %s', (latest_record_id, region_code))
             prices = cursor.fetchall()
 
             return {"record_id": latest_record_id, "prices": prices}

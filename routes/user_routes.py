@@ -28,15 +28,15 @@ def login(token_info):
         main_watchlist_data, status = get_main_watchlist_data(user_id)
         if status != 200:
             main_watchlist_data = None
-        watchlist_streaming_data, status = asyncio.run(get_streaming_recommendation_data(watchlist_id=return_val))
+        '''watchlist_streaming_data, status = asyncio.run(get_streaming_recommendation_data(watchlist_id=return_val))
         if status != 200:
-            watchlist_streaming_data = None
+            watchlist_streaming_data = None'''
         region, status = get_user_region_db(user_id)
         # If no region is returned due a DB issue, return a default region of "US"
         if status != 200:
             region = "US"
         return jsonify({'main_watchlist_id': return_val, "main_watchlist": {"Content": main_watchlist_data, "ID":  return_val},
-                        "ratings_list": ratings_list, "watchlist_streaming_data": watchlist_streaming_data, "region": region}), 200
+                        "ratings_list": ratings_list, "region": region}), 200
 
 @user_routes.route('/api/user', methods=['GET'])
 @auth_required
