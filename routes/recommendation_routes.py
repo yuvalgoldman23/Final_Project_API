@@ -19,15 +19,12 @@ from mysql.connector import Error
 import time
 import spacy
 from itertools import combinations
-import mysql.connector
-import threading
 from sentence_transformers import SentenceTransformer, util
 from routes.streaming_providers_routes import media_page_streaming_services
 
 nlp = spacy.load("en_core_web_md")
 recommendation_routes = Blueprint('recommendation_routes', __name__)
 
-db_lock = threading.Lock()
 query = f"SELECT * FROM media_data "
 cursor2.execute(query)
 
@@ -327,7 +324,7 @@ def calculate_keyword_similarity(keywords):
         embedding2 = model.encode(kw2['name'])
         similarity = util.cos_sim(embedding1, embedding2)
         '''
-        if similarity >=0.80 and (kw1['name'] !=  kw2['name']):
+        if similarity >=0.80:
          similarities.append({
             "keyword1": kw1['name'],
             "keyword2": kw2['name'],
@@ -415,45 +412,28 @@ def get_tv_trailer(tv_id):
 
 def get_movies_by_keyword(keyword_id):
     """Fetch movies associated with the keyword ID."""
-    """Fetch movies associated with the keyword ID from pages 1 to 3."""
     url = f"https://api.themoviedb.org/3/keyword/{keyword_id}/movies"
     params = {
-        "api_key": api_key,
-        "page": 1
+        "api_key": api_key
     }
-    all_results = []
-
-    for page in range(1, 4):  # Loop through pages 1 to 3
-        params["page"] = page
-        response = requests.get(url, params=params)
-        if response.status_code == 200:
-            results = response.json().get('results', [])
-            all_results.extend(results)
-        else:
-            break  # Stop if there's an error in any of the pages
-
-    return all_results
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+     return response.json().get('results', [])
+    else:
+        return []
 
 def get_tv_shows_by_keyword(keyword_id):
-    """Fetch TV shows associated with the keyword ID from pages 1 to 3."""
-    url = "https://api.themoviedb.org/3/discover/tv"
+    """Fetch TV shows associated with the keyword ID."""
+    url = f"https://api.themoviedb.org/3/discover/tv"
     params = {
         "api_key": api_key,
-        "with_keywords": keyword_id,
-        "page": 1
+        "with_keywords": keyword_id
     }
-    all_results = []
-
-    for page in range(1, 4):  # Loop through pages 1 to 3
-        params["page"] = page
-        response = requests.get(url, params=params)
-        if response.status_code == 200:
-            results = response.json().get('results', [])
-            all_results.extend(results)
-        else:
-            break  # Stop if there's an error in any of the pages
-
-    return all_results
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+     return response.json().get('results', [])
+    else:
+        return []
 
 @recommendation_routes.route('/api/watchlists/recommendation2', methods=['GET'])
 def get_recommendation2():
@@ -500,27 +480,24 @@ def get_recommendation2():
 @recommendation_routes.route('/api/watchlists/recommendation', methods=['GET'])
 @auth_required
 def get_recommendation(token_info):
-  with db_lock:
-   print('gETING RECOMANDATION WATCH LIST')
    try:
     #data = request.json
     #usr_id = data.get('user_id')
     usr_id=token_info.get('sub')
 
-    cursor3 = connection.cursor(dictionary=True)
     check_query = """
                                  SELECT COALESCE(
                                      (SELECT ID 
                                       FROM watch_lists_names 
                                       WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
                                  """
-
-    try:
-             cursor3.execute(check_query, (usr_id,))
-
-    except Error as e:
-            {"Error:": "error"}, 404
-    result = cursor3.fetchone()
+    while 1:
+        try:
+             cursor2.execute(check_query, (usr_id,))
+             break
+        except Error as e:
+            time.sleep(0.1)
+    result = cursor2.fetchone()
 
     watchlist_id = result['watchlist_id']
     if watchlist_id == "0":
@@ -543,13 +520,10 @@ def get_recommendation(token_info):
     # Filter out None values and construct the result
     result = [movie_data for movie_data in movie_data_list if movie_data is not None]
 
-
-    cursor3.close()
     # Return the result as a dictionary
     return {"Content": result, "ID": watchlist_id}, 200
    except requests.exceptions.HTTPError:
-       #cursor.close()
-       cursor3.close()
+
        return {"Error:": "error"}, 404
 
 
@@ -673,8 +647,7 @@ def get_tv_count(api_key, keyword_id):
 @recommendation_routes.route('/api/recommendation_feedback', methods=['POST'])
 @auth_required
 def update_preferences(token_info):
- with db_lock:
-  try:
+ try:
 
     data = request.json
     usr_id = token_info.get('sub')
@@ -683,16 +656,12 @@ def update_preferences(token_info):
     liked = data.get("is_liked")
     algorithm = data.get("algorithm")
     x=[]
-    '''
     if not (session.get('usr_pref', None)):
          x = get_usr_prep(usr_id)
          x=update_user_prep_item(x,media_id,is_movie,liked,"feedback")
     else:
         x = update_user_prep_item(x, media_id, is_movie, liked, "feedback")
     session['usr_pref'] = x
-    '''
-    cursor = connection.cursor()
-    cursor2 = connection.cursor(dictionary=True)
     query = f"SELECT COALESCE(  (SELECT ID  FROM recommendation_info  WHERE media_id = %s AND is_movie = %s AND user_ID = %s), '0') AS feedback_id;"
     cursor2.execute(query, (media_id, is_movie, usr_id))
     feedback_id = cursor2.fetchall()
@@ -767,14 +736,11 @@ def update_preferences(token_info):
     result = [movie_data for movie_data in movie_data_list if movie_data is not None]
 
     # Return the result as a dictionary
-    cursor.close()
-    cursor2.close()
     return {"Content": result, "ID": watchlist_id}, 200
 
-  except requests.exceptions.HTTPError:
-     cursor.close()
-     cursor2.close()
-     return "0"
+ except requests.exceptions.HTTPError:
+
+  return "0"
 
 
 def filter_fields(data, fields):
@@ -821,12 +787,12 @@ def update_user_prep_item(usr_prep,tmdb_id,is_movie,is_liked,type):
 
 def get_usr_prep(usr_id):
     query = f"SELECT *  from rating where rating.User_ID = %s "
-
-    try:
+    while 1:
+        try:
             cursor2.execute(query, (usr_id,))
-
-    except Error as e:
-            return []
+            break
+        except Error as e:
+            time.sleep(0.1)
     rating_of_usr = cursor2.fetchall()
     usr_prefrence = []
     for r in rating_of_usr:
@@ -890,434 +856,211 @@ def get_usr_prep(usr_id):
         usr_prefrence.append(p)
     return usr_prefrence
 
+from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
+from collections import Counter
+
 @recommendation_routes.route('/api/Media_recommendation', methods=['GET'])
 @auth_required
 def get_media_recommendationv2(token_info):
-    x=[]
     print("starting recommendation process")
     fields_to_keep = ["title", "release_date", "vote_average", "Recommended_by", "trailer", "poster_path",
-                      "overview", "name", "is_movie", "genres","tmdb_id", "original_title", "original_name", "first_air_date"]
+                      "overview", "name", "is_movie", "genres", "tmdb_id", "original_title", "original_name",
+                      "first_air_date"]
     usr_id = token_info.get('sub')
-    query = f"SELECT *  from rating where rating.User_ID = %s "
 
+    # Batch fetch all user ratings at once
     try:
-            cursor2.execute(query, (usr_id,))
+        cursor2.execute("SELECT * FROM rating WHERE User_ID = %s", (usr_id,))
+        rating_of_usr = cursor2.fetchall()
+    except Error:
+        return []
 
-    except Error as e:
-            return []
-    rating_of_usr = cursor2.fetchall()
-    '''
-    query = f"SELECT *  from rating where rating.User_ID = %s "
-    while 1:
-     try:
-      cursor2.execute(query, (usr_id,))
-      break
-     except Error as e:
-         time.sleep(0.1)
-    rating_of_usr = cursor2.fetchall()
-    usr_prefrence = []
-    for r in rating_of_usr:
-        if r['is_movie'] == 0:
-            gen_str = get_tv_gen_by_id(api_key, r['media_ID'])
-            r['genres'] = gen_str
-            x=get_tv_keywords(api_key, r['media_ID'])
-            if "results" in x:
-             r['key_words'] = x["results"]
-        elif r['is_movie'] == 1:
-            gen_str = get_movie_gen_by_id(api_key, r['media_ID'])
-            x= get_movie_keywords(api_key, r['media_ID'])
-            if "results" in x:
-                r['key_words'] =x["results"]
-            r['genres'] = gen_str
-        p = {}
-        p["media_Id"] = r["media_ID"]
-        p['gnr_str'] = r['genres']
-        p['is_movie'] = r['is_movie']
-        if "key_words" in r:
-         p['key_words'] = r['key_words']
-        if r['rating'] >= 7:
-            p['is_liked'] = 1
-        else:
-            p['is_liked'] = 0
-        usr_prefrence.append(p)
-    # return usr_prefrence
-    query = f"SELECT *  from recommendation_info where user_ID = %s "
-    while 1:
-        try:
-            cursor2.execute(query, (usr_id,))
-            break
-        except Error as e:
-            time.sleep(0.1)
-    feedbackes= cursor2.fetchall()
-    for r in feedbackes:
-        if r['is_movie'] == 0:
-            gen_str = get_tv_gen_by_id(api_key, r['media_id'])
-            r['genres'] = gen_str
-            x = get_tv_keywords(api_key, r['media_id'])
-            if "results" in x:
-              r['key_words']= x["results"]
-        elif r['is_movie'] == 1:
-            gen_str = get_movie_gen_by_id(api_key, r['media_id'])
-            r['genres'] = gen_str
-            x = get_movie_keywords(api_key, r['media_id'])
-            if "results" in x:
-             r['key_words'] = x["results"]
-        p = {}
-        p["media_Id"] = r["media_id"]
-        p['gnr_str'] = r['genres']
-        p['is_movie'] = r['is_movie']
-        if "key_words" in r:
-         p['key_words'] = r['key_words']
-        if r['liked'] == 1:
-            p['is_liked'] = 1
-        else:
-            p['is_liked'] = 0
-        usr_prefrence.append(p)
-    '''
-    '''
-    if not  session.get('usr_pref',[])  :
-        x = get_usr_prep(usr_id)
-        session['usr_pref'] = x
-        print("not in session")
-    else:
-        print("in session")
+    # Get user preferences in batch instead of one by one
+    usr_prefrence = get_usr_prep(usr_id)
 
-
-    usr_prefrence= session.get('usr_pref',[])
-    '''
-    usr_prefrence= get_usr_prep(usr_id)
-    algo_recommendation = []
-    key_words=[]
-
+    # Extract and process keywords more efficiently
+    key_words = []
     for u in usr_prefrence:
-        if "key_words" in u:
-            if u["is_liked"] ==1:
-             for x in u["key_words"]:
-                key_words.append(x)
+        if "key_words" in u and u["is_liked"] == 1:
+            key_words.extend(u["key_words"])
 
+    # Use Counter for efficient counting
     counter = Counter((item['id'], item['name']) for item in key_words)
+    key_words = [{'id': id, 'name': name, 'count': count}
+                 for (id, name), count in counter.items()]
 
-    key_words= [{'id': id, 'name': name, 'count': count} for (id, name), count in counter.items()]
-    '''
-    for k in key_words:
-        movie_count = get_movie_count(api_key, k["id"])
-        tv_count = get_tv_count(api_key, k["id"])
-        k["results_count"] = movie_count + tv_count
-    '''
-    #key_words = [item for item in key_words if item['count'] > 1]
-    chosen_words= []
-    rating_len=len (rating_of_usr)
-    for k in key_words:
-        if k['count']>=rating_len/4:
-            #chosen_words.append({'id': k['id'], 'name' : k['name']})
-            chosen_words.append(k['id'])
-    filter_key_words=[ [item for item in key_words if item['id'] not in chosen_words]]
-    key_words=filter_key_words[0]
-    sim=calculate_keyword_similarity(key_words)
-    while len(sim) >1:
-     o1=sim[0]
-     if  o1['count1'] + o1['count2']  >=rating_len/4:
-         chosen_words.append(o1['id1'])
-         filtered_data = [item for item in sim if item['id1'] != o1['id1'] and item['id2'] != o1['id1']  and item['id1'] != o1['id2'] and item['id2'] != o1['id2'] ]
-         sim= filtered_data
-     else:
-          newcount=o1['count1'] + o1['count2']
-          filtered_data = [item for item in sim if item['id1'] != o1['id2'] and item['id2'] != o1['id2']]
-          sim = filtered_data
-          for s in sim:
-              if s["id1"]==  o1['id1']:
-                  s["count1"]= newcount
-              if s["id2"]==  o1['id1']:
-                  s["count2"] = newcount
-    movies_canidate=[]
-    tv_canidate=[]
-    for w in chosen_words:
-        movie_res= get_movies_by_keyword(w)
-        tv_res= get_tv_shows_by_keyword(w)
-        for m in movie_res:
-            m["is_movie"]=1
-            movies_canidate.append(m)
-        for t in tv_res:
-            t["is_movie"] = 1
-            tv_canidate.append(t)
-    algo_recommendation2=[]
-    while 1:
-        if len(algo_recommendation2)==5:
-            break
-        rnd= random.randint(1, 2)
-        if rnd ==1:
-            random_element = random.choice(movies_canidate)
-            can_id=random_element["id"]
-            exists_in_usr_pref = any(item["media_Id"] == can_id for item in usr_prefrence)
-            exist_in_algo= any(item["id"] == can_id for item in algo_recommendation2)
-            if exists_in_usr_pref or exist_in_algo:
-                continue
-            gen_str=""
-            for g in random_element['genre_ids']:
-                gen_str=gen_str +str(g)+ ','
-            can_like, can_dislike = check_compatibility_v2(usr_prefrence, gen_str)
-            if (can_like > can_dislike):
-                can_copy = copy.deepcopy(random_element)
-                can_copy["likelihood"] = can_like - can_dislike
-                can_copy["is_movie"] = 1
-                can_copy["Recommended_by"] = "Algorithm2"
-                algo_recommendation2.append(can_copy)
-        if rnd ==2:
-            random_element = random.choice(tv_canidate)
-            can_id=random_element["id"]
-            exists_in_usr_pref = any(item["media_Id"] == can_id for item in usr_prefrence)
-            exist_in_algo= any(item["id"] == can_id for item in algo_recommendation2)
-            if exists_in_usr_pref or exist_in_algo:
-                continue
-            gen_str=""
-            for g in random_element['genre_ids']:
-                gen_str=gen_str +str(g)+ ','
-            can_like, can_dislike = check_compatibility_v2(usr_prefrence, gen_str)
-            if (can_like > can_dislike):
-                can_copy = copy.deepcopy(random_element)
-                can_copy["likelihood"] = can_like - can_dislike
-                can_copy["is_movie"]=0
-                can_copy["Recommended_by"] = "Algorithm2"
-                algo_recommendation2.append(can_copy)
+    # Calculate threshold once
+    rating_threshold = len(rating_of_usr) / 4
 
+    # Filter keywords more efficiently
+    chosen_words = {k['id'] for k in key_words if k['count'] >= rating_threshold}
+    key_words = [item for item in key_words if item['id'] not in chosen_words]
 
-    while 1:
-        if len(algo_recommendation) == 5:
-            break
+    # Calculate similarities once
+    sim = calculate_keyword_similarity(key_words)
+
+    # Process similarities more efficiently
+    while len(sim) > 1:
+        o1 = sim[0]
+        if o1['count1'] + o1['count2'] >= rating_threshold:
+            chosen_words.add(o1['id1'])
+            sim = [item for item in sim if item['id1'] != o1['id1'] and item['id2'] != o1['id1']
+                   and item['id1'] != o1['id2'] and item['id2'] != o1['id2']]
+        else:
+            newcount = o1['count1'] + o1['count2']
+            sim = [item for item in sim if item['id1'] != o1['id2'] and item['id2'] != o1['id2']]
+            for s in sim:
+                if s["id1"] == o1['id1']:
+                    s["count1"] = newcount
+                if s["id2"] == o1['id1']:
+                    s["count2"] = newcount
+
+    # Batch fetch movie and TV candidates
+    movies_canidate = []
+    tv_canidate = []
+
+    # Use concurrent.futures for parallel API calls
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        # Submit all API calls at once
+        movie_futures = [executor.submit(get_movies_by_keyword, w) for w in chosen_words]
+        tv_futures = [executor.submit(get_tv_shows_by_keyword, w) for w in chosen_words]
+
+        # Collect results as they complete
+        for future in concurrent.futures.as_completed(movie_futures):
+            movie_res = future.result()
+            for m in movie_res:
+                m["is_movie"] = 1
+                movies_canidate.append(m)
+
+        for future in concurrent.futures.as_completed(tv_futures):
+            tv_res = future.result()
+            for t in tv_res:
+                t["is_movie"] = 0
+                tv_canidate.append(t)
+
+    # Process recommendations more efficiently
+    algo_recommendation2 = []
+    usr_pref_media_ids = {item["media_Id"] for item in usr_prefrence}
+
+    while len(algo_recommendation2) < 5:
+        candidates = movies_canidate if random.randint(1, 2) == 1 else tv_canidate
+        if not candidates:
+            continue
+
+        random_element = random.choice(candidates)
+        can_id = random_element["id"]
+
+        if can_id in usr_pref_media_ids or any(item["id"] == can_id for item in algo_recommendation2):
+            continue
+
+        gen_str = ','.join(str(g) for g in random_element['genre_ids'])
+        can_like, can_dislike = check_compatibility_v2(usr_prefrence, gen_str)
+
+        if can_like > can_dislike:
+            can_copy = copy.deepcopy(random_element)
+            can_copy["likelihood"] = can_like - can_dislike
+            can_copy["is_movie"] = 1 if random_element in movies_canidate else 0
+            can_copy["Recommended_by"] = "Algorithm2"
+            algo_recommendation2.append(can_copy)
+
+    # Process Algorithm1 recommendations similarly
+    algo_recommendation = []
+    while len(algo_recommendation) < 5:
         can = greedy_random_selection(recommendation_candidates)
-        can_gnr_str = ""
         can_media_id = can["media_ID"]
 
-        # Check if can_media_id exists in usr_pref
-        exists_in_usr_pref = any(item["media_Id"] == can_media_id for item in usr_prefrence)
-
-        if exists_in_usr_pref:
+        if can_media_id in usr_pref_media_ids:
             continue
-        if (can["is_movie"]):
-            can_gnr_str = get_movie_gen_by_id(api_key, can["media_ID"])
-        else:
-            can_gnr_str = get_tv_gen_by_id(api_key, can["media_ID"])
+
+        can_gnr_str = get_movie_gen_by_id(api_key, can_media_id) if can["is_movie"] else get_tv_gen_by_id(api_key,
+                                                                                                          can_media_id)
         can_like, can_dislike = check_compatibility_v2(usr_prefrence, can_gnr_str)
-        if (can_like > can_dislike):
+
+        if can_like > can_dislike:
             can_copy = copy.deepcopy(can)
             can_copy["likelihood"] = can_like - can_dislike
-            can_copy["Recommended_by"]= "Algorithm1"
+            can_copy["Recommended_by"] = "Algorithm1"
             algo_recommendation.append(can_copy)
+
+    # Combine and sort recommendations
+    join_algo = sorted(algo_recommendation + algo_recommendation2,
+                       key=lambda a: a["likelihood"], reverse=True)
+
+    # Process final results more efficiently using concurrent API calls
     return_arr = []
-    join_algo=[]
-    for a in algo_recommendation:
-        join_algo.append(a)
-    for a in algo_recommendation2:
-        join_algo.append(a)
-    join_algo=sorted(join_algo, key=lambda a: a["likelihood"], reverse=True)
-    for a in  join_algo:
-        if a["Recommended_by"] =="Algorithm1":
-            if a["is_movie"]:
-                info = get_movie_info(a["media_ID"])
-                t = get_movie_trailer(a["media_ID"])
-                info["trailer"] = t
-                info["Recommended_by"] = "Popularity"
-                info["is_movie"] = 1
-                info["tmdb_id"] = a["media_ID"]
-                info = filter_fields(info, fields_to_keep)
-                info["streaming_services"] = media_page_streaming_services(a["media_ID"], "movie")
-                info["user_id"] = "0"
-                info["user_rating"] = 0
-                info["video_links"] = []
-                info["item_id"] = "0"
-                info["list_id"] = None
-                info["tmdb_rating"] = info.get("vote_average")
-                if not info.get("poster_path"):
-                    info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
-                    info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
-                else:
-                    info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                        "poster_path"]
-                    info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
-                        "poster_path"]
-                return_arr.append(info)
-            else:
-                info = get_tv_show_info(a["media_ID"])
-                t = get_tv_trailer(a["media_ID"])
-                info["trailer"] = t
-                info["title"] = info.get("name")
-                info["Recommended_by"] = "Popularity"
-                info["is_movie"] = 0
-                info["tmdb_id"] = a["media_ID"]
-                info = filter_fields(info, fields_to_keep)
-                info["streaming_services"] = media_page_streaming_services(a["media_ID"], "tv")
-                info["user_id"] = "0"
-                info["user_rating"] = 0
-                info["video_links"] = []
-                info["release_date"] = info.get('first_air_date')
-                info["item_id"] = "0"
-                info["list_id"] = None
-                info["tmdb_rating"] = info.get("vote_average")
-                if not ("poster_path" in info):
-                    info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
-                    info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
-                else:
-                    info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                        "poster_path"]
-                    info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
-                        "poster_path"]
-                return_arr.append(info)
-        if a["Recommended_by"] == "Algorithm2":
-            if a["is_movie"]:
-                info = get_movie_info(a["id"])
-                t = get_movie_trailer(a["id"])
-                info["trailer"] = t
-                info["Recommended_by"] = "Key words"
-                info["is_movie"] = 1
-                info["tmdb_id"] = a["id"]
-                info = filter_fields(info, fields_to_keep)
-                info["streaming_services"] = media_page_streaming_services(a["id"], "movie")
-                info["user_id"] = "0"
-                info["user_rating"] = 0
-                info["video_links"] = []
-                info["item_id"] = "0"
-                info["list_id"] = None
-                info["tmdb_rating"] = info.get("vote_average")
-                # TODO missing the default path, doesn't protect against no image....
-                if not ("poster_path" in info):
-                    info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
-                    info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
-                else:
-                    info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + str(info["poster_path"])
-                    info["poster_path"] = "https://image.tmdb.org/t/p/original/" + str(info["poster_path"])
-                return_arr.append(info)
-            else:
-                info = get_tv_show_info(a["id"])
-                t = get_tv_trailer(a["id"])
-                info["trailer"] = t
-                info["title"] = info.get("name")
-                info["Recommended_by"] = "Key words"
-                info["is_movie"] = 0
-                info["tmdb_id"] = a["id"]
-                info = filter_fields(info, fields_to_keep)
-                info["streaming_services"] = media_page_streaming_services(a["id"], "tv")
-                info["user_id"] = "0"
-                info["user_rating"] = 0
-                info["video_links"] = []
-                info["release_date"] = info.get('first_air_date')
-                info["item_id"] = "0"
-                info["list_id"] = None
-                info["tmdb_rating"] = info.get("vote_average")
-                if not ("poster_path" in info):
-                    info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
-                    info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
-                else:
-                    info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + str(info[ "poster_path"])
-                    info["poster_path"] = "https://image.tmdb.org/t/p/original/" + str(info["poster_path"])
-                return_arr.append(info)
-        if len(return_arr) >9:
-         break
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        futures = []
+        for a in join_algo[:10]:  # Limit to top 10 recommendations
+            if a["Recommended_by"] == "Algorithm1":
+                media_id = a["media_ID"]
+            else:  # Algorithm2
+                media_id = a["id"]
+
+            is_movie = a["is_movie"]
+            futures.append(executor.submit(
+                process_media_info,
+                media_id,
+                is_movie,
+                a["Recommended_by"],
+                fields_to_keep
+            ))
+
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                result = future.result()
+                if result:
+                    return_arr.append(result)
+            except Exception as e:
+                print(f"Error processing media info: {e}")
+                continue
+
+            if len(return_arr) > 9:
+                break
+
     return return_arr
 
 
-    for a in algo_recommendation:
+def process_media_info(media_id, is_movie, recommended_by, fields_to_keep):
+    """Helper function to process individual media items"""
+    try:
+        if is_movie:
+            info = get_movie_info(media_id)
+            trailer = get_movie_trailer(media_id)
+            media_type = "movie"
+        else:
+            info = get_tv_show_info(media_id)
+            trailer = get_tv_trailer(media_id)
+            info["title"] = info.get("name")
+            media_type = "tv"
+            info["release_date"] = info.get('first_air_date')
 
-        if a["is_movie"]:
-            info = get_movie_info(a["media_ID"])
-            t = get_movie_trailer(a["media_ID"])
-            info["trailer"] = t
-            info["Recommended_by"] = "Algorithm1"
-            info["is_movie"] = 1
-            info["tmdb_id"]= a["media_ID"]
-            info = filter_fields(info, fields_to_keep)
-            info["streaming_services"] = media_page_streaming_services(a["media_ID"], "movie")
-            info["user_id"] = "0"
-            info["user_rating"] = 0
-            info["video_links"] = []
-            info["item_id"] = "0"
-            info["list_id"] = None
-            info["tmdb_rating"] = info.get("vote_average")
-            if not info["poster_path"]:
-                info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
-                info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
-            else:
-             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                "poster_path"]
-             info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
-                "poster_path"]
+        info["trailer"] = trailer
+        info["Recommended_by"] = "Popularity" if recommended_by == "Algorithm1" else "Key words"
+        info["is_movie"] = 1 if is_movie else 0
+        info["tmdb_id"] = media_id
+        info = filter_fields(info, fields_to_keep)
+
+        # Add common fields
+        info.update({
+            "streaming_services": media_page_streaming_services(media_id, media_type),
+            "user_id": "0",
+            "user_rating": 0,
+            "video_links": [],
+            "item_id": "0",
+            "list_id": None,
+            "tmdb_rating": info.get("vote_average")
+        })
+
+        # Handle poster paths
+        if not info.get("poster_path"):
+            info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
+            info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
         else:
-            info = get_tv_show_info(a["media_ID"])
-            t = get_tv_trailer(a["media_ID"])
-            info["trailer"] = t
-            info["title"] = info.get("name")
-            info["Recommended_by"] = "Algorithm1"
-            info["is_movie"] = 0
-            info["tmdb_id"] = a["media_ID"]
-            info = filter_fields(info, fields_to_keep)
-            info["streaming_services"] = media_page_streaming_services(a["media_ID"], "tv")
-            info["user_id"] = "0"
-            info["user_rating"] = 0
-            info["video_links"] = []
-            info["release_date"] = info.get('first_air_date')
-            info["item_id"] = "0"
-            info["list_id"] = None
-            info["tmdb_rating"] = info.get("vote_average")
-            if not ("poster_path" in info):
-                info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
-                info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
-            else:
-             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                "poster_path"]
-             info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
-                "poster_path"]
-        return_arr.append(info)
-    for a in algo_recommendation2:
-        if a["is_movie"]:
-            info = get_movie_info(a["id"])
-            t = get_movie_trailer(a["id"])
-            info["trailer"] = t
-            info["recommended_by"] = "Algorithm2"
-            info["is_movie"] = 1
-            info["tmdb_id"]= a["id"]
-            info = filter_fields(info, fields_to_keep)
-            info["streaming_services"] = media_page_streaming_services(a["id"], "movie")
-            info["user_id"] = "0"
-            info["user_rating"] = 0
-            info["video_links"] = []
-            info["item_id"] = "0"
-            info["list_id"] = None
-            info["tmdb_rating"] = info.get("vote_average")
-            # TODO missing the default path, doesn't protect against no image....
-            if not ("poster_path" in info):
-                info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
-                info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
-            else:
-             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                "poster_path"]
-             info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
-                "poster_path"]
-        else:
-            info = get_tv_show_info(a["id"])
-            t = get_tv_trailer(a["id"])
-            info["trailer"] = t
-            info["title"] = info.get("name")
-            info["Recommended_by"] = "Algorithm2"
-            info["is_movie"] = 0
-            info["tmdb_id"] = a["id"]
-            info = filter_fields(info, fields_to_keep)
-            info["streaming_services"] = media_page_streaming_services(a["id"], "tv")
-            info["user_id"] = "0"
-            info["user_rating"] = 0
-            info["video_links"] = []
-            info["release_date"] = info.get('first_air_date')
-            info["item_id"] = "0"
-            info["list_id"] = None
-            info["tmdb_rating"] = info.get("vote_average")
-            if not info.get("poster_path"):
-                info["poster_path"] = "https://i.postimg.cc/fRV5SqCb/default-movie.jpg"
-                info["small_poster_path"] = "https://i.postimg.cc/TPrVnzDT/default-movie-small.jpg"
-            else:
-             info["poster_path"] = "https://image.tmdb.org/t/p/original/" + info[
-                "poster_path"]
-             info["small_poster_path"] = "https://image.tmdb.org/t/p/w200/" + info[
-                "poster_path"]
-        return_arr.append(info)
-        if len(return_arr) >10:
-         break
-    #print("the return arr is" , return_arr)
-    return return_arr
+            info["small_poster_path"] = f"https://image.tmdb.org/t/p/w200/{info['poster_path']}"
+            info["poster_path"] = f"https://image.tmdb.org/t/p/original/{info['poster_path']}"
+
+        return info
+    except Exception as e:
+        print(f"Error processing media {media_id}: {e}")
+        return None
