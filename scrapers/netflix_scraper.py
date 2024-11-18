@@ -172,7 +172,7 @@ class NetflixPriceScraper:
             price_dict = {price['country_code']: price['price'] for price in prices}
 
             print("Successfully returning Netflix pricing records", price_dict)
-            return {"record_id": latest_record_id, "prices": price_dict}
+            return price_dict
 
         except Exception as e:
             print("Error:", str(e))
