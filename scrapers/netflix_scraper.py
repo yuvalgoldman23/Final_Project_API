@@ -118,13 +118,13 @@ class NetflixPriceScraper:
             cursor = connection.cursor()
 
             # Get the latest version
-            cursor.execute('SELECT MAX(version) FROM price_records')
+            cursor.execute('SELECT MAX(version) FROM price_records WHERE type = %s' , ('NF', ))
             latest_version = cursor.fetchone()[0] or 0
             new_version = latest_version + 1
 
             # Create a new record with timestamp and version
-            cursor.execute('INSERT INTO price_records (timestamp, version) VALUES (%s, %s)',
-                           (datetime.now(), new_version))
+            cursor.execute('INSERT INTO price_records (timestamp, version, type) VALUES (%s, %s, %s)',
+                           (datetime.now(), new_version, 'NF'))
             record_id = cursor.lastrowid
 
             # Insert all prices
@@ -141,14 +141,18 @@ class NetflixPriceScraper:
 
             # Keep only the latest two versions
             cursor.execute('''
-                DELETE FROM price_records
-                WHERE version NOT IN (
-                    SELECT version
-                    FROM price_records
-                    ORDER BY version DESC
-                    LIMIT 2
-                )
-            ''')
+                                DELETE FROM price_records
+                                WHERE type = %s
+                                AND version NOT IN (
+                                    SELECT version FROM (
+                                        SELECT version
+                                        FROM price_records
+                                        WHERE type = %s
+                                        ORDER BY version DESC
+                                        LIMIT 2
+                                    ) AS subquery
+                                )
+            ''', ('NF','NF'))
             connection.commit()
             logger.info("Old versions beyond the latest two deleted from database")
 
@@ -161,9 +165,8 @@ class NetflixPriceScraper:
         cursor = connection.cursor(dictionary=True)
         try:
             # Get the latest version
-            cursor.execute('SELECT id FROM price_records ORDER BY version DESC LIMIT 1')
+            cursor.execute('SELECT id FROM price_records WHERE type = %s ORDER BY version DESC LIMIT 1', ('NF',))
             latest_record_id = cursor.fetchone()['id']
-
             # Get the prices associated with the latest record
             cursor.execute('SELECT price, country_code FROM netflix_prices WHERE record_id = %s', (latest_record_id,))
             prices = cursor.fetchall()
@@ -184,7 +187,7 @@ class NetflixPriceScraper:
         cursor = connection.cursor(dictionary=True)
         try:
             # Get the latest version
-            cursor.execute('SELECT id FROM price_records ORDER BY version DESC LIMIT 1')
+            cursor.execute('SELECT id FROM price_records WHERE type = %s ORDER BY version DESC LIMIT 1', ('NF',))
             latest_record_id = cursor.fetchone()['id']
 
             # Get the prices associated with the latest record
@@ -217,7 +220,7 @@ class NetflixPriceScraper:
     def check_existing_data(self):
         """Check if there's any existing price data in the database."""
         cursor = connection.cursor()
-        cursor.execute("SELECT COUNT(*) FROM price_records")
+        cursor.execute("SELECT COUNT(*) FROM price_records WHERE type = %s" , ('NF',))
         count = cursor.fetchone()[0]
         return count > 0
 
@@ -246,16 +249,18 @@ class NetflixPriceScraper:
         if not self.check_existing_data():
             logger.info("No existing data found. Running initial scraping...")
             self.run_scraper()
+            return
         # Run the scheduled scan if the datat is over 'xx' hours old
         if self.is_data_stale():
             logger.info("Data is stale. Running initial scraping...")
             self.run_scraper()
+            return
 
 
     def is_data_stale(self):
         """Check if the latest data is older than 24 hours."""
         cursor = connection.cursor()
-        cursor.execute("SELECT MAX(timestamp) FROM price_records")
+        cursor.execute("SELECT MAX(timestamp) FROM price_records WHERE type = %s" , ('NF',))
         latest_timestamp = cursor.fetchone()[0]
         if not latest_timestamp:
             return True  # No data exists, so it's stale by default

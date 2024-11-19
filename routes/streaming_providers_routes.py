@@ -22,17 +22,24 @@ TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_ACCESS_TOKEN = os.getenv("TMDB_ACCESS_TOKEN")
 
 
-def get_prices():
+def get_netflix_prices():
     # Access the scraper instance from the app's context
     scraper = current_app.netflix_scraper
     # Call the get_latest_prices function
     data = scraper.get_latest_prices()
     return data
 
+def get_usa_prices():
+    # Access the scraper instance
+    scraper = current_app.usa_scraper
+    # Call the get_latest_prices function
+    data = scraper.get_latest_prices()
+    return data
+
 
 @streaming_providers_routes.route('/api/netflix_prices', methods=['GET'])
-def get_netflix_prices():
-    return get_prices()
+def get_netflix_prices_route():
+    return get_netflix_prices()
 
 
 @streaming_providers_routes.route('/api/netflix_price_region', methods=['GET'])
@@ -43,6 +50,13 @@ def get_netflix_prices_by_region():
     scraper = current_app.netflix_scraper
     region_code = data.get("region")
     data = scraper.get_latest_price_by_region(region_code)
+    return jsonify(data)
+
+
+@streaming_providers_routes.route('/api/usa_prices', methods=['GET'])
+def get_usa_prices_route():
+    scraper = current_app.usa_scraper
+    data = scraper.get_latest_prices()
     return jsonify(data)
 
 
@@ -207,4 +221,4 @@ def streaming_recommendation(token_info):
         watchlist_id = data['watchlist_id']
 
     result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id))
-    return jsonify(result, get_prices()), status_code
+    return jsonify(result, get_netflix_prices(), get_usa_prices()), status_code
