@@ -158,12 +158,11 @@ async def produce_streaming_providers_list_for_content(content_id, content_type)
         print("TMDB Error", error)
         return {}
 
-async def get_streaming_recommendation_data(watchlist_id):
+async def get_streaming_recommendation_data(watchlist):
     """
     This helper function processes the watchlist and gathers streaming provider data for all territories.
     It returns the result as a dictionary with sorted providers and the best providers for each territory.
     """
-    watchlist = get_watchlist_by_id(watchlist_id)
     territory_results = {}
 
     async def process_watchlist_item(watchlist_object):
@@ -242,6 +241,6 @@ def streaming_recommendation(token_info):
         watchlist_id = db_response[0].get('ID')
     else:
         watchlist_id = data['watchlist_id']
-
-    result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id))
+    watchlist = get_watchlist_by_id(watchlist_id)
+    result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist))
     return jsonify(result, get_netflix_prices(), get_usa_prices()), status_code
