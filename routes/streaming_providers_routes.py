@@ -82,17 +82,40 @@ def media_page_streaming_services(content_id, content_type):
 
 def merge_provider_counts(main_providers, new_providers):
     for provider_name, data in new_providers.items():
+        # Check if the provider name contains "epix" (case insensitive)
+        if 'epix' in provider_name.lower():
+            provider_name = "MGM Plus"  # Rename the provider to "MGM Plus"
+
         new_first_word = provider_name.split()[0]
         if not any(
                 new_first_word in existing_provider.split()[0] or
                 existing_provider.split()[0] in new_first_word
                 for existing_provider in main_providers.keys()
         ):
+            # New provider name, add to main providers
             main_providers[provider_name] = data
         else:
+            # If the provider already exists in main_providers, update it
             if provider_name in main_providers:
-                main_providers[provider_name]["count"] += data["count"]
-                main_providers[provider_name]["tmdb_ids"].extend(data["tmdb_ids"])
+                # Ensure uniqueness of TMDB IDs by creating a set of (tmdb_id, is_movie) tuples
+                existing_tmdb_ids = set(
+                    (tmdb_obj['tmdb_id'], tmdb_obj['is_movie']) for tmdb_obj in main_providers[provider_name]["tmdb_ids"]
+                )
+                new_tmdb_ids = set(
+                    (tmdb_obj['tmdb_id'], tmdb_obj['is_movie']) for tmdb_obj in data["tmdb_ids"]
+                )
+
+                # Combine the existing and new TMDB IDs (union ensures uniqueness)
+                combined_tmdb_ids = list(existing_tmdb_ids.union(new_tmdb_ids))
+
+                # Update the tmdb_ids list with the unique combined entries
+                main_providers[provider_name]["tmdb_ids"] = [
+                    {"tmdb_id": tmdb_id, "is_movie": is_movie} for tmdb_id, is_movie in combined_tmdb_ids
+                ]
+
+                # Update the count to reflect the number of unique TMDB IDs
+                main_providers[provider_name]["count"] = len(main_providers[provider_name]["tmdb_ids"])
+
                 # Ensure we keep the logo_path if it exists
                 if "logo_path" in data and data["logo_path"]:
                     main_providers[provider_name]["logo_path"] = data["logo_path"]
