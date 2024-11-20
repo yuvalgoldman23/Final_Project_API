@@ -1,10 +1,26 @@
 import mysql.connector
-
+import threading
+import logging
+lock = threading.Lock()
 #Returns true if the response is an error, false otherwise
+'''
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Log to console
+        logging.FileHandler("F:\\debug.log")  # Save logs to a file
+    ],
+    force=True  # Overwrite any existing logging configuration
+)
+'''
 def is_db_response_error(response):
+    #logging.debug(f"Checking response: {response}, Type: {type(response)}")
     if isinstance(response, mysql.connector.Error):
+        # logging.debug("Database error detected.")
         return True
     else:
+        #logging.debug("Database error didnt detected.")
         return False
 
 def isNegative(num):

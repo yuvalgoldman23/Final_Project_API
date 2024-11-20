@@ -1,21 +1,26 @@
 import mysql.connector
+from mysql.connector import pooling
 from mysql.connector import errorcode
+import threading
 
-connection = mysql.connector.connect(
+connection_pool = pooling.MySQLConnectionPool(
+    pool_name="mypool",
+    pool_size=20,
     host="127.0.0.1",
+    pool_reset_session=True,
     user="root",
-    password="password",
+    password="yanovsky",
     database="final_project_db",
-    connection_timeout=28800
+
 
 )
 
-# Check if connection is successful
-if connection.is_connected():
-    print("Connected to MySQL database")
-    cursor = connection.cursor()
-    cursor2 = connection.cursor(dictionary=True)
+semaphore = threading.Semaphore(10)
+global_lock = threading.Lock()
 
+# Check if connection is successful
+
+print("Connected to MySQL database")
 
 def handle_mysql_error(err):
     """Handle MySQL errors."""

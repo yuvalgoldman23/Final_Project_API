@@ -2,8 +2,8 @@
 
 from flask import Flask
 from flask_session import Session
-from routes import (watchlists_routes, feed_routes, streaming_providers_routes, user_routes, tmdb_routes,
-                    reviews_routes, ratings_routes, recommendation_routes, discover_routes)
+from routes import (watchlists_routes,  streaming_providers_routes, user_routes, tmdb_routes,
+                     ratings_routes, recommendation_routes, discover_routes)
 from flask_cors import CORS
 import asyncio
 from datetime import timedelta
@@ -26,11 +26,11 @@ CORS(app, supports_credentials=True ,resources={r"/*": {"origins": "http://local
 
 # Register blueprints for each set of routes
 app.register_blueprint(watchlists_routes)
-app.register_blueprint(feed_routes)
+#app.register_blueprint(feed_routes)
 app.register_blueprint(streaming_providers_routes)
 app.register_blueprint(user_routes)
 app.register_blueprint(tmdb_routes)
-app.register_blueprint(reviews_routes)
+#app.register_blueprint(reviews_routes)
 app.register_blueprint(ratings_routes)
 
 app.register_blueprint(recommendation_routes)
@@ -39,4 +39,4 @@ app.permanent_session_lifetime = timedelta(days=1)  # Set session lifetime
 Session.permanent = True  # Mark this session as permanent
 app.secret_key = 'your_fixed_secret_key'
 if __name__ == '__main__':
-    app.run(debug=True, )
+    app.run(debug=True,use_reloader=False )
