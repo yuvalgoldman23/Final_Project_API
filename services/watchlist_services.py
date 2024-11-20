@@ -225,7 +225,7 @@ def get_watchlist_by_id(watchlist_ID):
         #semaphore.release()
     """
     try:
-        with lock:  # Thread-safe access
+            # Thread-safe access
             # Fetch connection from pool
             connection2 = connection_pool.get_connection()
 
@@ -234,7 +234,28 @@ def get_watchlist_by_id(watchlist_ID):
                 connection2.reconnect()
 
             # Execute query
-            query = "SELECT * FROM final_project_db.watch_lists_objects WHERE Parent_ID = %s"
+            query = """
+            SELECT 
+                wlo.ID,
+                wlo.Parent_ID,
+                wlo.TMDB_ID,
+                wlo.User_ID,
+                wlo.is_movie,
+                CASE 
+                    WHEN ri.liked = 1 THEN 1
+                    ELSE 0
+                END AS is_liked
+            FROM 
+                watch_lists_objects wlo
+            LEFT JOIN 
+                recommendation_info ri
+            ON 
+                wlo.TMDB_ID = ri.media_id 
+                AND wlo.is_movie = ri.is_movie 
+                AND wlo.User_ID = ri.user_ID
+            WHERE 
+                wlo.Parent_ID = %s;
+            """
             with connection2.cursor(dictionary=True) as cursor4:
                 cursor4.execute(query, (watchlist_ID,))
                 results = cursor4.fetchall()

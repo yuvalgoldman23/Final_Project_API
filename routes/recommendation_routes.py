@@ -687,7 +687,7 @@ def update_preferences(token_info):
                                  SELECT COALESCE(
                                      (SELECT ID 
                                       FROM watch_lists_names 
-                                      WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
+                                      WHERE User_ID = %s AND Main = 1), 0) AS watchlist_id;
                                  """
     cursor4.execute(check_query, (usr_id,))
     result = cursor4.fetchone()
@@ -700,7 +700,7 @@ def update_preferences(token_info):
         if liked == 1 or liked == "1":
 
             # If no such watchlist exists (watchlist_id is 0), insert a new one
-            if watchlist_id[0] == '0':
+            if watchlist_id == '0':
                 insert_query = """
                                  INSERT INTO watch_lists_names ( User_ID, name, Main)
                                  VALUES ( %s, "Recommendation",2)                        
@@ -711,7 +711,7 @@ def update_preferences(token_info):
                                           SELECT COALESCE(
                                               (SELECT ID 
                                                FROM watch_lists_names 
-                                               WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
+                                               WHERE User_ID = %s AND Main = 1), 0) AS watchlist_id;
                                           """
             cursor4.execute(check_query, (usr_id,))
             result = cursor4.fetchone()
@@ -750,7 +750,9 @@ def update_preferences(token_info):
         {
             'TMDB_ID': item.get('TMDB_ID'),
             'is_movie': item.get('is_movie'),
-            'ID': item.get('ID')
+            'ID': item.get('ID'),
+            'is_liked': item.get('is_liked')
+
         }
         for item in watchlist_object
         if item.get('TMDB_ID') is not None

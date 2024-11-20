@@ -121,7 +121,7 @@ def get_main_watchlist(token_info):
 '''Async get main watchlist'''
 # TODO much faster, talk to Omer to understand how we can implement in the client
 # TODO use the same strategy to fetch the ratings list
-async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist_id, item_id):
+async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist_id, item_id,is_liked):
     movie_url = f"https://api.themoviedb.org/3/movie/{content_id}?api_key={api_key}&append_to_response=videos"
     tv_url = f"https://api.themoviedb.org/3/tv/{content_id}?api_key={api_key}&append_to_response=videos"
 
@@ -171,6 +171,7 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
 
             media_info['watchlist_item_id'] = item_id
 
+            media_info['is_liked']= is_liked
             #media_info['streaming_services'] = media_page_streaming_services(content_id, "movie") if is_movie else media_page_streaming_services(content_id, "tv")
             return media_info
         else:
@@ -181,7 +182,7 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
 async def fetch_movies(content_info, api_key, user_id, watchlist_id):
     async with aiohttp.ClientSession() as session:
         tasks = [
-            asyncio.create_task(fetch_movie(session, item['TMDB_ID'], item['is_movie'], api_key, user_id, watchlist_id, item['ID']))
+            asyncio.create_task(fetch_movie(session, item['TMDB_ID'], item['is_movie'], api_key, user_id, watchlist_id, item['ID'],item['is_liked']))
             for item in content_info
         ]
         return await asyncio.gather(*tasks)
@@ -212,7 +213,8 @@ def get_main_watchlist_data(user_id):
         {
             'TMDB_ID': item.get('TMDB_ID'),
             'is_movie': item.get('is_movie'),
-            'ID': item.get('ID')
+            'ID': item.get('ID'),
+            'is_liked': item.get("is_liked")
         }
         for item in watchlist_object
         if item.get('TMDB_ID') is not None
