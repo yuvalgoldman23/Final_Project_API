@@ -1,4 +1,5 @@
-from database_connector import connection, cursor, cursor2
+#from database_connector import connection, cursor, cursor2
+from database_connector import  connection_pool , semaphore
 import mysql.connector
 from mysql.connector import errorcode
 from routes import recommendation_routes as rr
@@ -20,6 +21,10 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
         
         session['usr_pref'] = y
         '''
+        connection2 = connection_pool.get_connection()
+
+        cursor = connection2.cursor()
+        cursor2 = connection2.cursor(dictionary=True)
         # Check if a rating already exists for the given user and media
         check_existing_query = "SELECT EXISTS(SELECT 1 FROM `final_project_db`.`rating` WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s)"
         cursor.execute(check_existing_query, (User_ID, Media_id, is_movie))
@@ -30,13 +35,13 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
             # Update the existing rating
             update_query = "UPDATE `final_project_db`.`rating` SET rating = %s WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s"
             cursor.execute(update_query, (rating, User_ID, Media_id, is_movie))
-            connection.commit()
+            connection2.commit()
             return f"Success updating rating for {Media_id}", 200
         else:
             # Insert a new rating
             insert_query = "INSERT INTO `final_project_db`.`rating`(`User_ID`,`Media_ID`,`rating`, `is_movie`) VALUES (%s,%s,%s,%s)"
             cursor.execute(insert_query, (User_ID, Media_id, rating, is_movie))
-            connection.commit()
+            connection2.commit()
 
             # Retrieve and return the ID of the newly inserted rating
             rating_id_query = "SELECT ID FROM `final_project_db`.`rating` WHERE User_ID = %s AND Media_ID = %s AND is_movie = %s ORDER BY ID DESC LIMIT 1"
@@ -60,10 +65,23 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
         else:
             print(err)
             return str(err), 404  # Convert error to string before returning
+    finally:
+
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'cursor2' in locals() and cursor2:
+            cursor2.close()
+        if 'connection2' in locals() and not (connection2 is None):
+            if connection2 and connection2.is_connected():
+                connection2.close()
 
 
 def get_rating_of_user(user_id, content_id, is_movie):
     try:
+        connection2 = connection_pool.get_connection()
+
+        cursor = connection2.cursor()
+        cursor2 = connection2.cursor(dictionary=True)
         if content_id:
 
             query = "SELECT * FROM `final_project_db`.`rating` WHERE User_ID = %s AND media_ID = %s AND is_movie = %s"
@@ -95,6 +113,14 @@ def get_rating_of_user(user_id, content_id, is_movie):
         else:
             print(err)
             return str(err), 404  # Convert error to string before returning
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'cursor2' in locals() and cursor2:
+            cursor2.close()
+        if 'connection2' in locals() and not (connection2 is None):
+            if connection2 and connection2.is_connected():
+                connection2.close()
 
 
 def Remove_rating(content_id, is_movie, User_ID):
@@ -106,9 +132,13 @@ def Remove_rating(content_id, is_movie, User_ID):
 
         y = rr.remove_user_prep_item(session.pop('usr_pref', None), Media_id, is_movie)
         '''
+        connection2 = connection_pool.get_connection()
+
+        cursor = connection2.cursor()
+        cursor2 = connection2.cursor(dictionary=True)
         delete_query = "DELETE FROM `final_project_db`.`rating` WHERE `media_ID`= %s AND is_movie = %s AND `User_ID`= %s;"
         cursor.execute(delete_query, (content_id, is_movie, User_ID))
-        connection.commit()
+        connection2.commit()
         if cursor.rowcount > 0:
             return f"Successfully removed {content_id}", 200
         else:
@@ -123,6 +153,14 @@ def Remove_rating(content_id, is_movie, User_ID):
         else:
             print(err)
             return str(err), 404  # Convert error to string before returning
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'cursor2' in locals() and cursor2:
+            cursor2.close()
+        if 'connection2' in locals() and not (connection2 is None):
+            if connection2 and connection2.is_connected():
+                connection2.close()
 
 
 def update_rating(content_id, is_movie, User_ID, new_rating):
@@ -132,12 +170,18 @@ def update_rating(content_id, is_movie, User_ID, new_rating):
         if not (session.get('usr_pref', None)):
             x = rr.get_usr_prep(User_ID)
             session['usr_pref'] = x
-        '''
+        
+        
         liked = 0
         if new_rating > 6:
             liked = 1
         y = rr.update_user_prep_item(session.pop('usr_pref', None), Media_id, is_movie, liked, "rating")
         session['usr_pref'] = y
+        '''
+        connection2 = connection_pool.get_connection()
+
+        cursor = connection2.cursor()
+        cursor2 = connection2.cursor(dictionary=True)
         select_query = "SELECT `rating` FROM `final_project_db`.`rating` WHERE `media_ID`= %s AND is_movie = %s AND `User_ID`= %s;"
         cursor.execute(select_query, (content_id, is_movie, User_ID))
         current_rating = cursor.fetchall()
@@ -152,7 +196,7 @@ def update_rating(content_id, is_movie, User_ID, new_rating):
         # Step 3: Proceed with the update
         update_query = "UPDATE `final_project_db`.`rating` SET `rating` = %s WHERE `media_ID`= %s AND is_movie = %s AND `User_ID`= %s;"
         cursor.execute(update_query, (new_rating, content_id, is_movie, User_ID))
-        connection.commit()
+        connection2.commit()
 
         if cursor.rowcount > 0:
             return f"Successfully updated {content_id}", 200
@@ -166,3 +210,11 @@ def update_rating(content_id, is_movie, User_ID, new_rating):
             return "Database does not exist", 404
         else:
             return str(err), 404  # Convert error to string before returning
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'cursor2' in locals() and cursor2:
+            cursor2.close()
+        if 'connection2' in locals() and not (connection2 is None):
+            if connection2 and connection2.is_connected():
+                connection2.close()
