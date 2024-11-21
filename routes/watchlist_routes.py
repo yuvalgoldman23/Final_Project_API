@@ -166,7 +166,6 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
                 else:
                     media_info['video_links'] = [data['videos']['results'][0]['key']]
                     for video in data['videos']['results']:
-                        print("passing through videos loop")
                         if video['type'].lower in {'trailer', 'official trailer', 'official teaser'} and video['official'] is True:
                             media_info['video_links'] = [video['key']]
                             break
