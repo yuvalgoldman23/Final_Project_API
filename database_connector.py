@@ -9,7 +9,7 @@ connection_pool = pooling.MySQLConnectionPool(
     host="127.0.0.1",
     pool_reset_session=True,
     user="root",
-    password="yanovsky",
+    password="password",
     database="final_project_db",
 
 

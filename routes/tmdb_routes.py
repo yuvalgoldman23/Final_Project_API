@@ -87,20 +87,19 @@ def get_tv_show_info(tv_show_id):
     else:
         data['poster_path'] = "https://image.tmdb.org/t/p/original" + data['poster_path']
         data['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + data['poster_path']
-    if data.get("videos") and data.get("videos").get("results"):
-        data["video_links"] = data["videos"]["results"]
-        if not data.get("video_links"):
-            data["video_links"] = []
+    # Video links
+    if data.get('videos'):
+        if not data['videos'].get('results'):
+            data['video_links'] = []
         else:
-            data["video_links"] = [data["videos"]["results"][0]["key"]]
-        '''
-        # First, check if there exists an 'official' video of type 'Trailer' from 'site' = YouTube
-        for link in data["video_links"]:
-            # TODO Currently we return a single video only, the first trailer found. Change the conditions/break if require something else
-            if link["type"] == "official" and link["site"] == "YouTube" and link["site"] == "Trailer":
-                data["video_links"] = link["key"]
-                break
-        '''
+            data['video_links'] = [data['videos']['results'][0]['key']]
+            for video in data['videos']['results']:
+                if video['type'].lower() in {'trailer', 'official trailer', 'official teaser'} and video[
+                    'official'] is True:
+                    data['video_links'] = [video['key']]
+                    break
+    else:
+        data['video_links'] = []
     data["recommendations"] = data.get('recommendations').get('results', [])
 
     data['streaming_services'] = media_page_streaming_services(tv_show_id, "tv")
@@ -148,20 +147,18 @@ def get_movie_info(movie_id):
     else:
         data['poster_path'] = "https://image.tmdb.org/t/p/original" + data['poster_path']
         data['small_poster_path'] = "https://image.tmdb.org/t/p/w200" + data['poster_path']
-    if "videos" in data and "results" in data["videos"] and len(data["videos"]["results"]) > 0:
-            data["video_links"] = data["videos"]["results"]
-            if not data["video_links"]:
-                data["video_links"] = []
+        # Video links
+        if data.get('videos'):
+            if not data['videos'].get('results'):
+                data['video_links'] = []
             else:
-                data["video_links"] = [data["videos"]["results"][0]["key"]]
-            '''
-            # First, check if there exists an 'official' video of type 'Trailer' from 'site' = YouTube
-            for link in data["video_links"]:
-                # TODO Currently we return a single video only, the first trailer found. Change the conditions/break if require something else
-                if link["type"] == "official" and link["site"] == "YouTube" and link["site"] == "Trailer":
-                    data["video_links"] = link["key"]
-                    break
-            '''
+                data['video_links'] = [data['videos']['results'][0]['key']]
+                for video in data['videos']['results']:
+                    if video['type'].lower() in {'trailer', 'official trailer', 'official teaser'} and video['official'] is True:
+                        data['video_links'] = [video['key']]
+                        break
+        else:
+            data['video_links'] = []
     if "credits" in data and "crew" in data["credits"]:
         # Find the director and the screenwriter in the crew data and assign as "director" and "screenwriter"
         data["director"] = next((person for person in data["credits"]["crew"] if person["job"] == "Director"), None)

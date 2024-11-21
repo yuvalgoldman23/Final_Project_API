@@ -75,7 +75,11 @@ def produce_client_ready_watchlist(watchlist_id, watchlist_items):
                 media_info['video_links'] = None
             else:
                 media_info['video_links'] = [tmdb_info['videos']['results'][0]['key']]
-            # TODO choose the right video to be here! e.g. trailer, youtube, official etc
+                for video in tmdb_info['videos']['results']:
+                    print("passing through videos loop")
+                    if video['type'] == 'trailer' and video['official'] is True:
+                        media_info['video_links'] = [video['key']]
+                        break
             #print("provided the following video link",  media_info['video_links'])
         else:
             media_info['video_links'] = None
@@ -119,8 +123,6 @@ def get_main_watchlist(token_info):
         return jsonify(client_ready_watchlist), 200
 
 '''Async get main watchlist'''
-# TODO much faster, talk to Omer to understand how we can implement in the client
-# TODO use the same strategy to fetch the ratings list
 async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist_id, item_id,is_liked):
     movie_url = f"https://api.themoviedb.org/3/movie/{content_id}?api_key={api_key}&append_to_response=videos"
     tv_url = f"https://api.themoviedb.org/3/tv/{content_id}?api_key={api_key}&append_to_response=videos"
@@ -158,9 +160,18 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
             media_info['tmdb_rating'] = data.get('vote_average')
 
             # Video links
-            videos = data.get('videos', {}).get('results', [])
-            # Changed code to be an array here
-            media_info['video_links'] = [videos[0].get('key')] if videos else None
+            if data.get('videos'):
+                if not data['videos'].get('results'):
+                    media_info['video_links'] = []
+                else:
+                    media_info['video_links'] = [data['videos']['results'][0]['key']]
+                    for video in data['videos']['results']:
+                        print("passing through videos loop")
+                        if video['type'].lower in {'trailer', 'official trailer', 'official teaser'} and video['official'] is True:
+                            media_info['video_links'] = [video['key']]
+                            break
+            else:
+                media_info['video_links'] = []
 
             # User Rating
             user_rating, status_code = rating_service.get_rating_of_user(user_id, content_id, is_movie)
@@ -172,7 +183,6 @@ async def fetch_movie(session, content_id, is_movie, api_key, user_id, watchlist
             media_info['watchlist_item_id'] = item_id
 
             media_info['is_liked']= is_liked
-            #media_info['streaming_services'] = media_page_streaming_services(content_id, "movie") if is_movie else media_page_streaming_services(content_id, "tv")
             return media_info
         else:
             print(f"Had an error returning the info for {content_id} with response of {response.status}")

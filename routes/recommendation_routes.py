@@ -124,8 +124,7 @@ class DNNModel(nn.Module):
 # Instantiate the model, loss function, and optimizer
 model = DNNModel()
 
-#model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
-model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
+model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
 trained_model = model
 
 
@@ -490,7 +489,7 @@ def get_recommendation2():
 
 @recommendation_routes.route('/api/watchlists/recommendation', methods=['GET'])
 @auth_required
-def get_recommendation(token_info):
+def get_recommendations_watchlist(token_info):
    try:
     #data = request.json
     #usr_id = data.get('user_id')
