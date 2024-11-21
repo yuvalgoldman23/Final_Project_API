@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 import re
 import pycountry
 import json
-from database_connector import connection, handle_mysql_error
+from database_connector import connection_pool , semaphore, handle_mysql_error
 import logging
 
 # Set up logging

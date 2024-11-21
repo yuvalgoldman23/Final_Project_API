@@ -9,12 +9,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation">
-      <change afterPath="$PROJECT_DIR$/scrapers/netflix_scraper.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scrapers/usa_scraper.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/streaming_providers_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/streaming_providers_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scrapers/netflix_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/scrapers/netflix_scraper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scrapers/usa_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/scrapers/usa_scraper.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -292,14 +289,6 @@
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
       <updated>1718181979884</updated>
-    </task>
-    <task id="LOCAL-00022" summary="Updated the content deletion as per request - now watchlist id is optional">
-      <option name="closed" value="true" />
-      <created>1719251241702</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1719251241702</updated>
     </task>
     <task id="LOCAL-00023" summary="Fixed a slight error in ratings where tv shows rating could not be added">
       <option name="closed" value="true" />
@@ -661,7 +650,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732194055883</updated>
     </task>
-    <option name="localTasksCounter" value="68" />
+    <task id="LOCAL-00068" summary="Added old files from netflix_prices branch">
+      <option name="closed" value="true" />
+      <created>1732207769942</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1732207769942</updated>
+    </task>
+    <option name="localTasksCounter" value="69" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

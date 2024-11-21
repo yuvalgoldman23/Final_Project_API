@@ -7,7 +7,7 @@ import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 import threading
-from database_connector import connection, handle_mysql_error
+from database_connector import connection_pool , semaphore, handle_mysql_error
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
