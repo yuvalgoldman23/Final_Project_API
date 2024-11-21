@@ -17,11 +17,12 @@ logger = logging.getLogger(__name__)
 class USAScraper:
     def __init__(self):
         self.scheduler = BackgroundScheduler()
-        self.setup_database()
+        #self.setup_database()
 
     def setup_database(self):
         """Initialize the database tables if they don't exist."""
         try:
+            connection = connection_pool.get_connection()
             cursor = connection.cursor()
 
             # Create price records table
@@ -46,8 +47,12 @@ class USAScraper:
 
             connection.commit()
             logger.info("Database tables initialized successfully")
+            connection.close()
+            semaphore.release()
 
         except Exception as e:
+            semaphore.release()
+            connection.close()
             logger.error(f"Error setting up database: {e}")
             handle_mysql_error(e)
 
@@ -135,7 +140,12 @@ class USAScraper:
 
                 # Find the cheapest price
                 cheapest_price = min(basic_ads_price, ad_free_price)
-                services.append(service_name)
+                if service_name.startswith("Amazon"):
+                    services.append("Amazon Prime Video")
+                elif service_name.startswith("Peacock"):
+                    services.append("Peacock Premium")
+                else:
+                    services.append(service_name)
                 prices.append(cheapest_price)
 
         if services:  # Check if data was found
@@ -147,6 +157,8 @@ class USAScraper:
     def save_to_database(self, services_prices):
         """Save scraped prices to database"""
         try:
+            semaphore.acquire()
+            connection = connection_pool.get_connection()
             cursor = connection.cursor()
 
             # Get the latest version
@@ -170,6 +182,18 @@ class USAScraper:
                     VALUES (%s, %s, %s)
                 ''', (record_id, normalized_service_name, row['Cheapest Price']))
 
+            # Insert the normalized name into the database
+            cursor.execute('''
+                INSERT INTO streaming_prices (record_id, "fuboTV", "75")
+                VALUES (%s, %s, %s)
+            ''', (record_id, normalized_service_name, row['Cheapest Price']))
+
+            # Insert the normalized name into the database
+            cursor.execute('''
+                INSERT INTO streaming_prices (record_id, "MGM ", "5.99")
+                VALUES (%s, %s, %s)
+            ''', (record_id, normalized_service_name, row['Cheapest Price']))
+
             # Commit the new version
             connection.commit()
             logger.info(f"Prices saved to database with version {new_version}")
@@ -190,14 +214,20 @@ class USAScraper:
                 )
             ''', ('US', 'US'))
             connection.commit()
+            connection.close()
+            semaphore.release()
             logger.info("Old versions beyond the latest two deleted from database")
 
         except Exception as e:
+            connection.close()
+            semaphore.release()
             logger.error(f"Error saving to database: {e}")
             handle_mysql_error(e)
 
     def get_latest_prices(self):
         """Retrieve the latest pricing data from the database."""
+        semaphore.acquire()
+        connection = connection_pool.get_connection()
         cursor = connection.cursor(dictionary=True)
         try:
             # Get the latest version
@@ -212,10 +242,15 @@ class USAScraper:
             # Transform the list of prices into a dictionary
             price_dict = {price['service_name']: price['cheapest_price'] for price in prices}
 
+            connection.close()
+            semaphore.release()
+
             print("Successfully returning streaming service pricing records", price_dict)
             return price_dict
 
         except Exception as e:
+            semaphore.release()
+            connection.close()
             print("Error:", str(e))
             logger.error(f"Error fetching latest prices: {e}")
             return {"error": "Unable to retrieve data"}
@@ -267,9 +302,13 @@ class USAScraper:
 
     def check_existing_data(self):
         """Check if there's any existing price data in the database."""
+        semaphore.acquire()
+        connection = connection_pool.get_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*) FROM streaming_prices")
         count = cursor.fetchone()[0]
+        connection.close()
+        semaphore.release()
         return count > 0
 
     def initialize_scraper(self, hours=24):

@@ -20,11 +20,12 @@ logger = logging.getLogger(__name__)
 class NetflixPriceScraper:
     def __init__(self):
         self.scheduler = BackgroundScheduler()
-        self.setup_database()
+        #self.setup_database()
 
     def setup_database(self):
         """Initialize the database tables if they don't exist."""
         try:
+            connection = connection_pool.get_connection()
             cursor = connection.cursor()
 
             # Create price records table
@@ -115,6 +116,8 @@ class NetflixPriceScraper:
 
     def save_to_database(self, country_prices):
         try:
+            semaphore.acquire()
+            connection = connection_pool.get_connection()
             cursor = connection.cursor()
 
             # Get the latest version
@@ -155,13 +158,18 @@ class NetflixPriceScraper:
             ''', ('NF','NF'))
             connection.commit()
             logger.info("Old versions beyond the latest two deleted from database")
-
+            connection.close()
+            semaphore.release()
         except Exception as e:
+            semaphore.release()
+            connection.close()
             logger.error(f"Error saving to database: {e}")
             handle_mysql_error(e)
 
     def get_latest_prices(self):
         """Retrieve the latest pricing data from the database."""
+        semaphore.acquire()
+        connection = connection_pool.get_connection()
         cursor = connection.cursor(dictionary=True)
         try:
             # Get the latest version
@@ -175,15 +183,20 @@ class NetflixPriceScraper:
             price_dict = {price['country_code']: price['price'] for price in prices}
 
             print("Successfully returning Netflix pricing records", price_dict)
+            connection.close()
+            semaphore.release()
             return price_dict
 
         except Exception as e:
             print("Error:", str(e))
+            semaphore.release()
+            connection.close()
             logger.error(f"Error fetching latest prices: {e}")
             return {"error": "Unable to retrieve data"}
 
     def get_latest_price_by_region(self, region_code):
         """Retrieve the latest pricing data from the database."""
+        connection = connection_pool.get_connection()
         cursor = connection.cursor(dictionary=True)
         try:
             # Get the latest version
@@ -219,9 +232,13 @@ class NetflixPriceScraper:
 
     def check_existing_data(self):
         """Check if there's any existing price data in the database."""
+        semaphore.acquire()
+        connection = connection_pool.get_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT COUNT(*) FROM price_records WHERE type = %s" , ('NF',))
         count = cursor.fetchone()[0]
+        connection.close()
+        semaphore.release()
         return count > 0
 
     def run_scraper(self):
@@ -259,9 +276,13 @@ class NetflixPriceScraper:
 
     def is_data_stale(self):
         """Check if the latest data is older than 24 hours."""
+        semaphore.acquire()
+        connection = connection_pool.get_connection()
         cursor = connection.cursor()
         cursor.execute("SELECT MAX(timestamp) FROM price_records WHERE type = %s" , ('NF',))
         latest_timestamp = cursor.fetchone()[0]
+        connection.close()
+        semaphore.release()
         if not latest_timestamp:
             return True  # No data exists, so it's stale by default
         return (datetime.now() - latest_timestamp).total_seconds() > 24 * 3600

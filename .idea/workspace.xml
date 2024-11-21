@@ -8,8 +8,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation">
+    <list default="true" id="90342082-95b0-4031-bb04-1bdd68f3efae" name="Changes" comment="Added correct imports for new database connectors to the scrapers">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/user_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scrapers/netflix_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/scrapers/netflix_scraper.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scrapers/usa_scraper.py" beforeDir="false" afterPath="$PROJECT_DIR$/scrapers/usa_scraper.py" afterDir="false" />
     </list>
@@ -289,14 +290,6 @@
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
       <updated>1718181979884</updated>
-    </task>
-    <task id="LOCAL-00023" summary="Fixed a slight error in ratings where tv shows rating could not be added">
-      <option name="closed" value="true" />
-      <created>1719327806150</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1719327806150</updated>
     </task>
     <task id="LOCAL-00024" summary="Fixed a slight error in ratings where tv shows rating could not be added, changd watchlist content addition to post">
       <option name="closed" value="true" />
@@ -658,7 +651,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732207769942</updated>
     </task>
-    <option name="localTasksCounter" value="69" />
+    <task id="LOCAL-00069" summary="Added correct imports for new database connectors to the scrapers">
+      <option name="closed" value="true" />
+      <created>1732208253127</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1732208253127</updated>
+    </task>
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -676,7 +677,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Updated readme to include new watchlist object, added an example" />
     <MESSAGE value="Fixed a bug happening causing errors in watchlists containing both movies and tv-shows" />
     <MESSAGE value="Added server handling of movie/tv shows posters. Still not added for cast" />
     <MESSAGE value="Updated &quot;large poster path&quot; to include the original poster as is" />
@@ -701,7 +701,8 @@
     <MESSAGE value="Added server side support for streaming services in the recommendation_routes.py ahead of client implementation" />
     <MESSAGE value="Fixed some video links to be the official trailer" />
     <MESSAGE value="Removed printing of videos" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed printing of videos" />
+    <MESSAGE value="Added correct imports for new database connectors to the scrapers" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added correct imports for new database connectors to the scrapers" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -720,7 +721,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1732206105048" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/streaming_providers_routes_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1732211470258" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/basic_server_user_api_py$Final_Project_API.coverage" NAME="Final_Project_API Coverage Results" MODIFIED="1728581461220" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
