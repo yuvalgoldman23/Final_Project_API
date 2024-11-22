@@ -10,7 +10,7 @@ To run the database, make sure you have a MySQL server program, such as MySQL Wo
 ```sql
 CREATE DATABASE final_project_DB;
 ```
-Now, download the following database file: https://drive.google.com/file/d/1jFzXS_ro0xRgpkI-i8vOAGr4AcKMBVh-/view?usp=drive_link
+Now, download the following database file: https://drive.google.com/file/d/11I0QLVWYOs4TFkwAz45uX4nhg1su1hZC/view?usp=drive_link
 
 Then, through the program, import the downloaded data into the SQL server.
 After finishing this step, you're all set to continue to setting up the Flask server.
