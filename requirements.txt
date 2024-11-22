@@ -1,19 +1,25 @@
-Flask
-requests
-python-dotenv
+Flask~=3.0.3
+requests~=2.26.0
+python-dotenv~=0.19.2
 PyJWT
 Flask-CORS
 Werkzeug
-mysql-connector-python
+mysql-connector-python~=8.4.0
 
 
-aiohttp
-mysql
-numpy
-torch
+aiohttp~=3.10.10
+mysql~=0.0.3
+numpy~=2.0.2
+torch~=2.4.1
 waitress
 
-spacy
+spacy~=3.8.2
 
 sentence_transformers
 
+
+geoip2~=4.8.0
+pandas~=2.2.3
+beautifulsoup4~=4.12.3
+APScheduler~=3.10.4
+pycountry~=24.6.1

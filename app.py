@@ -8,6 +8,8 @@ from flask_cors import CORS
 import asyncio
 from datetime import timedelta
 import database_connector
+from scrapers.netflix_scraper import NetflixPriceScraper
+from scrapers.usa_scraper import USAScraper
 
 app = Flask(__name__)
 '''
@@ -22,6 +24,16 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=60)
 Session(app)'''
 
 CORS(app, supports_credentials=True ,resources={r"/*": {"origins": "http://localhost:3000"}})
+
+# Scrapers setup
+netflix_scraper = NetflixPriceScraper()
+netflix_scraper.initialize_netflix_scraper(hours=24)
+# Setting up a global instance of the netflix scraper
+app.netflix_scraper = netflix_scraper
+# Setting up the usa scraper as a global instance
+usa_scraper = USAScraper()
+usa_scraper.initialize_scraper(hours=24)
+app.usa_scraper = usa_scraper
 
 
 # Register blueprints for each set of routes

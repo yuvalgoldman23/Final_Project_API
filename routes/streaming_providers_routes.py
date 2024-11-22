@@ -2,7 +2,7 @@ import time
 import asyncio
 
 import requests
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 import utils
 from auth import auth_required
 from dotenv import load_dotenv
@@ -20,6 +20,44 @@ streaming_providers_routes = Blueprint('streaming_providers_routes', __name__)
 # Fetch TMDB API key from environment variables
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 TMDB_ACCESS_TOKEN = os.getenv("TMDB_ACCESS_TOKEN")
+
+
+def get_netflix_prices():
+    # Access the scraper instance from the app's context
+    scraper = current_app.netflix_scraper
+    # Call the get_latest_prices function
+    data = scraper.get_latest_prices()
+    return data
+
+def get_usa_prices():
+    # Access the scraper instance
+    scraper = current_app.usa_scraper
+    # Call the get_latest_prices function
+    data = scraper.get_latest_prices()
+    return data
+
+
+@streaming_providers_routes.route('/api/netflix_prices', methods=['GET'])
+def get_netflix_prices_route():
+    return get_netflix_prices()
+
+
+@streaming_providers_routes.route('/api/netflix_price_region', methods=['GET'])
+def get_netflix_prices_by_region():
+    data = request.json
+    if not data.get("region"):
+        return jsonify({"error": "No region provided"}), 400
+    scraper = current_app.netflix_scraper
+    region_code = data.get("region")
+    data = scraper.get_latest_price_by_region(region_code)
+    return jsonify(data)
+
+
+@streaming_providers_routes.route('/api/usa_prices', methods=['GET'])
+def get_usa_prices_route():
+    scraper = current_app.usa_scraper
+    data = scraper.get_latest_prices()
+    return jsonify(data)
 
 
 def media_page_streaming_services(content_id, content_type):
@@ -44,17 +82,40 @@ def media_page_streaming_services(content_id, content_type):
 
 def merge_provider_counts(main_providers, new_providers):
     for provider_name, data in new_providers.items():
+        # Check if the provider name contains "epix" (case insensitive)
+        if 'epix' in provider_name.lower():
+            provider_name = "MGM Plus"  # Rename the provider to "MGM Plus"
+
         new_first_word = provider_name.split()[0]
         if not any(
                 new_first_word in existing_provider.split()[0] or
                 existing_provider.split()[0] in new_first_word
                 for existing_provider in main_providers.keys()
         ):
+            # New provider name, add to main providers
             main_providers[provider_name] = data
         else:
+            # If the provider already exists in main_providers, update it
             if provider_name in main_providers:
-                main_providers[provider_name]["count"] += data["count"]
-                main_providers[provider_name]["tmdb_ids"].extend(data["tmdb_ids"])
+                # Ensure uniqueness of TMDB IDs by creating a set of (tmdb_id, is_movie) tuples
+                existing_tmdb_ids = set(
+                    (tmdb_obj['tmdb_id'], tmdb_obj['is_movie']) for tmdb_obj in main_providers[provider_name]["tmdb_ids"]
+                )
+                new_tmdb_ids = set(
+                    (tmdb_obj['tmdb_id'], tmdb_obj['is_movie']) for tmdb_obj in data["tmdb_ids"]
+                )
+
+                # Combine the existing and new TMDB IDs (union ensures uniqueness)
+                combined_tmdb_ids = list(existing_tmdb_ids.union(new_tmdb_ids))
+
+                # Update the tmdb_ids list with the unique combined entries
+                main_providers[provider_name]["tmdb_ids"] = [
+                    {"tmdb_id": tmdb_id, "is_movie": is_movie} for tmdb_id, is_movie in combined_tmdb_ids
+                ]
+
+                # Update the count to reflect the number of unique TMDB IDs
+                main_providers[provider_name]["count"] = len(main_providers[provider_name]["tmdb_ids"])
+
                 # Ensure we keep the logo_path if it exists
                 if "logo_path" in data and data["logo_path"]:
                     main_providers[provider_name]["logo_path"] = data["logo_path"]
@@ -97,12 +158,11 @@ async def produce_streaming_providers_list_for_content(content_id, content_type)
         print("TMDB Error", error)
         return {}
 
-async def get_streaming_recommendation_data(watchlist_id):
+async def get_streaming_recommendation_data(watchlist):
     """
     This helper function processes the watchlist and gathers streaming provider data for all territories.
     It returns the result as a dictionary with sorted providers and the best providers for each territory.
     """
-    watchlist = get_watchlist_by_id(watchlist_id)
     territory_results = {}
 
     async def process_watchlist_item(watchlist_object):
@@ -160,7 +220,7 @@ async def get_streaming_recommendation_data(watchlist_id):
 
             final_results[territory] = {
                 "providers": sorted_providers,
-                "best_providers": best_providers
+                "best_providers": best_providers,
             }
 
     return final_results, 200 if final_results else 404
@@ -181,6 +241,6 @@ def streaming_recommendation(token_info):
         watchlist_id = db_response[0].get('ID')
     else:
         watchlist_id = data['watchlist_id']
-
-    result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist_id))
-    return jsonify(result), status_code
+    watchlist = get_watchlist_by_id(watchlist_id)
+    result, status_code = asyncio.run(get_streaming_recommendation_data(watchlist))
+    return jsonify(result, get_netflix_prices(), get_usa_prices()), status_code
