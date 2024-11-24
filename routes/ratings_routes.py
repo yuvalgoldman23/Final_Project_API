@@ -207,7 +207,8 @@ def get_ratings_list_data(user_id):
 
     # Filter out None values and construct the result
     result = [movie_data for movie_data in movie_data_list if movie_data is not None]
-
+    for r in result:
+        r["is_rating"]=True
     # Return the result as a dictionary
     return {"Content": result}, 200
 

@@ -3,12 +3,13 @@ from database_connector import  connection_pool , semaphore
 import mysql.connector
 from mysql.connector import errorcode
 from routes import recommendation_routes as rr
-
+import safety
 from flask import jsonify ,session
 
 def Add_rating(User_ID, Media_id, rating, is_movie):
     print("starting add rating process")
-
+    if(not(safety.is_only_numbers_or_letters(User_ID) and safety.is_only_numbers_or_letters(Media_id) and safety.is_only_numbers_or_letters(rating) and safety.is_one_or_zero(is_movie))):
+        return []
     try:
         '''
         if not (session.get('usr_pref', None)):
@@ -77,6 +78,8 @@ def Add_rating(User_ID, Media_id, rating, is_movie):
 
 
 def get_rating_of_user(user_id, content_id, is_movie):
+    if not ((safety.is_only_numbers_or_letters(content_id) or content_id==None) and (safety.is_one_or_zero(is_movie) or is_movie ==None)):
+        return []
     try:
         connection2 = connection_pool.get_connection()
 
@@ -125,13 +128,8 @@ def get_rating_of_user(user_id, content_id, is_movie):
 
 def Remove_rating(content_id, is_movie, User_ID):
     try:
-        '''
-        if not (session.get('usr_pref', None)):
-            x = rr.get_usr_prep(User_ID)
-            session['usr_pref'] = x
-
-        y = rr.remove_user_prep_item(session.pop('usr_pref', None), Media_id, is_movie)
-        '''
+        if not (safety.is_only_numbers_or_letters(content_id) and safety.is_one_or_zero(is_movie) ):
+            return []
         connection2 = connection_pool.get_connection()
 
         cursor = connection2.cursor()
@@ -165,19 +163,8 @@ def Remove_rating(content_id, is_movie, User_ID):
 
 def update_rating(content_id, is_movie, User_ID, new_rating):
     try:
-        # Step 1: Check the current rating
-        '''
-        if not (session.get('usr_pref', None)):
-            x = rr.get_usr_prep(User_ID)
-            session['usr_pref'] = x
-        
-        
-        liked = 0
-        if new_rating > 6:
-            liked = 1
-        y = rr.update_user_prep_item(session.pop('usr_pref', None), Media_id, is_movie, liked, "rating")
-        session['usr_pref'] = y
-        '''
+        if (safety.is_only_numbers_or_letters(content_id) and safety.is_one_or_zero(is_movie) and safety.is_only_numbers_or_letters(new_rating)):
+            return []
         connection2 = connection_pool.get_connection()
 
         cursor = connection2.cursor()

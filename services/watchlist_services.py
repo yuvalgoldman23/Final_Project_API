@@ -5,12 +5,15 @@ from mysql.connector import errorcode
 from flask import jsonify
 import threading
 
+import safety
 lock = threading.Lock()
 
 def add_watch_list_item(userID, Media_TMDB_ID, Parent_ID, is_movie):
+    if not (safety.is_only_numbers_or_letters(userID) and safety.is_only_numbers_or_letters(Media_TMDB_ID)and safety.is_only_numbers_or_letters(Parent_ID) and safety.is_one_or_zero(is_movie)):
+        return []
     print("in db-side add watchlist item")
     watchlist_id_query = "SELECT ID FROM final_project_db.watch_lists_objects WHERE User_ID = %s AND TMDB_ID = %s AND Parent_ID = %s AND is_movie = %s ORDER BY ID DESC LIMIT 1"
-    semaphore.acquire()
+
     try:
         select_query = "SELECT COUNT(*) FROM final_project_db.watch_lists_objects WHERE TMDB_ID = %s AND Parent_ID = %s AND User_ID = %s AND is_movie = %s"
         connection2 = connection_pool.get_connection()
@@ -47,11 +50,12 @@ def add_watch_list_item(userID, Media_TMDB_ID, Parent_ID, is_movie):
             cursor4.close()
         if 'connection2' in locals() and connection2.is_connected():
             connection2.close()
-        semaphore.release()
+
 
 
 def remove_watch_list_item(userID, watch_list_id, content_id):
-    semaphore.acquire()
+    if not (safety.is_only_numbers_or_letters(userID) and safety.is_only_numbers_or_letters(watch_list_id) and safety.is_only_numbers_or_letters(content_id)):
+        return []
     try:
         delete_query = "DELETE FROM final_project_db.watch_lists_objects WHERE Parent_ID= %s AND TMDB_ID = %s AND User_ID= %s ;"
         connection2 = connection_pool.get_connection()
@@ -77,12 +81,13 @@ def remove_watch_list_item(userID, watch_list_id, content_id):
             cursor4.close()
         if 'connection2' in locals() and connection2.is_connected():
             connection2.close()
-        semaphore.release()
+
 
 
 def create_watchlist(user_id, name, Is_main):
     watchlist_id_query = "SELECT ID FROM final_project_db.watch_lists_names WHERE User_ID = %s ORDER BY ID DESC LIMIT 1"
-    semaphore.acquire()
+    if not (safety.is_only_numbers_or_letters(user_id),safety.is_only_numbers_or_letters(name),safety.is_one_or_zero(Is_main)):
+        return []
     try:
         connection2 = connection_pool.get_connection()
         #cursor3 = connection2.cursor()
@@ -125,11 +130,12 @@ def create_watchlist(user_id, name, Is_main):
             cursor4.close()
         if 'connection2' in locals() and connection2.is_connected():
             connection2.close()
-        semaphore.release()
+
 
 
 def remove_watch_list(userID, watch_list_id):
-    semaphore.acquire()
+    if not (safety.is_only_numbers_or_letters(userID) and safety.is_only_numbers_or_letters(watch_list_id)):
+        return []
     try:
         connection2 = connection_pool.get_connection()
         #cursor3 = connection2.cursor()
@@ -159,11 +165,11 @@ def remove_watch_list(userID, watch_list_id):
             cursor4.close()
         if 'connection2' in locals() and connection2.is_connected():
             connection2.close()
-        semaphore.release()
+
 
 
 def get_user_watchlists(user_id):
-    semaphore.acquire()
+
     try:
 
         query = "SELECT * FROM final_project_db.watch_lists_names WHERE User_ID = %s"
@@ -184,46 +190,12 @@ def get_user_watchlists(user_id):
             cursor4.close()
         if 'connection2' in locals() and connection2.is_connected():
             connection2.close()
-        semaphore.release()
+
 
 def get_watchlist_by_id(watchlist_ID):
-    """
+    if not(safety.is_only_numbers_or_letters(watchlist_ID)):
+         return []
 
-    :param watchlist_ID:
-    :return: Returns the content objects (tmdb_id's and is_movie) of the provided watchlist id
-
-
-    #semaphore.acquire()
-    try:
-       with lock:
-        query = "SELECT * FROM final_project_db.watch_lists_objects WHERE Parent_ID = %s FOR SHARE "
-        connection2 = connection_pool.get_connection()
-        #cursor3 = connection2.cursor()
-        if not connection2.is_connected():
-            connection2.reconnect()
-        cursor4 = connection2.cursor(dictionary=True)
-
-        '''
-        with connection2.cursor(dictionary=True) as cursor2:
-            cursor2.execute(query, (watchlist_ID,))
-            results = cursor2.fetchall()
-            return results
-        '''
-        cursor4.execute(query, (watchlist_ID,))
-        results = cursor4.fetchall()
-        return results
-    except mysql.connector.Error as err:
-
-        return handle_mysql_error(err)
-    finally:
-        if 'cursor3' in locals() and cursor3:
-            cursor3.close()
-        if 'cursor4' in locals() and cursor4:
-            cursor4.close()
-        if 'connection2' in locals() and connection2.is_connected():
-            connection2.close()
-        #semaphore.release()
-    """
     try:
             # Thread-safe access
             # Fetch connection from pool
@@ -273,7 +245,9 @@ def get_watchlist_by_id(watchlist_ID):
 
 
 def get_watchlist_details_only(watchlist_ID):
-    semaphore.acquire()
+    if not (safety.is_only_numbers_or_letters(watchlist_ID)):
+        return []
+
     try:
         query = "SELECT * FROM final_project_db.watch_lists_names WHERE ID = %s"
         connection2 = connection_pool.get_connection()
@@ -296,12 +270,12 @@ def get_watchlist_details_only(watchlist_ID):
             cursor4.close()
         if 'connection2' in locals() and connection2.is_connected():
             connection2.close()
-        semaphore.release()
+
 
 
 def get_main_watchlist(user_ID):
 
-    semaphore.acquire()
+
     try:
         query = "SELECT * FROM final_project_db.watch_lists_names WHERE User_ID = %s AND Main = 1"
         connection2 = connection_pool.get_connection()
@@ -322,7 +296,7 @@ def get_main_watchlist(user_ID):
             cursor4.close()
         if 'connection2' in locals() and connection2.is_connected():
             connection2.close()
-        semaphore.release()
+
 
 def handle_mysql_error(err):
     if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
@@ -345,7 +319,8 @@ def check_content_in_watchlist(watchlist_ID, content_id, is_movie):
     :param is_movie: Boolean flag indicating if the content is a movie.
     :return: True if the content exists in the watchlist, otherwise False.
     """
-    semaphore.acquire()
+    if not (safety.is_only_numbers_or_letters(watchlist_ID)and safety.is_only_numbers_or_letters(content_id) and safety.is_one_or_zero(is_movie)):
+        return []
     try:
         query = """
         SELECT COUNT(*) AS count 
@@ -368,5 +343,5 @@ def check_content_in_watchlist(watchlist_ID, content_id, is_movie):
             cursor4.close()
         if 'connection2' in locals() and connection2.is_connected():
             connection2.close()
-        semaphore.release()
+
 

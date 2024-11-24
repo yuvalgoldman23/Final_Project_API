@@ -22,7 +22,7 @@ import spacy
 from itertools import combinations
 from sentence_transformers import SentenceTransformer, util
 from routes.streaming_providers_routes import media_page_streaming_services
-
+import safety
 nlp = spacy.load("en_core_web_md")
 recommendation_routes = Blueprint('recommendation_routes', __name__)
 
@@ -124,7 +124,8 @@ class DNNModel(nn.Module):
 # Instantiate the model, loss function, and optimizer
 model = DNNModel()
 
-model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
+#model.load_state_dict(torch.load("trained_modelv1_66_correct.pth"))
+model.load_state_dict(torch.load("C:\\Users\\Yanovsky\\Documents\\GitHub\\Final_Project_API\\trained_modelv1_66_correct.pth"))
 trained_model = model
 
 
@@ -261,6 +262,9 @@ def check_compatibility_v2(usr_preperense, cannidate):
         propabillity = trained_model(mat_tensor)
         p1 = propabillity[0, 0].item()
         p2 = propabillity[0, 1].item()
+        if p["type"]=="feedback":
+            p1=p1*0.3
+            p2=p2*0.3
         if p['is_liked']:
             like = like + p1
             dislike = dislike + p2
@@ -445,47 +449,7 @@ def get_tv_shows_by_keyword(keyword_id):
     else:
         return []
 
-@recommendation_routes.route('/api/watchlists/recommendation2', methods=['GET'])
-def get_recommendation2():
-   try:
-    data = request.json
-    usr_id = data.get('user_id')
 
-    check_query = """
-                                 SELECT COALESCE(
-                                     (SELECT ID 
-                                      FROM watch_lists_names 
-                                      WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
-                                 """
-    cursor2.execute(check_query, (usr_id,))
-    result = cursor2.fetchone()
-
-    watchlist_id = result['watchlist_id']
-    if watchlist_id == "0":
-        return {"Content": [], "ID": "0"}, 200
-    watchlist_object = ws.get_watchlist_by_id(watchlist_id)
-    if utils.is_db_response_error(watchlist_object):
-        return {'Error': str(watchlist_object)}, 404
-    extracted_watchlist = [
-        {
-            'TMDB_ID': item.get('TMDB_ID'),
-            'is_movie': item.get('is_movie'),
-            'ID': item.get('ID')
-        }
-        for item in watchlist_object
-        if item.get('TMDB_ID') is not None
-    ]
-    # Fetch movies asynchronously, passing both TMDB_ID and is_movie
-    movie_data_list = rt.run_async(rt.fetch_movies, extracted_watchlist, api_key, usr_id, watchlist_id)
-
-    # Filter out None values and construct the result
-    result = [movie_data for movie_data in movie_data_list if movie_data is not None]
-
-    # Return the result as a dictionary
-    return {"Content": result, "ID": watchlist_id}, 200
-   except requests.exceptions.HTTPError:
-
-       return {"Error:": "error"}, 404
 
 @recommendation_routes.route('/api/watchlists/recommendation', methods=['GET'])
 @auth_required
@@ -545,97 +509,7 @@ def get_recommendations_watchlist(token_info):
                connection2.close()
 
 
-@recommendation_routes.route('/api/recommendation_feedbackv2', methods=['GET'])
-def update_prefrences2():
-   try:
-    data = request.json
-    usr_id = data.get('user_id')
-    is_movie= data.get('is_movie')
-    media_id= data.get('media_id')
-    liked = data.get("is_liked")
-    algorithm = data.get("algorithm")
-    query = f"SELECT COALESCE(  (SELECT ID  FROM recommendation_info  WHERE media_id = %s AND is_movie = %s AND user_ID = %s), '0') AS feedback_id;"
-    cursor2.execute(query, (media_id, is_movie, usr_id))
-    feedback_id = cursor2.fetchall()
-    check_query = """
-                             SELECT COALESCE(
-                                 (SELECT ID 
-                                  FROM watch_lists_names 
-                                  WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
-                             """
-    cursor2.execute(check_query, (usr_id,))
-    result = cursor2.fetchone()
 
-    watchlist_id = result['watchlist_id']
-
-    if  feedback_id[0]["feedback_id"] == '0':
-        insert_query = "  INSERT INTO recommendation_info (media_id, is_movie, user_ID, liked, Algorithm)  VALUES (%s, %s, %s, %s, %s)   "
-        cursor.execute(insert_query, (media_id, is_movie, usr_id, liked, algorithm))
-        if liked == 1 or liked == "1":
-
-
-            # If no such watchlist exists (watchlist_id is 0), insert a new one
-            if  watchlist_id[0] == '0':
-
-                insert_query = """
-                             INSERT INTO watch_lists_names ( User_ID, name, Main)
-                             VALUES ( %s, "Recommendation",2)                        
-                             """
-                cursor.execute(insert_query, (usr_id,))
-                connection.commit()
-            check_query = """
-                                      SELECT COALESCE(
-                                          (SELECT ID 
-                                           FROM watch_lists_names 
-                                           WHERE User_ID = %s AND Main = 2), 0) AS watchlist_id;
-                                      """
-            cursor2.execute(check_query, (usr_id,))
-            result = cursor2.fetchone()
-
-            watchlist_id = result['watchlist_id']
-            insert_query = """
-                         INSERT INTO watch_lists_objects ( Parent_ID, TMDB_ID, user_ID, is_movie)
-                         VALUES ( %s, %s, %s, %s);
-                         """
-            cursor.execute(insert_query, (watchlist_id, media_id, usr_id, int(is_movie)))
-
-    else:
-
-        update_query = "  UPDATE recommendation_info  SET liked = %s, Algorithm = %s  WHERE ID = %s  "
-        cursor.execute(update_query, (liked, algorithm, feedback_id[0]["feedback_id"]))
-    connection.commit()
-    watchlist_object = ws.get_watchlist_by_id(watchlist_id)
-    if utils.is_db_response_error(watchlist_object):
-        return {'Error': str(watchlist_object)}, 404
-
-    # Extract TMDB IDs and is_movie from the watchlist object
-    extracted_watchlist = [
-        {
-            'TMDB_ID': item.get('TMDB_ID'),
-            'is_movie': item.get('is_movie'),
-            'ID': item.get('ID')
-        }
-        for item in watchlist_object
-        if item.get('TMDB_ID') is not None
-    ]
-
-    if watchlist_id == "0":
-        return {"Content": [], "ID": "0"}, 200
-    api_key = '2e07ce71cc9f7b5a418b824c87bcb76f'
-
-    # Fetch movies asynchronously, passing both TMDB_ID and is_movie
-    movie_data_list = rt.run_async(rt.fetch_movies, extracted_watchlist, api_key, usr_id, watchlist_id)
-
-    # Filter out None values and construct the result
-    result = [movie_data for movie_data in movie_data_list if movie_data is not None]
-
-    # Return the result as a dictionary
-    return {"Content": result, "ID": watchlist_id}, 200
-
-
-   except requests.exceptions.HTTPError:
-
-       return {"Error:": "error"}, 404
 
 # Function to get the total count of movies for the keyword
 def get_movie_count(api_key, keyword_id):
@@ -665,7 +539,7 @@ def get_tv_count(api_key, keyword_id):
 @recommendation_routes.route('/api/recommendation_feedback', methods=['POST'])
 @auth_required
 def update_preferences(token_info):
- semaphore.acquire()
+
  try:
 
     data = request.json
@@ -674,6 +548,8 @@ def update_preferences(token_info):
     media_id = data.get('media_id')
     liked = data.get("is_liked")
     algorithm = data.get("algorithm")
+    if not (safety.is_one_or_zero(is_movie)) and (safety.is_one_or_zero(liked)) and  (safety.is_only_numbers_or_letters(media_id) ) and (safety.is_only_numbers_or_letters(algorithm)):
+        return "0"
     connection2 = connection_pool.get_connection()
 
     cursor3 = connection2.cursor()
@@ -780,7 +656,7 @@ def update_preferences(token_info):
      if 'connection2' in locals() and not(connection2 is None) :
          if connection2 and connection2.is_connected():
           connection2.close()
-     semaphore.release()
+
 
 
 def filter_fields(data, fields):
@@ -918,6 +794,8 @@ def get_media_recommendationv2(token_info):
     data = request.json
     media_type= data.get("media_type")
     algorithm_choice= data.get("algorithm_choice")
+    if not (safety.is_only_numbers_or_letters(media_type) and (safety.is_only_numbers_or_letters(algorithm_choice))):
+        return []
     query = f"SELECT *  from rating where rating.User_ID = %s "
     connection2 = connection_pool.get_connection()
     cursor3 = connection2.cursor()
@@ -943,7 +821,10 @@ def get_media_recommendationv2(token_info):
     result = cursor4.fetchone()  # Fetch the result as a dictionary
     key_words_sum = result['key_words_sum']
     popularity_sum = result['popularity_sum']
-    algo_pref = 1 if key_words_sum > popularity_sum else 0
+    if  key_words_sum==None or popularity_sum==None:
+        algo_pref=3
+    else:
+     algo_pref = 1 if key_words_sum > popularity_sum else 0
     algo_recommendation = []
     key_words=[]
 
@@ -969,6 +850,7 @@ def get_media_recommendationv2(token_info):
         if k['count']>=rating_len/4:
             #chosen_words.append({'id': k['id'], 'name' : k['name']})
             chosen_words.append(k['id'])
+
     filter_key_words=[ [item for item in key_words if item['id'] not in chosen_words]]
     key_words=filter_key_words[0]
     sim=calculate_keyword_similarity(key_words)
@@ -989,6 +871,12 @@ def get_media_recommendationv2(token_info):
                   s["count2"] = newcount
     movies_canidate=[]
     tv_canidate=[]
+    if chosen_words==[]:
+        chosen_words.append(16)
+        #chosen_words.append(174244)
+        #chosen_words.append(703)
+        chosen_words.append(322942)
+
     for w in chosen_words:
         movie_res= get_movies_by_keyword(w)
         tv_res= get_tv_shows_by_keyword(w)
@@ -1020,6 +908,8 @@ def get_media_recommendationv2(token_info):
                 can_copy["likelihood"] = can_like - can_dislike
                 if algo_pref ==1:
                     can_copy["likelihood"]= can_copy["likelihood"]*1.1
+
+
                 can_copy["is_movie"] = 1
                 can_copy["Recommended_by"] = "Algorithm2"
                 algo_recommendation2.append(can_copy)
