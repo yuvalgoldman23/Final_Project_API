@@ -333,11 +333,7 @@ def calculate_keyword_similarity(keywords):
         doc2 = nlp(kw2['name'])
         similarity = doc1.similarity(doc2)
 
-        '''
-        embedding1 = model.encode(kw1['name'])
-        embedding2 = model.encode(kw2['name'])
-        similarity = util.cos_sim(embedding1, embedding2)
-        '''
+
         if similarity >=0.80:
          similarities.append({
             "keyword1": kw1['name'],
@@ -894,9 +890,10 @@ def get_media_recommendationv2(token_info):
         if rnd ==1 and media_type != "tvshows"  :
             random_element = random.choice(movies_canidate)
             can_id=random_element["id"]
-            exists_in_usr_pref = any(item["media_Id"] == can_id for item in usr_prefrence)
-            exist_in_algo2= any(item["id"] == can_id for item in algo_recommendation2)
-            exist_in_list= any(item["TMDB_ID"] == can_id for item in list_of_usr)
+            can_id_str=str(can_id)
+            exists_in_usr_pref = any(item["media_Id"] == can_id_str for item in usr_prefrence)
+            exist_in_algo2= any(item["id"] == can_id_str for item in algo_recommendation2)
+            exist_in_list= any(item["TMDB_ID"] == can_id_str for item in list_of_usr)
             if exists_in_usr_pref or exist_in_algo2 or exist_in_list:
                 continue
             gen_str=""
@@ -916,10 +913,11 @@ def get_media_recommendationv2(token_info):
         if rnd ==2 and media_type != "movies":
             random_element = random.choice(tv_canidate)
             can_id=random_element["id"]
-            exists_in_usr_pref = any(item["media_Id"] == can_id for item in usr_prefrence)
-            exist_in_algo= any(item["id"] == can_id for item in algo_recommendation2)
-            exist_in_list = any(item["TMDB_ID"] == can_id for item in list_of_usr)
-            if exists_in_usr_pref or exist_in_algo or exist_in_list:
+            can_id_str = str(can_id)
+            exists_in_usr_pref = any(item["media_Id"] == can_id_str for item in usr_prefrence)
+            exist_in_algo2= any(item["id"] == can_id_str for item in algo_recommendation2)
+            exist_in_list = any(item["TMDB_ID"] == can_id_str for item in list_of_usr)
+            if exists_in_usr_pref or exist_in_algo2 or exist_in_list:
                 continue
             gen_str=""
             for g in random_element['genre_ids']:
@@ -941,11 +939,11 @@ def get_media_recommendationv2(token_info):
         can = greedy_random_selection(recommendation_candidates)
         can_gnr_str = ""
         can_media_id = can["media_ID"]
-
+        can_media_id_str= str(can_media_id)
         # Check if can_media_id exists in usr_pref
-        exists_in_usr_pref = any(item["media_Id"] == can_media_id for item in usr_prefrence)
-        exist_in_algo= any(item["media_ID"] == can_media_id for item in algo_recommendation)
-        exist_in_list = any(item["TMDB_ID"] == can_media_id for item in list_of_usr)
+        exists_in_usr_pref = any(item["media_Id"] == can_media_id_str for item in usr_prefrence)
+        exist_in_algo= any(item["media_ID"] == can_media_id_str for item in algo_recommendation)
+        exist_in_list = any(item["TMDB_ID"] == can_media_id_str for item in list_of_usr)
 
         if exists_in_usr_pref or exist_in_list or exist_in_algo:
             continue
