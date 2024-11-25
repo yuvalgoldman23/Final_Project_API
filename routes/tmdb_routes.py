@@ -253,7 +253,7 @@ def get_actor_combine_credits(actor_id):
     # Combine crew credits and consolidate roles
     combined_crew_credits = {}
     for credit in tv_credit_crew + movie_credit_crew:
-        key = (credit['id'], credit['media_kind'], credit['title'])
+        key = (credit['id'], credit['media_kind'], credit['title'] if credit.get('title') else credit.get('original_title'))
         if key not in combined_crew_credits:
             combined_crew_credits[key] = credit
         else:
