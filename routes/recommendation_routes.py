@@ -895,9 +895,9 @@ def get_media_recommendationv2(token_info):
             random_element = random.choice(movies_canidate)
             can_id=random_element["id"]
             exists_in_usr_pref = any(item["media_Id"] == can_id for item in usr_prefrence)
-            exist_in_algo= any(item["id"] == can_id for item in algo_recommendation2)
+            exist_in_algo2= any(item["id"] == can_id for item in algo_recommendation2)
             exist_in_list= any(item["TMDB_ID"] == can_id for item in list_of_usr)
-            if exists_in_usr_pref or exist_in_algo or exist_in_list:
+            if exists_in_usr_pref or exist_in_algo2 or exist_in_list:
                 continue
             gen_str=""
             for g in random_element['genre_ids']:
@@ -944,8 +944,10 @@ def get_media_recommendationv2(token_info):
 
         # Check if can_media_id exists in usr_pref
         exists_in_usr_pref = any(item["media_Id"] == can_media_id for item in usr_prefrence)
-        exist_in_list = any(item["TMDB_ID"] == can_id for item in list_of_usr)
-        if exists_in_usr_pref:
+        exist_in_algo= any(item["media_ID"] == can_media_id for item in algo_recommendation)
+        exist_in_list = any(item["TMDB_ID"] == can_media_id for item in list_of_usr)
+
+        if exists_in_usr_pref or exist_in_list or exist_in_algo:
             continue
         is_movie= can["is_movie"]
         if is_movie==1 and media_type == "tvshows":
